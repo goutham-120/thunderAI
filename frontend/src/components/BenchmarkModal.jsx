@@ -3,7 +3,9 @@ import {
   X, 
   CheckCircle2, 
   Award, 
-  ArrowUpRight
+  ArrowUpRight,
+  AlertTriangle,
+  Info
 } from 'lucide-react';
 import { 
   LineChart, 
@@ -51,13 +53,13 @@ export default function BenchmarkModal({
             </div>
             <div>
               <h2 className="text-base font-bold flex items-center gap-2">
-                Scientific Verification & Benchmark Metrics
-                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono font-bold border border-emerald-500/30">
-                  +47% CSI Gain
+                Scientific Verification & Target Benchmark Matrix
+                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 font-mono font-bold border border-blue-500/30">
+                  Target Specs
                 </span>
               </h2>
               <p className="text-xs text-slate-300">
-                Rigorous meteorological comparison against operational IMD baselines
+                Architectural performance targets comparison against operational baselines
               </p>
             </div>
           </div>
@@ -69,39 +71,47 @@ export default function BenchmarkModal({
           </button>
         </div>
 
+        {/* Validation Pending Banner */}
+        <div className="bg-amber-950/40 border-b border-amber-500/30 px-6 py-2.5 flex items-center space-x-3 text-amber-300 text-xs">
+          <Info className="w-4 h-4 shrink-0 text-amber-400" />
+          <span>
+            <strong>Validation Status:</strong> Validation pending real historical labelled dataset. Metrics below represent reference architectural targets pending offline evaluation against real multi-year historical archives.
+          </span>
+        </div>
+
         {/* Content */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
           {/* Key Metric Takeaways */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="p-3.5 rounded-xl bg-blue-950/40 border border-blue-500/30">
               <span className="text-[10px] font-bold text-blue-300 uppercase tracking-wider block">
-                Critical Success Index (CSI @ 30m)
+                Target CSI (@ 30m)
               </span>
               <div className="flex items-baseline space-x-2 mt-1">
                 <span className="text-2xl font-bold font-mono text-cyan-400">0.68</span>
                 <span className="text-xs text-emerald-400 font-bold flex items-center">
-                  <ArrowUpRight className="w-3.5 h-3.5" /> +47% vs Optical Flow
+                  <ArrowUpRight className="w-3.5 h-3.5" /> +47% Target Gain
                 </span>
               </div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
               <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider block">
-                Probability of Detection (POD @ 60m)
+                Target POD (@ 60m)
               </span>
               <div className="flex items-baseline space-x-2 mt-1">
                 <span className="text-2xl font-bold font-mono text-emerald-400">0.73</span>
-                <span className="text-xs text-slate-400 font-mono">73% Hits</span>
+                <span className="text-xs text-slate-400 font-mono">Target 73% Hits</span>
               </div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-purple-950/40 border border-purple-500/30">
               <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider block">
-                False Alarm Ratio (FAR @ 60m)
+                Target FAR (@ 60m)
               </span>
               <div className="flex items-baseline space-x-2 mt-1">
                 <span className="text-2xl font-bold font-mono text-purple-400">0.26</span>
-                <span className="text-xs text-emerald-400 font-bold">Cut by 46%</span>
+                <span className="text-xs text-emerald-400 font-bold">Target 26% FAR</span>
               </div>
             </div>
           </div>
@@ -109,7 +119,7 @@ export default function BenchmarkModal({
           {/* Chart Section */}
           <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/60">
             <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3">
-              CSI (Critical Success Index) vs. Forecast Lead Time (0 - 180 Minutes)
+              CSI (Critical Success Index) Target Curves vs. Forecast Lead Time (0 - 180 Minutes)
             </h3>
             <div className="h-56 w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -131,7 +141,7 @@ export default function BenchmarkModal({
           {/* Detailed Metric Table */}
           <div>
             <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2">
-              Comprehensive Meteorological Evaluation Matrix
+              Target Meteorological Verification Matrix
             </h3>
             <div className="overflow-x-auto rounded-xl border border-slate-800">
               <table className="w-full text-left text-xs">
@@ -172,7 +182,7 @@ export default function BenchmarkModal({
 
         {/* Footer */}
         <div className="px-6 py-3 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-          <span>Evaluated on 45 Unseen Severe Storm Episodes across India</span>
+          <span>Reference Targets Matrix (Offline Historical Benchmark Pending Data Availability)</span>
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold transition-all border border-slate-700"

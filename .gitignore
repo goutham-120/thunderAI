@@ -32,3 +32,10 @@ wheels/
 .DS_Store
 Thumbs.db
 *.log
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*
+!.env.example
+

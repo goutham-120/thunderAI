@@ -1,15 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import { 
-  Layers, 
-  Zap, 
-  Radio, 
-  Navigation, 
-  Sparkles, 
-  Crosshair,
   Maximize2,
   Plus,
-  Minus
+  Minus,
+  Crosshair,
+  Zap
 } from 'lucide-react';
 import { REGION_CONFIGS } from './WeatherMapConfig';
 
@@ -27,7 +23,7 @@ export default function WeatherMap({
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [baseMapStyle, setBaseMapStyle] = useState('satellite');
+  const [baseMapStyle, setBaseMapStyle] = useState('map');
 
   const currentRegion = REGION_CONFIGS[selectedRegion] || REGION_CONFIGS['Andhra Pradesh & Telangana'];
 
@@ -71,10 +67,10 @@ export default function WeatherMap({
 
     const drawCanopy = (cx, cy, rMax) => {
       const grad = ctx.createRadialGradient(cx, cy, 5, cx, cy, rMax);
-      grad.addColorStop(0.0, 'rgba(255, 255, 255, 0.85)'); // Cold White Top (-70C)
-      grad.addColorStop(0.3, 'rgba(216, 180, 254, 0.7)');  // Deep Purple
-      grad.addColorStop(0.6, 'rgba(96, 165, 250, 0.45)');  // Blue Anvil
-      grad.addColorStop(0.85, 'rgba(30, 58, 138, 0.25)'); // Cirrus Fringe
+      grad.addColorStop(0.0, 'rgba(255, 255, 255, 0.85)');
+      grad.addColorStop(0.3, 'rgba(216, 180, 254, 0.7)');
+      grad.addColorStop(0.6, 'rgba(96, 165, 250, 0.45)');
+      grad.addColorStop(0.85, 'rgba(30, 58, 138, 0.25)');
       grad.addColorStop(1.0, 'rgba(0, 0, 0, 0.0)');
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -87,7 +83,7 @@ export default function WeatherMap({
     return canvas.toDataURL();
   };
 
-  // --- 3. Thunderstorm AI Risk Heatmap (Crimson/Orange) ---
+  // --- 3. Thunderstorm AI Risk Heatmap ---
   const generateAIRiskImageDataUrl = (horizon) => {
     const canvas = document.createElement('canvas');
     canvas.width = 256; canvas.height = 256;
@@ -97,9 +93,9 @@ export default function WeatherMap({
 
     const drawRisk = (cx, cy, rMax) => {
       const grad = ctx.createRadialGradient(cx, cy, 5, cx, cy, rMax);
-      grad.addColorStop(0.0, 'rgba(239, 68, 68, 0.85)'); // 90%+ Red
-      grad.addColorStop(0.45, 'rgba(249, 115, 22, 0.6)'); // 70% Orange
-      grad.addColorStop(0.75, 'rgba(234, 179, 8, 0.35)'); // 40% Yellow
+      grad.addColorStop(0.0, 'rgba(239, 68, 68, 0.85)');
+      grad.addColorStop(0.45, 'rgba(249, 115, 22, 0.6)');
+      grad.addColorStop(0.75, 'rgba(234, 179, 8, 0.35)');
       grad.addColorStop(1.0, 'rgba(59, 130, 246, 0.0)');
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -112,7 +108,7 @@ export default function WeatherMap({
     return canvas.toDataURL();
   };
 
-  // --- 4. Lightning Risk Heatmap (Electric Violet / Amber) ---
+  // --- 4. Lightning Risk Heatmap ---
   const generateLightningRiskImageDataUrl = (horizon) => {
     const canvas = document.createElement('canvas');
     canvas.width = 256; canvas.height = 256;
@@ -122,9 +118,9 @@ export default function WeatherMap({
 
     const drawLightRisk = (cx, cy, rMax) => {
       const grad = ctx.createRadialGradient(cx, cy, 3, cx, cy, rMax);
-      grad.addColorStop(0.0, 'rgba(245, 158, 11, 0.9)');  // Amber
-      grad.addColorStop(0.35, 'rgba(168, 85, 247, 0.7)'); // Violet
-      grad.addColorStop(0.7, 'rgba(59, 130, 246, 0.3)');  // Blue
+      grad.addColorStop(0.0, 'rgba(245, 158, 11, 0.9)');
+      grad.addColorStop(0.35, 'rgba(168, 85, 247, 0.7)');
+      grad.addColorStop(0.7, 'rgba(59, 130, 246, 0.3)');
       grad.addColorStop(1.0, 'rgba(0, 0, 0, 0.0)');
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -137,7 +133,7 @@ export default function WeatherMap({
     return canvas.toDataURL();
   };
 
-  // --- 5. Rainfall Forecast Isohyets Canvas (Cyan/Blue mm/hr) ---
+  // --- 5. Rainfall Isohyet Canvas ---
   const generateRainfallImageDataUrl = (horizon) => {
     const canvas = document.createElement('canvas');
     canvas.width = 256; canvas.height = 256;
@@ -147,9 +143,9 @@ export default function WeatherMap({
 
     const drawRain = (cx, cy, rMax) => {
       const grad = ctx.createRadialGradient(cx, cy, 5, cx, cy, rMax);
-      grad.addColorStop(0.0, 'rgba(6, 182, 212, 0.85)');  // 70+ mm/hr Heavy Downpour (Cyan)
-      grad.addColorStop(0.35, 'rgba(59, 130, 246, 0.7)'); // 40 mm/hr Blue
-      grad.addColorStop(0.7, 'rgba(16, 185, 129, 0.45)'); // 15 mm/hr Emerald
+      grad.addColorStop(0.0, 'rgba(6, 182, 212, 0.85)');
+      grad.addColorStop(0.35, 'rgba(59, 130, 246, 0.7)');
+      grad.addColorStop(0.7, 'rgba(16, 185, 129, 0.45)');
       grad.addColorStop(1.0, 'rgba(0, 0, 0, 0.0)');
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -162,7 +158,7 @@ export default function WeatherMap({
     return canvas.toDataURL();
   };
 
-  // --- 6. Cloud Top Temperature Map (-75C to -20C) ---
+  // --- 6. Cloud Top Temp Canvas ---
   const generateCloudTopTempImageDataUrl = () => {
     const canvas = document.createElement('canvas');
     canvas.width = 256; canvas.height = 256;
@@ -170,10 +166,10 @@ export default function WeatherMap({
 
     const drawTemp = (cx, cy, rMax) => {
       const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, rMax);
-      grad.addColorStop(0.0, 'rgba(232, 121, 249, 0.9)'); // -75C Extreme Deep Overshoot
-      grad.addColorStop(0.3, 'rgba(139, 92, 246, 0.75)'); // -60C
-      grad.addColorStop(0.6, 'rgba(59, 130, 246, 0.5)');  // -40C
-      grad.addColorStop(0.85, 'rgba(6, 182, 212, 0.3)');  // -20C
+      grad.addColorStop(0.0, 'rgba(232, 121, 249, 0.9)');
+      grad.addColorStop(0.3, 'rgba(139, 92, 246, 0.75)');
+      grad.addColorStop(0.6, 'rgba(59, 130, 246, 0.5)');
+      grad.addColorStop(0.85, 'rgba(6, 182, 212, 0.3)');
       grad.addColorStop(1.0, 'rgba(0, 0, 0, 0.0)');
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -186,17 +182,16 @@ export default function WeatherMap({
     return canvas.toDataURL();
   };
 
-  // --- 7. NWP CAPE Instability Energy Canvas (1500 to 3200 J/kg) ---
+  // --- 7. CAPE Energy Canvas ---
   const generateCAPEImageDataUrl = () => {
     const canvas = document.createElement('canvas');
     canvas.width = 256; canvas.height = 256;
     const ctx = canvas.getContext('2d');
 
-    // Broad atmospheric instability field
     const grad = ctx.createRadialGradient(120, 140, 10, 120, 140, 120);
-    grad.addColorStop(0.0, 'rgba(239, 68, 68, 0.55)');   // Extreme CAPE (>2800 J/kg)
-    grad.addColorStop(0.45, 'rgba(249, 115, 22, 0.4)');  // High CAPE (2000 J/kg)
-    grad.addColorStop(0.8, 'rgba(234, 179, 8, 0.25)');   // Moderate CAPE (1400 J/kg)
+    grad.addColorStop(0.0, 'rgba(239, 68, 68, 0.55)');
+    grad.addColorStop(0.45, 'rgba(249, 115, 22, 0.4)');
+    grad.addColorStop(0.8, 'rgba(234, 179, 8, 0.25)');
     grad.addColorStop(1.0, 'rgba(0, 0, 0, 0.0)');
 
     ctx.fillStyle = grad;
@@ -209,17 +204,17 @@ export default function WeatherMap({
     if (!mapContainerRef.current || mapRef.current) return;
 
     const baseSources = {
-      'satellite-source': {
-        type: 'raster',
-        tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
-        tileSize: 256,
-        attribution: 'Tiles &copy; Esri, Maxar'
-      },
       'map-source': {
         type: 'raster',
         tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
         tileSize: 256,
         attribution: '&copy; OpenStreetMap'
+      },
+      'satellite-source': {
+        type: 'raster',
+        tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+        tileSize: 256,
+        attribution: 'Tiles &copy; Esri, Maxar'
       },
       'terrain-source': {
         type: 'raster',
@@ -239,10 +234,10 @@ export default function WeatherMap({
         version: 8,
         sources: baseSources,
         layers: [
-          { id: 'base-satellite-layer', type: 'raster', source: 'satellite-source', minzoom: 0, maxzoom: 19, layout: { visibility: 'visible' } },
-          { id: 'base-map-layer', type: 'raster', source: 'map-source', minzoom: 0, maxzoom: 19, layout: { visibility: 'none' } },
+          { id: 'base-map-layer', type: 'raster', source: 'map-source', minzoom: 0, maxzoom: 19, layout: { visibility: 'visible' } },
+          { id: 'base-satellite-layer', type: 'raster', source: 'satellite-source', minzoom: 0, maxzoom: 19, layout: { visibility: 'none' } },
           { id: 'base-terrain-layer', type: 'raster', source: 'terrain-source', minzoom: 0, maxzoom: 19, layout: { visibility: 'none' } },
-          { id: 'boundaries-layer', type: 'raster', source: 'boundaries-source', minzoom: 0, maxzoom: 19, paint: { 'raster-opacity': 0.95 } }
+          { id: 'boundaries-layer', type: 'raster', source: 'boundaries-source', minzoom: 0, maxzoom: 19, paint: { 'raster-opacity': 0.85 } }
         ]
       },
       center: currentRegion.center,
@@ -273,9 +268,9 @@ export default function WeatherMap({
         filter: ['!=', 'isState', true],
         paint: {
           'circle-radius': ['case', ['get', 'isMain'], 6, 3.5],
-          'circle-color': ['case', ['get', 'isMain'], '#EF4444', '#FFFFFF'],
-          'circle-stroke-width': 1.5,
-          'circle-stroke-color': '#0F172A'
+          'circle-color': '#DC2626',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#FFFFFF'
         }
       });
 
@@ -285,16 +280,16 @@ export default function WeatherMap({
         source: 'cities',
         layout: {
           'text-field': ['get', 'name'],
-          'text-size': ['case', ['get', 'isState'], 14, ['get', 'isMain'], 12, 10],
+          'text-size': ['case', ['get', 'isState'], 13, ['get', 'isMain'], 11, 10],
           'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
           'text-offset': [0.6, -0.6],
           'text-anchor': 'left',
           'text-transform': ['case', ['get', 'isState'], 'uppercase', 'none']
         },
         paint: {
-          'text-color': '#F8FAFC',
-          'text-halo-color': '#070B14',
-          'text-halo-width': 2.5
+          'text-color': '#0F2942',
+          'text-halo-color': '#F8FCFE',
+          'text-halo-width': 3
         }
       });
 
@@ -315,9 +310,9 @@ export default function WeatherMap({
         type: 'circle',
         source: 'lightning-strikes',
         paint: {
-          'circle-radius': 14,
+          'circle-radius': 12,
           'circle-color': '#F59E0B',
-          'circle-opacity': 0.5
+          'circle-opacity': 0.4
         }
       });
 
@@ -326,14 +321,14 @@ export default function WeatherMap({
         type: 'circle',
         source: 'lightning-strikes',
         paint: {
-          'circle-radius': 4.5,
-          'circle-color': '#FEF08A',
+          'circle-radius': 4,
+          'circle-color': '#D97706',
           'circle-stroke-width': 1.5,
-          'circle-stroke-color': '#F59E0B'
+          'circle-stroke-color': '#FFFFFF'
         }
       });
 
-      // Wind Vector GeoJSON (stream flow arrows SE 18 km/h)
+      // Wind Vector GeoJSON
       const windVectors = [];
       const b = currentRegion.bounds;
       for (let lat = b.minLat + 0.6; lat < b.maxLat; lat += 0.8) {
@@ -360,9 +355,9 @@ export default function WeatherMap({
         source: 'wind-vectors',
         layout: { visibility: 'none' },
         paint: {
-          'line-color': '#38BDF8',
+          'line-color': '#0284C7',
           'line-width': 2,
-          'line-opacity': 0.75,
+          'line-opacity': 0.7,
           'line-dasharray': [2, 2]
         }
       });
@@ -389,7 +384,7 @@ export default function WeatherMap({
     };
   }, []);
 
-  // Update Region Dynamic Center, Zoom, Cities, and Lightning Strikes
+  // Update Region Dynamic Center & Cities
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapLoaded) return;
@@ -417,7 +412,7 @@ export default function WeatherMap({
     }
   }, [selectedRegion, mapLoaded]);
 
-  // Switch Base Style (Map, Satellite, Terrain)
+  // Switch Base Style
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapLoaded) return;
@@ -433,7 +428,7 @@ export default function WeatherMap({
     }
   }, [baseMapStyle, mapLoaded]);
 
-  // --- DYNAMIC RENDERING FOR ALL 10 LAYERS ---
+  // Dynamic Rendering for Layers
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapLoaded) return;
@@ -446,7 +441,7 @@ export default function WeatherMap({
       [b.minLon, b.minLat]
     ];
 
-    // 1. Radar Reflectivity Layer
+    // 1. Radar Layer
     const radarDataUrl = generateRadarImageDataUrl(horizonMin);
     if (map.getSource('radar-source')) {
       map.removeLayer('radar-layer');
@@ -458,11 +453,11 @@ export default function WeatherMap({
         id: 'radar-layer',
         type: 'raster',
         source: 'radar-source',
-        paint: { 'raster-opacity': 0.9, 'raster-resampling': 'linear' }
+        paint: { 'raster-opacity': 0.85, 'raster-resampling': 'linear' }
       }, 'boundaries-layer');
     }
 
-    // 2. Satellite (IR) Layer
+    // 2. Satellite Layer
     const satDataUrl = generateSatelliteImageDataUrl();
     if (map.getSource('satellite-ir-source')) {
       map.removeLayer('satellite-ir-layer');
@@ -474,11 +469,11 @@ export default function WeatherMap({
         id: 'satellite-ir-layer',
         type: 'raster',
         source: 'satellite-ir-source',
-        paint: { 'raster-opacity': 0.7, 'raster-resampling': 'linear' }
+        paint: { 'raster-opacity': 0.65, 'raster-resampling': 'linear' }
       }, 'boundaries-layer');
     }
 
-    // 3. Thunderstorm AI Risk Layer
+    // 3. AI Risk Layer
     const riskDataUrl = generateAIRiskImageDataUrl(horizonMin);
     if (map.getSource('ai-risk-source')) {
       map.removeLayer('ai-risk-layer');
@@ -490,7 +485,7 @@ export default function WeatherMap({
         id: 'ai-risk-layer',
         type: 'raster',
         source: 'ai-risk-source',
-        paint: { 'raster-opacity': 0.65, 'raster-resampling': 'linear' }
+        paint: { 'raster-opacity': 0.6, 'raster-resampling': 'linear' }
       }, 'radar-layer');
     }
 
@@ -506,11 +501,11 @@ export default function WeatherMap({
         id: 'lightning-risk-layer',
         type: 'raster',
         source: 'lightning-risk-source',
-        paint: { 'raster-opacity': 0.75, 'raster-resampling': 'linear' }
+        paint: { 'raster-opacity': 0.7, 'raster-resampling': 'linear' }
       }, 'radar-layer');
     }
 
-    // 5. Rainfall Forecast Isohyet Layer (mm/hr)
+    // 5. Rainfall Isohyets
     const rainDataUrl = generateRainfallImageDataUrl(horizonMin);
     if (map.getSource('rainfall-source')) {
       map.removeLayer('rainfall-layer');
@@ -522,11 +517,11 @@ export default function WeatherMap({
         id: 'rainfall-layer',
         type: 'raster',
         source: 'rainfall-source',
-        paint: { 'raster-opacity': 0.8, 'raster-resampling': 'linear' }
+        paint: { 'raster-opacity': 0.75, 'raster-resampling': 'linear' }
       }, 'boundaries-layer');
     }
 
-    // 6. Cloud Top Temperature Layer
+    // 6. Cloud Top Temp
     const cloudTopDataUrl = generateCloudTopTempImageDataUrl();
     if (map.getSource('cloud-top-source')) {
       map.removeLayer('cloud-top-layer');
@@ -538,11 +533,11 @@ export default function WeatherMap({
         id: 'cloud-top-layer',
         type: 'raster',
         source: 'cloud-top-source',
-        paint: { 'raster-opacity': 0.75, 'raster-resampling': 'linear' }
+        paint: { 'raster-opacity': 0.7, 'raster-resampling': 'linear' }
       }, 'boundaries-layer');
     }
 
-    // 7. CAPE (Model) Thermodynamic Energy Layer
+    // 7. CAPE Energy
     const capeDataUrl = generateCAPEImageDataUrl();
     if (map.getSource('cape-source')) {
       map.removeLayer('cape-layer');
@@ -554,23 +549,22 @@ export default function WeatherMap({
         id: 'cape-layer',
         type: 'raster',
         source: 'cape-source',
-        paint: { 'raster-opacity': 0.55, 'raster-resampling': 'linear' }
+        paint: { 'raster-opacity': 0.5, 'raster-resampling': 'linear' }
       }, 'boundaries-layer');
     }
 
-    // 8. Wind Vectors Layer
+    // 8. Wind Vectors
     if (map.getLayer('wind-lines')) {
       map.setLayoutProperty('wind-lines', 'visibility', activeLayers.wind ? 'visible' : 'none');
     }
 
-    // 9. Lightning Points Toggle
-    const isLightningActive = activeLayers.lightning;
+    // 9. Lightning Points
     if (map.getLayer('lightning-glow')) {
-      map.setLayoutProperty('lightning-glow', 'visibility', isLightningActive ? 'visible' : 'none');
-      map.setLayoutProperty('lightning-core', 'visibility', isLightningActive ? 'visible' : 'none');
+      map.setLayoutProperty('lightning-glow', 'visibility', activeLayers.lightning ? 'visible' : 'none');
+      map.setLayoutProperty('lightning-core', 'visibility', activeLayers.lightning ? 'visible' : 'none');
     }
 
-    // 10. Boundaries Toggle
+    // 10. Boundaries
     if (map.getLayer('boundaries-layer')) {
       map.setLayoutProperty('boundaries-layer', 'visibility', activeLayers.adminBoundaries ? 'visible' : 'none');
     }
@@ -582,36 +576,36 @@ export default function WeatherMap({
   const handleResetCenter = () => mapRef.current?.flyTo({ center: currentRegion.center, zoom: currentRegion.zoom });
 
   return (
-    <div className="relative w-full h-full bg-[#070B14] rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col min-h-[480px]">
-      {/* Top Map Type Toggles (Map, Satellite, Terrain) */}
+    <div className="relative w-full h-full bg-[#F8FCFE] rounded-xl overflow-hidden border border-[#D0E3F0] shadow-xs flex flex-col min-h-[480px]">
+      {/* Map Type Controls (Map, Satellite, Terrain) */}
       <div className="absolute top-3 right-3 z-20 flex items-center space-x-1.5">
-        <div className="bg-slate-900/90 backdrop-blur-md p-1 rounded-xl border border-slate-700 shadow-lg flex items-center space-x-1 text-xs font-semibold">
+        <div className="bg-[#F8FCFE]/95 backdrop-blur-xs p-1 rounded-lg border border-[#D0E3F0] shadow-xs flex items-center space-x-1 text-xs font-medium text-[#0F2942]">
           <button
             onClick={() => setBaseMapStyle('map')}
-            className={`px-3 py-1 rounded-lg transition-all ${
+            className={`px-3 py-1 rounded-md transition-all ${
               baseMapStyle === 'map' 
-                ? 'bg-blue-600 text-white shadow-[0_0_10px_rgba(37,99,235,0.5)] border border-blue-400/40 font-bold' 
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-[#0284C7] text-white font-semibold shadow-2xs' 
+                : 'text-[#47637E] hover:text-[#0F2942] hover:bg-[#EEF6FB]'
             }`}
           >
             Map
           </button>
           <button
             onClick={() => setBaseMapStyle('satellite')}
-            className={`px-3 py-1 rounded-lg transition-all ${
+            className={`px-3 py-1 rounded-md transition-all ${
               baseMapStyle === 'satellite' 
-                ? 'bg-blue-600 text-white shadow-[0_0_10px_rgba(37,99,235,0.5)] border border-blue-400/40 font-bold' 
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-[#0284C7] text-white font-semibold shadow-2xs' 
+                : 'text-[#47637E] hover:text-[#0F2942] hover:bg-[#EEF6FB]'
             }`}
           >
             Satellite
           </button>
           <button
             onClick={() => setBaseMapStyle('terrain')}
-            className={`px-3 py-1 rounded-lg transition-all ${
+            className={`px-3 py-1 rounded-md transition-all ${
               baseMapStyle === 'terrain' 
-                ? 'bg-blue-600 text-white shadow-[0_0_10px_rgba(37,99,235,0.5)] border border-blue-400/40 font-bold' 
-                : 'text-slate-300 hover:text-white'
+                ? 'bg-[#0284C7] text-white font-semibold shadow-2xs' 
+                : 'text-[#47637E] hover:text-[#0F2942] hover:bg-[#EEF6FB]'
             }`}
           >
             Terrain
@@ -620,87 +614,67 @@ export default function WeatherMap({
 
         <button 
           onClick={handleResetCenter}
-          className="p-2 bg-slate-900/90 backdrop-blur-md hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-700 shadow-lg transition-all"
+          className="p-2 bg-[#F8FCFE]/95 backdrop-blur-xs hover:bg-[#EEF6FB] text-[#0F2942] rounded-lg border border-[#D0E3F0] shadow-xs transition-all"
           title="Fullscreen / Center"
         >
           <Maximize2 className="w-3.5 h-3.5" />
         </button>
       </div>
 
-      {/* Right Map Navigation Controls (+, -, Target) */}
-      <div className="absolute right-3 top-20 z-20 flex flex-col space-y-1.5">
+      {/* Right Map Zoom Controls */}
+      <div className="absolute right-3 top-16 z-20 flex flex-col space-y-1">
         <button
           onClick={handleZoomIn}
-          className="p-2 bg-slate-900/90 backdrop-blur-md hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-700 shadow-lg transition-all"
+          className="p-2 bg-[#F8FCFE]/95 backdrop-blur-xs hover:bg-[#EEF6FB] text-[#0F2942] rounded-lg border border-[#D0E3F0] shadow-xs transition-all"
         >
           <Plus className="w-4 h-4" />
         </button>
         <button
           onClick={handleZoomOut}
-          className="p-2 bg-slate-900/90 backdrop-blur-md hover:bg-slate-800 text-slate-200 rounded-xl border border-slate-700 shadow-lg transition-all"
+          className="p-2 bg-[#F8FCFE]/95 backdrop-blur-xs hover:bg-[#EEF6FB] text-[#0F2942] rounded-lg border border-[#D0E3F0] shadow-xs transition-all"
         >
           <Minus className="w-4 h-4" />
         </button>
         <button
           onClick={handleResetCenter}
-          className="p-2 bg-slate-900/90 backdrop-blur-md hover:bg-slate-800 text-cyan-400 rounded-xl border border-slate-700 shadow-lg transition-all"
+          className="p-2 bg-[#F8FCFE]/95 backdrop-blur-xs hover:bg-[#EEF6FB] text-[#0284C7] rounded-lg border border-[#D0E3F0] shadow-xs transition-all"
           title="Recenter"
         >
           <Crosshair className="w-4 h-4" />
         </button>
       </div>
 
-      {/* MapLibre WebGL Container */}
+      {/* MapLibre Container */}
       <div 
         ref={mapContainerRef} 
-        className="w-full h-full flex-1 min-h-[480px] bg-[#070B14]"
+        className="w-full h-full flex-1 min-h-[480px] bg-[#EEF6FB]"
       />
 
-      {/* Bottom-Left Radar Reflectivity Scale Legend */}
-      <div className="absolute bottom-3 left-3 z-20 bg-slate-950/90 backdrop-blur-md p-3 rounded-2xl border border-slate-800 shadow-2xl">
-        <div className="text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-          <span>Doppler Reflectivity Scale (dBZ)</span>
+      {/* Bottom-Left Reflectivity Scale Legend */}
+      <div className="absolute bottom-3 left-3 z-20 bg-[#F8FCFE]/95 backdrop-blur-xs p-2.5 rounded-lg border border-[#D0E3F0] shadow-sm font-sans text-xs">
+        <div className="text-[10px] font-bold text-[#0F2942] uppercase tracking-wider mb-1">
+          Radar Reflectivity (dBZ)
         </div>
-        <div className="flex items-center space-x-1 text-[9px] font-mono font-bold">
-          <span className="text-slate-400">0</span>
-          <div className="flex rounded overflow-hidden border border-slate-700 h-2.5">
-            <span className="w-4 bg-cyan-400 inline-block"></span>
-            <span className="w-4 bg-emerald-400 inline-block"></span>
-            <span className="w-4 bg-green-500 inline-block"></span>
-            <span className="w-4 bg-yellow-400 inline-block"></span>
-            <span className="w-4 bg-orange-500 inline-block"></span>
-            <span className="w-4 bg-red-500 inline-block"></span>
-            <span className="w-4 bg-fuchsia-500 inline-block"></span>
-            <span className="w-4 bg-purple-500 inline-block"></span>
-            <span className="w-4 bg-white inline-block"></span>
-          </div>
-          <span className="text-white">70</span>
-        </div>
-        <div className="flex justify-between text-[8px] font-mono text-slate-400 mt-1">
+        <div className="flex items-center space-x-1 text-[9px] font-mono font-bold text-[#0F2942]">
           <span>0</span>
-          <span>10</span>
-          <span>20</span>
-          <span>30</span>
-          <span>40</span>
-          <span>50</span>
-          <span>60</span>
+          <div className="flex rounded overflow-hidden border border-[#D0E3F0] h-2.5">
+            <span className="w-3.5 bg-cyan-400 inline-block"></span>
+            <span className="w-3.5 bg-emerald-400 inline-block"></span>
+            <span className="w-3.5 bg-green-500 inline-block"></span>
+            <span className="w-3.5 bg-yellow-400 inline-block"></span>
+            <span className="w-3.5 bg-orange-500 inline-block"></span>
+            <span className="w-3.5 bg-red-500 inline-block"></span>
+            <span className="w-3.5 bg-fuchsia-500 inline-block"></span>
+            <span className="w-3.5 bg-purple-500 inline-block"></span>
+          </div>
           <span>70</span>
         </div>
       </div>
 
       {/* Bottom-Right Lightning Legend */}
-      <div className="absolute bottom-3 right-16 z-20 bg-slate-950/90 backdrop-blur-md px-3 py-2 rounded-2xl border border-slate-800 shadow-2xl flex items-center space-x-3 text-xs">
-        <div className="flex items-center space-x-1 font-bold text-amber-400 text-[11px]">
-          <Zap className="w-3.5 h-3.5 fill-current" />
-          <span>Lightning (last 30 min)</span>
-        </div>
-        <div className="flex items-center space-x-2 text-[10px] font-mono text-slate-300">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-300"></span>1-5</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-400"></span>6-20</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500"></span>21-50</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-fuchsia-500"></span>51-100</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-400"></span>&gt;100</span>
-        </div>
+      <div className="absolute bottom-3 right-3 z-20 bg-[#F8FCFE]/95 backdrop-blur-xs px-3 py-1.5 rounded-lg border border-[#D0E3F0] shadow-sm flex items-center space-x-2 text-xs">
+        <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+        <span className="font-medium text-[#0F2942] text-[11px]">Lightning Strikes</span>
       </div>
     </div>
   );

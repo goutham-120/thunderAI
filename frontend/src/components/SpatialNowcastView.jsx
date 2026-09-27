@@ -1,0 +1,103 @@
+import React from 'react';
+import WeatherMap from './WeatherMap';
+import { Layers, ChevronDown, Radio, Zap, Satellite, Wind, ShieldAlert, CloudRain, Thermometer, Sparkles } from 'lucide-react';
+
+export default function SpatialNowcastView({
+  forecastData,
+  selectedCell,
+  onSelectCell,
+  activeLayers,
+  toggleLayer,
+  horizonMin,
+  setHorizonMin,
+  selectedLocation,
+  onLocationSelect,
+  selectedRegion,
+  setSelectedRegion
+}) {
+  const layerButtons = [
+    { key: 'radar', label: 'Radar dBZ', icon: Radio, activeColor: 'bg-[#DC2626] text-white border-[#DC2626]' },
+    { key: 'satellite', label: 'Satellite IR', icon: Satellite, activeColor: 'bg-[#4F46E5] text-white border-[#4F46E5]' },
+    { key: 'lightning', label: 'Lightning Feed', icon: Zap, activeColor: 'bg-[#D97706] text-white border-[#D97706]' },
+    { key: 'aiRisk', label: 'Storm AI Risk', icon: Sparkles, activeColor: 'bg-[#0284C7] text-white border-[#0284C7]' },
+    { key: 'lightningRisk', label: 'Lightning Risk', icon: ShieldAlert, activeColor: 'bg-[#EA580C] text-white border-[#EA580C]' },
+    { key: 'rainfall', label: 'Rainfall Isohyets', icon: CloudRain, activeColor: 'bg-[#0284C7] text-white border-[#0284C7]' },
+    { key: 'cloudTop', label: 'Cloud Top Temp', icon: Thermometer, activeColor: 'bg-[#7C3AED] text-white border-[#7C3AED]' },
+    { key: 'wind', label: 'Wind Vectors', icon: Wind, activeColor: 'bg-[#0D9488] text-white border-[#0D9488]' }
+  ];
+
+  return (
+    <div className="space-y-4 font-sans text-[#0F2942]">
+      {/* Top Header & Layer Bar */}
+      <div className="bg-[#F8FCFE] border border-[#D0E3F0] p-4 rounded-xl shadow-xs space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-bold text-[#0F2942] tracking-tight flex items-center gap-2 font-mono">
+              <Layers className="w-4 h-4 text-[#0284C7]" />
+              SPATIAL ATMOSPHERIC NOWCAST
+            </h2>
+            <p className="text-xs text-[#47637E] font-mono">
+              Multimodal Sensor Layers & Spatiotemporal Radar/Satellite Overlays
+            </p>
+          </div>
+
+          {/* Region Dropdown Selector */}
+          <div className="flex items-center space-x-2">
+            <span className="text-xs font-mono font-bold text-[#47637E] uppercase">Region:</span>
+            <div className="relative">
+              <select
+                value={selectedRegion}
+                onChange={(e) => setSelectedRegion(e.target.value)}
+                className="bg-[#EEF6FB] border border-[#D0E3F0] text-[#0F2942] text-xs rounded-lg px-3 py-1.5 appearance-none focus:outline-hidden focus:border-[#0284C7] font-mono font-semibold pr-8"
+              >
+                <option value="Andhra Pradesh & Telangana">AP & Telangana (HYD DWR)</option>
+                <option value="East Coast (Odisha & WB)">East Coast (Odisha/WB)</option>
+                <option value="South Interior Karnataka">Karnataka (BLR Footprint)</option>
+                <option value="All India Composite">All India Composite</option>
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 text-[#47637E] absolute right-2.5 top-2.5 pointer-events-none" />
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Layer Toggles Bar */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-[#E2EAF0] text-xs font-mono">
+          <span className="text-[10px] text-[#64829E] uppercase font-bold mr-1">Active Layers:</span>
+          {layerButtons.map(layer => {
+            const Icon = layer.icon;
+            const isActive = activeLayers[layer.key];
+            return (
+              <button
+                key={layer.key}
+                onClick={() => toggleLayer(layer.key)}
+                className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium border transition-all ${
+                  isActive
+                    ? layer.activeColor
+                    : 'bg-[#EEF6FB] text-[#47637E] border-[#D0E3F0] hover:bg-[#E5F0F7] hover:text-[#0F2942]'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{layer.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Main Large Weather Map View */}
+      <div className="h-[620px] w-full">
+        <WeatherMap
+          forecastData={forecastData}
+          selectedCell={selectedCell}
+          onSelectCell={onSelectCell}
+          activeLayers={activeLayers}
+          toggleLayer={toggleLayer}
+          horizonMin={horizonMin}
+          selectedLocation={selectedLocation}
+          onLocationSelect={onLocationSelect}
+          selectedRegion={selectedRegion}
+        />
+      </div>
+    </div>
+  );
+}

@@ -5,82 +5,81 @@
 
 @layer base {
   body {
-    @apply bg-[#070B14] text-slate-100 font-sans antialiased selection:bg-blue-600 selection:text-white overflow-x-hidden;
+    background-color: #EEF6FB;
+    color: #0F2942;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 }
 
-/* Custom dark meteorological scrollbars and animations */
+/* Atmospheric subtle grid texture */
+.bg-atmospheric {
+  background-color: #EEF6FB;
+  background-image: 
+    radial-gradient(ellipse at 50% 0%, rgba(224, 242, 254, 0.8) 0%, rgba(238, 246, 251, 0.4) 60%, rgba(229, 240, 247, 0.8) 100%),
+    linear-gradient(to right, rgba(208, 227, 240, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(208, 227, 240, 0.25) 1px, transparent 1px);
+  background-size: 100% 100%, 32px 32px, 32px 32px;
+}
+
+/* Light Blue Theme Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0B1120;
+  background: #E5F0F7;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
+  background: #B4CEE0;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #8AB4D0;
 }
 
-@keyframes pulse-slow {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.98); }
+/* Meteorological Cards */
+.meteo-card {
+  background-color: #F8FCFE;
+  border: 1px solid #D0E3F0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(15, 41, 66, 0.04);
 }
 
-.animate-pulse-slow {
-  animation: pulse-slow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.meteo-card:hover {
+  border-color: #B8D6EB;
 }
 
-.glass-panel {
-  background: rgba(13, 19, 33, 0.85);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(30, 41, 59, 0.9);
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 4px 10px -2px rgba(0, 0, 0, 0.3);
-}
-
-.glass-card {
-  background: rgba(17, 24, 39, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(51, 65, 85, 0.5);
-}
-
-.glass-card:hover {
-  border-color: rgba(59, 130, 246, 0.6);
-  box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.2);
-}
-
-/* MapLibre Dark Theme Override */
+/* MapLibre Light Blue Controls */
 .maplibregl-ctrl-group {
-  background: rgba(15, 23, 42, 0.85) !important;
-  border: 1px solid rgba(51, 65, 85, 0.8) !important;
-  border-radius: 12px !important;
+  background: #F8FCFE !important;
+  border: 1px solid #D0E3F0 !important;
+  border-radius: 10px !important;
   overflow: hidden !important;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+  box-shadow: 0 2px 6px rgba(15, 41, 66, 0.08) !important;
 }
 
 .maplibregl-ctrl-group button {
-  border-bottom: 1px solid rgba(51, 65, 85, 0.5) !important;
+  border-bottom: 1px solid #E2EAF0 !important;
 }
 
 .maplibregl-ctrl-icon {
-  filter: invert(1) hue-rotate(180deg) !important;
+  filter: none !important;
 }
 
 .maplibregl-popup-content {
-  background: rgba(15, 23, 42, 0.95) !important;
-  border: 1px solid rgba(59, 130, 246, 0.5) !important;
-  border-radius: 12px !important;
-  color: #fff !important;
-  padding: 10px !important;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.6) !important;
+  background: #F8FCFE !important;
+  border: 1px solid #D0E3F0 !important;
+  border-radius: 10px !important;
+  color: #0F2942 !important;
+  padding: 12px !important;
+  box-shadow: 0 4px 16px rgba(15, 41, 66, 0.12) !important;
 }
 
 .maplibregl-popup-anchor-top .maplibregl-popup-tip {
-  border-bottom-color: rgba(15, 23, 42, 0.95) !important;
+  border-bottom-color: #F8FCFE !important;
 }
 .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
-  border-top-color: rgba(15, 23, 42, 0.95) !important;
+  border-top-color: #F8FCFE !important;
 }

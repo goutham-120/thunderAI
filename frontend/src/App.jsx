@@ -3,18 +3,25 @@ import Header from './components/Header';
 import LeftSidebar from './components/LeftSidebar';
 import WeatherMap from './components/WeatherMap';
 import RightPanel from './components/RightPanel';
-import BottomDashboard from './components/BottomDashboard';
-import AlertsModal from './components/AlertsModal';
-import BenchmarkModal from './components/BenchmarkModal';
+import ForecastTimelineBar from './components/ForecastTimelineBar';
+import NowcastSummaryBar from './components/NowcastSummaryBar';
+import SpatialNowcastView from './components/SpatialNowcastView';
+import StormCellsView from './components/StormCellsView';
+import ForecastView from './components/ForecastView';
+import AlertsView from './components/AlertsView';
+import ReplayView from './components/ReplayView';
+import ExplainabilityView from './components/ExplainabilityView';
+import ModelView from './components/ModelView';
+import DataSourcesView from './components/DataSourcesView';
+import DataProvenanceModal from './components/DataProvenanceModal';
 import HistoricalReplayBar from './components/HistoricalReplayBar';
 
 const API_BASE = 'http://localhost:8000/api';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('live'); // 'live', 'forecast', 'tracks', 'replay', 'analytics', 'alerts'
+  const [activeTab, setActiveTab] = useState('live'); // 'live', 'spatial', 'cells', 'forecast', 'alerts', 'replay', 'explainability', 'model', 'datasources'
   const [horizonMin, setHorizonMin] = useState(30);
   const [selectedRegion, setSelectedRegion] = useState('Andhra Pradesh & Telangana');
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedLocation, setSelectedLocation] = useState({
     name: 'Hyderabad, Telangana',
     lat: '17.3850',
@@ -22,13 +29,13 @@ export default function App() {
   });
 
   const [forecastData, setForecastData] = useState(null);
+  const [systemStatus, setSystemStatus] = useState(null);
   const [selectedCell, setSelectedCell] = useState(null);
   const [historicalEvents, setHistoricalEvents] = useState([]);
   const [benchmarkData, setBenchmarkData] = useState(null);
   const [selectedEventId, setSelectedEventId] = useState('HYD-PREMONSOON-2024');
 
-  const [isAlertsOpen, setIsAlertsOpen] = useState(false);
-  const [isBenchmarkOpen, setIsBenchmarkOpen] = useState(false);
+  const [isProvenanceOpen, setIsProvenanceOpen] = useState(false);
 
   const [activeLayers, setActiveLayers] = useState({
     radar: true,
@@ -40,16 +47,20 @@ export default function App() {
     wind: false,
     cloudTop: false,
     cape: false,
-    adminBoundaries: true,
-    stormVectors: true
+    adminBoundaries: true
   });
 
   const toggleLayer = (layerKey) => {
     setActiveLayers(prev => ({ ...prev, [layerKey]: !prev[layerKey] }));
   };
 
-  // Fetch initial metadata
+  // Fetch initial system status & benchmarks
   useEffect(() => {
+    fetch(`${API_BASE}/system/status`)
+      .then(res => res.json())
+      .then(data => setSystemStatus(data))
+      .catch(err => console.warn('System status fetch fallback active', err));
+
     fetch(`${API_BASE}/replay/events`)
       .then(res => res.json())
       .then(data => {
@@ -92,102 +103,163 @@ export default function App() {
     }
   }, [selectedRegion]);
 
-  const activeAlerts = forecastData?.cap_alerts || [];
-
   return (
-    <div className="min-h-screen bg-[#070B14] flex flex-col text-slate-100 font-sans selection:bg-blue-600 selection:text-white">
-      {/* Top Main Navigation */}
+    <div className="min-h-screen bg-atmospheric flex flex-col text-[#0F2942] font-sans selection:bg-[#0284C7] selection:text-white">
+      
+      {/* Top Header */}
       <Header
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        activeAlertCount={activeAlerts.length || 3}
-        selectedRegion={selectedRegion}
-        setSelectedRegion={setSelectedRegion}
+        systemStatus={systemStatus}
+        onOpenProvenance={() => setIsProvenanceOpen(true)}
       />
 
-      {/* Historical Replay Banner if in Replay view */}
+      {/* Historical Replay Banner if activeTab === 'replay' */}
       {activeTab === 'replay' && (
         <HistoricalReplayBar
           selectedEventId={selectedEventId}
           setSelectedEventId={setSelectedEventId}
           historicalEvents={historicalEvents}
-          replayTimestamp="15:40"
-          setReplayTimestamp={() => {}}
         />
       )}
 
-      {/* Main Command Center Stage */}
-      <main className="flex-1 p-3.5 max-w-[1600px] mx-auto w-full flex flex-col space-y-4">
+      {/* Main Workstation Stage */}
+      <div className="flex-1 flex overflow-hidden">
         
-        {/* TOP SECTION: Left Sidebar (Layers) + Center Map + Right Panel (Location & XAI) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
-          {/* Left Column: Layers & Horizon (2.5 cols) */}
-          <div className="lg:col-span-3 xl:col-span-2 flex flex-col">
-            <LeftSidebar
-              activeLayers={activeLayers}
-              toggleLayer={toggleLayer}
-              horizonMin={horizonMin}
-              setHorizonMin={setHorizonMin}
-              selectedRegion={selectedRegion}
-              setSelectedRegion={setSelectedRegion}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-            />
-          </div>
+        {/* Permanent Left Sidebar (PAGES ONLY) */}
+        <LeftSidebar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
 
-          {/* Center Column: Photorealistic Satellite + Radar Convective Map (6.5 cols) */}
-          <div className="lg:col-span-6 xl:col-span-7 flex flex-col min-h-[520px]">
-            <WeatherMap
+        {/* Dynamic Main View Container */}
+        <main className="flex-1 p-4 overflow-y-auto max-w-[1600px] mx-auto w-full">
+          
+          {/* 1. OVERVIEW PAGE */}
+          {activeTab === 'live' && (
+            <div className="space-y-4">
+              {/* Map Centerpiece (8 cols) + Right Side Location/XAI Panel (4 cols) */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                
+                {/* Center Map (8 cols) */}
+                <div className="lg:col-span-8 xl:col-span-9 flex flex-col min-h-[500px]">
+                  <WeatherMap
+                    forecastData={forecastData}
+                    selectedCell={selectedCell}
+                    onSelectCell={setSelectedCell}
+                    activeLayers={activeLayers}
+                    toggleLayer={toggleLayer}
+                    horizonMin={horizonMin}
+                    selectedLocation={selectedLocation}
+                    onLocationSelect={setSelectedLocation}
+                    selectedRegion={selectedRegion}
+                  />
+                </div>
+
+                {/* Right Panel (4 cols) */}
+                <div className="lg:col-span-4 xl:col-span-3 flex flex-col">
+                  <RightPanel
+                    xaiData={forecastData?.xai_explanation}
+                    selectedCell={selectedCell}
+                    summaryMetrics={forecastData?.summary_metrics}
+                    selectedLocation={selectedLocation}
+                  />
+                </div>
+              </div>
+
+              {/* FORECAST TIMELINE */}
+              <ForecastTimelineBar
+                horizonMin={horizonMin}
+                setHorizonMin={setHorizonMin}
+              />
+
+              {/* COMPACT NOWCAST SUMMARY */}
+              <NowcastSummaryBar
+                forecastData={forecastData}
+              />
+            </div>
+          )}
+
+          {/* 2. SPATIAL NOWCAST PAGE */}
+          {activeTab === 'spatial' && (
+            <SpatialNowcastView
               forecastData={forecastData}
               selectedCell={selectedCell}
               onSelectCell={setSelectedCell}
               activeLayers={activeLayers}
               toggleLayer={toggleLayer}
               horizonMin={horizonMin}
+              setHorizonMin={setHorizonMin}
               selectedLocation={selectedLocation}
               onLocationSelect={setSelectedLocation}
               selectedRegion={selectedRegion}
+              setSelectedRegion={setSelectedRegion}
             />
-          </div>
+          )}
 
-          {/* Right Column: Selected Location, Dual Risk & AI Explanation (3 cols) */}
-          <div className="lg:col-span-3 xl:col-span-3 flex flex-col">
-            <RightPanel
-              xaiData={forecastData?.xai_explanation}
+          {/* 3. STORM CELLS PAGE */}
+          {activeTab === 'cells' && (
+            <StormCellsView
+              forecastData={forecastData}
               selectedCell={selectedCell}
-              summaryMetrics={forecastData?.summary_metrics}
-              selectedLocation={selectedLocation}
+              onSelectCell={setSelectedCell}
             />
-          </div>
-        </div>
+          )}
 
-        {/* BOTTOM SECTION: Forecast Timeline + Probability Chart + Atmospheric Conditions + Storm Cells Table + Alerts */}
-        <BottomDashboard
-          forecastData={forecastData}
-          horizonMin={horizonMin}
-          setHorizonMin={setHorizonMin}
-          onOpenAlerts={() => setIsAlertsOpen(true)}
-          onOpenBenchmark={() => setIsBenchmarkOpen(true)}
-        />
-      </main>
+          {/* 4. FORECAST PAGE */}
+          {activeTab === 'forecast' && (
+            <ForecastView
+              forecastData={forecastData}
+              horizonMin={horizonMin}
+              setHorizonMin={setHorizonMin}
+            />
+          )}
 
-      {/* Modals & Overlays */}
-      <AlertsModal
-        isOpen={isAlertsOpen || activeTab === 'alerts'}
-        onClose={() => {
-          setIsAlertsOpen(false);
-          if (activeTab === 'alerts') setActiveTab('live');
-        }}
-        alerts={activeAlerts}
-      />
+          {/* 5. ALERTS PAGE */}
+          {activeTab === 'alerts' && (
+            <AlertsView
+              alerts={forecastData?.cap_alerts}
+            />
+          )}
 
-      <BenchmarkModal
-        isOpen={isBenchmarkOpen || activeTab === 'analytics'}
-        onClose={() => {
-          setIsBenchmarkOpen(false);
-          if (activeTab === 'analytics') setActiveTab('live');
-        }}
-        benchmarkData={benchmarkData}
+          {/* 6. HISTORICAL REPLAY PAGE */}
+          {activeTab === 'replay' && (
+            <ReplayView
+              historicalEvents={historicalEvents}
+              selectedEventId={selectedEventId}
+              setSelectedEventId={setSelectedEventId}
+            />
+          )}
+
+          {/* 7. EXPLAINABILITY PAGE */}
+          {activeTab === 'explainability' && (
+            <ExplainabilityView
+              xaiData={forecastData?.xai_explanation}
+            />
+          )}
+
+          {/* 8. MODEL PERFORMANCE PAGE */}
+          {activeTab === 'model' && (
+            <ModelView
+              systemStatus={systemStatus}
+              benchmarkData={benchmarkData}
+            />
+          )}
+
+          {/* 9. DATA SOURCES PAGE */}
+          {activeTab === 'datasources' && (
+            <DataSourcesView
+              systemStatus={systemStatus}
+            />
+          )}
+
+        </main>
+      </div>
+
+      {/* Data Provenance Modal */}
+      <DataProvenanceModal
+        isOpen={isProvenanceOpen}
+        onClose={() => setIsProvenanceOpen(false)}
+        systemStatus={systemStatus}
       />
     </div>
   );

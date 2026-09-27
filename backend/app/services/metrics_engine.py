@@ -88,13 +88,16 @@ class MetricsEngine:
         ]
 
         return {
+            "validation_status": "Validation pending real historical labelled dataset",
+            "is_measured_empirical_benchmark": False,
+            "disclaimer": "Metrics below represent reference architectural targets pending offline validation against real multi-year historical labelled archives.",
             "horizons": horizons,
             "models": models_data,
             "summary_table": summary_table,
             "key_takeaways": [
-                "VAJRA-AI achieves a +47% improvement in Critical Success Index (CSI) at 30-min lead time over operational optical flow.",
-                "False Alarm Ratio (FAR) is reduced from 49% (optical flow) to 26% at 60-min lead time due to satellite cloud-top cooling and NWP CIN constraints.",
-                "Brier score of 0.112 demonstrates superior probabilistic calibration, avoiding over-confident false alarms."
+                "VAJRA-AI targets a +47% improvement in Critical Success Index (CSI) at 30-min lead time over operational optical flow.",
+                "False Alarm Ratio (FAR) is targeted to be reduced from 49% (optical flow) to 26% at 60-min lead time due to satellite cloud-top cooling and NWP CIN constraints.",
+                "Probabilistic calibration targets a Brier score of ~0.112, avoiding over-confident false alarms."
             ]
         }
 

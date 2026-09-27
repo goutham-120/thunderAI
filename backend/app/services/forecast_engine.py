@@ -2,7 +2,8 @@
 Master Nowcasting & Forecast Orchestrator Service
 Coordinates data ingestion/harmonization, deep learning inference, storm tracking, XAI, and CAP alerting.
 """
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
+from datetime import datetime, timezone, timedelta
 import numpy as np
 from app.services.data_harmonizer import harmonizer
 from app.models.spatiotemporal_net import ai_engine
@@ -16,7 +17,8 @@ class ForecastEngine:
         self,
         horizon_min: int = 30,
         event_id: str = "LIVE",
-        t_offset_minutes: int = 0
+        t_offset_minutes: int = 0,
+        data_mode: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Runs full multimodal pipeline and produces geospatial payload for the UI.
@@ -55,8 +57,9 @@ class ForecastEngine:
             base_wind = "SE 18 km/h"
             base_tpw = 52.0
 
-        # 1. Harmonize multimodal observations into 4D tensor
-        cube_data = harmonizer.generate_synthetic_convective_cube(
+        # 1. Harmonize multimodal observations into 4D tensor (Real IMD vs Synthetic)
+        cube_data = harmonizer.get_convective_cube(
+            data_mode=data_mode,
             time_steps=5,
             storm_center=center,
             storm_speed_kmh=speed,
@@ -138,20 +141,47 @@ class ForecastEngine:
         sat_tir_grid = np.round(last_frame[::2, ::2, 2], 1).tolist()
         lightning_density_grid = np.round(last_frame[::2, ::2, 4], 2).tolist()
 
+        now_dt = datetime.now(timezone.utc)
+        obs_iso = cube_data.get("observation_timestamp") or now_dt.isoformat()
+        try:
+            obs_dt = datetime.fromisoformat(obs_iso)
+        except Exception:
+            obs_dt = now_dt
+        valid_dt = obs_dt + timedelta(minutes=horizon_min)
+
         return {
             "status": "success",
             "event_id": event_id,
+            "data_mode": cube_data.get("data_mode", "synthetic"),
+            "data_quality": cube_data.get("data_quality", "SYNTHETIC"),
+            "is_valid": cube_data.get("is_valid", True),
+            "model_status": ai_engine.model_status,
+            "inference_mode": ai_engine.inference_mode,
+            "model_provenance": ai_engine.get_model_provenance(),
             "horizon_minutes": horizon_min,
-            "timestamp": cube_data["timestamp"],
+            "timestamp": obs_iso,
+            "timestamps": {
+                "observation_time": obs_iso,
+                "ingestion_time": cube_data.get("ingestion_timestamp") or now_dt.isoformat(),
+                "forecast_generation_time": now_dt.isoformat(),
+                "forecast_valid_time": valid_dt.isoformat()
+            },
             "bounds": cube_data["bounds"],
             "grid_dimensions": {"rows": 32, "cols": 32},
+            "channel_provenance": cube_data.get("channel_provenance", {}),
+            "channel_status": cube_data.get("channel_status", {}),
+            "real_channels": cube_data.get("real_channels", []),
+            "fallback_channels": cube_data.get("fallback_channels", []),
+            "missing_channels": cube_data.get("missing_channels", []),
+            "fallback_used": cube_data.get("fallback_used", False),
+            "source_statuses": cube_data.get("source_statuses", {}),
             "atmospheric_conditions": {
-                "temperature_c": base_temp,
-                "relative_humidity_percent": base_rh,
-                "cape_jkg": int(base_cape),
-                "wind_speed_direction": base_wind,
+                "temperature_c": cube_data["nwp_variables"]["temperature_2m"] if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("temperature_2m") is not None else base_temp,
+                "relative_humidity_percent": cube_data["nwp_variables"]["relative_humidity_2m"] if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("relative_humidity_2m") is not None else base_rh,
+                "cape_jkg": int(cube_data["nwp_variables"]["cape_jkg"]) if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("cape_jkg") is not None else int(base_cape),
+                "wind_speed_direction": f"10m Wind: {cube_data['nwp_variables']['wind_speed_10m']} km/h" if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("wind_speed_10m") is not None else base_wind,
                 "pressure_hpa": int(base_press),
-                "precipitable_water_mm": int(base_tpw)
+                "precipitable_water_mm": int(cube_data["nwp_variables"]["total_precipitable_water_mm"]) if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("total_precipitable_water_mm") is not None else int(base_tpw)
             },
             "probability_curves": {
                 "thunderstorm": prob_curve_thunder,
