@@ -111,7 +111,46 @@ export default function App() {
         activeTab={activeTab}
         systemStatus={systemStatus}
         onOpenProvenance={() => setIsProvenanceOpen(true)}
+        selectedRegion={selectedRegion}
+        setSelectedRegion={setSelectedRegion}
+        selectedLocation={selectedLocation}
       />
+
+      {/* Top Emergency Convective Threat Banner */}
+      {(() => {
+        const topCell = selectedCell || (forecastData?.storm_cells && forecastData.storm_cells[0]);
+        const topAlert = forecastData?.cap_alerts && forecastData.cap_alerts[0];
+        const hasThreat = topCell || topAlert;
+
+        return (
+          <div className={`px-5 py-2.5 flex items-center justify-between text-xs font-mono border-b border-t transition-colors ${
+            hasThreat ? 'bg-[#FEF2F2] border-[#FEE2E2] text-[#991B1B]' : 'bg-[#F0FDF4] border-[#DCFCE7] text-[#166534]'
+          }`}>
+            <div className="flex items-center space-x-3 overflow-x-auto">
+              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-sans shrink-0 ${
+                hasThreat ? 'bg-[#DC2626] text-white' : 'bg-[#16A34A] text-white'
+              }`}>
+                {hasThreat ? '⚡ CONVECTIVE THREAT WARNING' : '✓ NORMAL ATMOSPHERIC STATUS'}
+              </span>
+
+              {hasThreat ? (
+                <div className="flex items-center space-x-4 font-sans text-xs">
+                  <span><strong className="font-mono text-[#0F2942]">Location:</strong> {selectedLocation?.name || 'Hyderabad, Telangana'}</span>
+                  <span><strong className="font-mono text-[#0F2942]">Storm ID:</strong> {topCell?.cell_id || 'CELL-A'}</span>
+                  <span><strong className="font-mono text-[#0F2942]">Movement:</strong> {topCell?.movement ? `${topCell.movement.direction_compass} @ ${topCell.movement.speed_kmh} km/h` : 'SE @ 24 km/h'}</span>
+                  <span><strong className="font-mono text-[#0F2942]">Lifecycle:</strong> <span className="font-bold text-[#DC2626]">{topCell?.lifecycle_state || 'RAPIDLY INTENSIFYING'}</span></span>
+                </div>
+              ) : (
+                <span className="font-sans text-xs">NO ACTIVE CONVECTIVE WARNING — All regional atmospheric sectors operating within safe baseline thresholds.</span>
+              )}
+            </div>
+
+            <div className="hidden lg:flex items-center space-x-2 text-[10px] text-[#47637E] font-mono shrink-0 ml-2">
+              <span>Updated: {forecastData?.timestamp ? new Date(forecastData.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Historical Replay Banner if activeTab === 'replay' */}
       {activeTab === 'replay' && (

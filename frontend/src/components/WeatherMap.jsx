@@ -571,6 +571,23 @@ export default function WeatherMap({
 
   }, [forecastData, mapLoaded, activeLayers, horizonMin, selectedRegion]);
 
+  // Selected Cell Map Centering & Focus Effect
+  // Selected Cell Map Centering & Focus Effect
+useEffect(() => {
+  const map = mapRef.current;
+  if (!map || !mapLoaded || !selectedCell?.center) return;
+
+  const { lat, lon } = selectedCell.center;
+
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+
+  map.flyTo({
+    center: [lon, lat],
+    zoom: Math.max(map.getZoom(), 8.5),
+    essential: true
+  });
+}, [selectedCell, mapLoaded]);
+
   const handleZoomIn = () => mapRef.current?.zoomIn();
   const handleZoomOut = () => mapRef.current?.zoomOut();
   const handleResetCenter = () => mapRef.current?.flyTo({ center: currentRegion.center, zoom: currentRegion.zoom });
@@ -652,22 +669,41 @@ export default function WeatherMap({
 
       {/* Bottom-Left Reflectivity Scale Legend */}
       <div className="absolute bottom-3 left-3 z-20 bg-[#F8FCFE]/95 backdrop-blur-xs p-2.5 rounded-lg border border-[#D0E3F0] shadow-sm font-sans text-xs">
-        <div className="text-[10px] font-bold text-[#0F2942] uppercase tracking-wider mb-1">
-          Radar Reflectivity (dBZ)
+        <div className="text-[10px] font-bold text-[#0F2942] uppercase tracking-wider mb-1 flex items-center justify-between gap-2">
+          <span>Radar Reflectivity Scale (dBZ)</span>
+          {selectedCell && (
+            <span className="text-[9px] font-mono text-[#DC2626] font-bold bg-[#FEF2F2] px-1.5 py-0.5 rounded border border-[#FEE2E2]">
+              Focus: {selectedCell.cell_id}
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-4 gap-1 text-[9px] font-mono font-semibold text-[#0F2942] mb-1">
+          <div className="flex items-center space-x-1">
+            <span className="w-2.5 h-2.5 rounded-xs bg-cyan-400 inline-block border border-cyan-500"></span>
+            <span>15–30 Light</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <span className="w-2.5 h-2.5 rounded-xs bg-yellow-400 inline-block border border-yellow-500"></span>
+            <span>30–45 Mod</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <span className="w-2.5 h-2.5 rounded-xs bg-red-500 inline-block border border-red-600"></span>
+            <span>45–55 Heavy</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <span className="w-2.5 h-2.5 rounded-xs bg-purple-600 inline-block border border-purple-700"></span>
+            <span>&gt;55 Severe</span>
+          </div>
         </div>
         <div className="flex items-center space-x-1 text-[9px] font-mono font-bold text-[#0F2942]">
-          <span>0</span>
-          <div className="flex rounded overflow-hidden border border-[#D0E3F0] h-2.5">
-            <span className="w-3.5 bg-cyan-400 inline-block"></span>
-            <span className="w-3.5 bg-emerald-400 inline-block"></span>
-            <span className="w-3.5 bg-green-500 inline-block"></span>
-            <span className="w-3.5 bg-yellow-400 inline-block"></span>
-            <span className="w-3.5 bg-orange-500 inline-block"></span>
-            <span className="w-3.5 bg-red-500 inline-block"></span>
-            <span className="w-3.5 bg-fuchsia-500 inline-block"></span>
-            <span className="w-3.5 bg-purple-500 inline-block"></span>
+          <span>15</span>
+          <div className="flex flex-1 rounded overflow-hidden border border-[#D0E3F0] h-2">
+            <span className="w-1/4 bg-cyan-400 inline-block"></span>
+            <span className="w-1/4 bg-yellow-400 inline-block"></span>
+            <span className="w-1/4 bg-red-500 inline-block"></span>
+            <span className="w-1/4 bg-purple-600 inline-block"></span>
           </div>
-          <span>70</span>
+          <span>65+</span>
         </div>
       </div>
 
