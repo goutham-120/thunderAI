@@ -20,6 +20,7 @@ import AreaIntelligencePanel from './components/AreaIntelligencePanel';
 import ActiveThreatsPanel from './components/ActiveThreatsPanel';
 import DashboardStatusFooter from './components/DashboardStatusFooter';
 import MultiSourceConsistencyPanel from './components/MultiSourceConsistencyPanel';
+import ForecastEvolutionSection from './components/ForecastEvolutionSection';
 
 import { REGION_CONFIGS } from './components/WeatherMapConfig';
 import indiaStatesData from './data/india_states.json';
@@ -295,6 +296,16 @@ export default function App() {
               {/* Current Atmospheric Conditions */}
               <NowcastSummaryBar
                 forecastData={forecastData}
+              />
+
+              {/* Multi-Horizon Forecast Evolution (+15m to +180m) */}
+              <ForecastEvolutionSection
+                forecastData={forecastData}
+                areaData={areaData}
+                horizonMin={horizonMin}
+                setHorizonMin={setHorizonMin}
+                selectedLocation={selectedLocation}
+                selectedRegion={selectedRegion}
               />
 
               {/* Multi-Source Cross-Observation Consistency Analysis */}
