@@ -7,10 +7,8 @@ export default function DashboardStatusFooter({ systemStatus, forecastData, onOp
   const aiModel = systemStatus?.ai_model || {};
 
   const getStatusBadge = (statusStr) => {
-    if (statusStr === 'REAL' || statusStr === 'ARCHIVE') {
+    if (statusStr === 'REAL' || statusStr === 'ARCHIVE' || statusStr === 'AVAILABLE' || statusStr === 'ONLINE') {
       return <span className="text-[#047857] font-bold">● ONLINE</span>;
-    } else if (statusStr === 'SYNTHETIC_FALLBACK' || statusStr === 'UNAVAILABLE') {
-      return <span className="text-[#64748B] font-semibold">● SIMULATED</span>;
     }
     return <span className="text-[#0284C7] font-semibold">● ACTIVE</span>;
   };

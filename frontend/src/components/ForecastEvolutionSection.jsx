@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, Clock, Zap, Flame, CloudRain, Radio, ChevronRight } from 'lucide-react';
+import { TrendingUp, Clock, Zap, Flame, CloudRain, Radio, ArrowRight, ShieldAlert, Sparkles } from 'lucide-react';
 
 export default function ForecastEvolutionSection({
   forecastData,
@@ -20,27 +20,43 @@ export default function ForecastEvolutionSection({
       <div className="bg-[#F8FCFE] border border-[#D0E3F0] p-4 rounded-xl shadow-xs font-sans text-xs text-[#64829E]">
         <div className="flex items-center space-x-2">
           <Clock className="w-4 h-4 text-[#0284C7] animate-spin" />
-          <span>Calculating multi-horizon forecast evolution...</span>
+          <span>Calculating multi-horizon forecast evolution for selected target...</span>
         </div>
       </div>
     );
   }
 
-  // Determine peak convective horizon for operational insight string
+  // Determine peak convective horizon and overall trend
   let peakItem = evolutionList[0];
+  let firstItem = evolutionList[0];
+  let lastItem = evolutionList[evolutionList.length - 1];
+
   for (const item of evolutionList) {
-    const thu = item.thunderstorm_prob_pct || item.p_thunderstorm || 0;
-    const peakThu = peakItem.thunderstorm_prob_pct || peakItem.p_thunderstorm || 0;
+    const thu = item.thunderstorm_prob_pct ?? item.p_thunderstorm ?? 0;
+    const peakThu = peakItem.thunderstorm_prob_pct ?? peakItem.p_thunderstorm ?? 0;
     if (thu > peakThu) {
       peakItem = item;
     }
   }
 
-  const locationName = selectedLocation?.name || selectedRegion || 'Selected Region';
+  const locationName = selectedLocation?.name || selectedRegion || 'Selected Target';
   const peakTimeLabel = peakItem.label || (peakItem.horizon_min === 0 ? 'NOW' : `+${peakItem.horizon_min}m`);
   const peakThuVal = peakItem.thunderstorm_prob_pct ?? peakItem.p_thunderstorm ?? 0;
   const peakDbzVal = peakItem.max_dbz ?? peakItem.pred_dbz ?? 0;
   const peakRainVal = peakItem.rainfall_rate_mmh ?? peakItem.rainfall_mmh ?? 0;
+  const firstThuVal = firstItem.thunderstorm_prob_pct ?? firstItem.p_thunderstorm ?? 0;
+  const lastThuVal = lastItem.thunderstorm_prob_pct ?? lastItem.p_thunderstorm ?? 0;
+
+  let trendSummary = 'Stable atmospheric baseline';
+  if (peakThuVal > firstThuVal && peakThuVal > 50) {
+    trendSummary = `Convective intensification peaking at ${peakTimeLabel} (${peakThuVal}% storm prob, ${peakDbzVal} dBZ), followed by gradual dissipation toward +180m (${lastThuVal}%).`;
+  } else if (firstThuVal > 50 && lastThuVal < firstThuVal) {
+    trendSummary = `High convective activity currently active (${firstThuVal}%), expected to gradually decay through +180m (${lastThuVal}%).`;
+  } else if (peakThuVal > 30) {
+    trendSummary = `Moderate convective instability predicted with maximum storm probability ${peakThuVal}% around ${peakTimeLabel}.`;
+  } else {
+    trendSummary = `Atmospheric conditions expected to remain mostly quiescent (storm probability < ${Math.max(peakThuVal, 10)}% across all lead times).`;
+  }
 
   const getThreatBadge = (levelStr) => {
     switch (levelStr) {
@@ -57,49 +73,90 @@ export default function ForecastEvolutionSection({
   };
 
   return (
-    <div className="bg-[#F8FCFE] border border-[#D0E3F0] p-4 rounded-xl shadow-xs font-sans space-y-3 select-none">
+    <section aria-label="Forecast Evolution" className="bg-[#F8FCFE] border border-[#D0E3F0] p-4 rounded-xl shadow-xs font-sans space-y-3 select-none">
       
-      {/* Section Header */}
+      {/* 1. Header with Title & Lead Time Selector Indicator */}
       <div className="flex flex-wrap items-center justify-between border-b border-[#E2EAF0] pb-2.5 gap-2">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2.5">
           <div className="p-1.5 rounded-lg bg-[#EEF6FB] border border-[#D0E3F0] text-[#0284C7]">
             <TrendingUp className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-[#0F2942] uppercase tracking-wider font-mono flex items-center gap-2">
-              Forecast Evolution Sequence
-              <span className="text-[9px] px-2 py-0.5 rounded bg-[#0284C7] text-white font-bold">
-                0m → +180m PROJECTION
+            <h2 className="text-xs font-bold text-[#0F2942] uppercase tracking-wider font-mono flex items-center gap-2">
+              <span>FORECAST EVOLUTION</span>
+              <span className="text-[9px] px-2 py-0.5 rounded bg-[#0284C7] text-white font-bold tracking-tight">
+                NOW → +180m PROJECTION
               </span>
-            </h3>
+            </h2>
             <p className="text-[10px] text-[#47637E] font-medium">
-              Multimodal Nowcast progression for <strong className="font-mono text-[#0F2942]">{locationName}</strong>. Click any horizon to select.
+              Multimodal Nowcast Progression for <strong className="font-mono text-[#0F2942]">{locationName}</strong>
             </p>
           </div>
         </div>
 
-        <div className="text-[10px] font-mono text-[#47637E] flex items-center space-x-2">
-          <span>Active Lead Time:</span>
-          <span className="px-2 py-0.5 rounded bg-[#0284C7] text-white font-bold">
-            {horizonMin === 0 ? 'NOW' : `+${horizonMin}m`}
+        <div className="flex items-center space-x-3 text-[10px] font-mono">
+          <span className="text-[#47637E] hidden sm:inline">Selected Horizon:</span>
+          <span className="px-2 py-0.5 rounded bg-[#0284C7] text-white font-bold shadow-2xs">
+            {horizonMin === 0 ? 'NOW (T+0m)' : `+${horizonMin} min`}
           </span>
         </div>
       </div>
 
-      {/* Dynamic Operational Evolution Summary */}
-      <div className="bg-[#EEF6FB] p-2.5 rounded-lg border border-[#D0E3F0] text-xs font-mono text-[#0F2942] flex items-center justify-between">
+      {/* 2. Step-by-Step Evolution Flow Bar (NOW -> +15 -> +30 -> +60 -> +120 -> +180m) */}
+      <div className="bg-[#EEF6FB] p-2.5 rounded-lg border border-[#D0E3F0] flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+        <div className="flex items-center space-x-1.5 overflow-x-auto text-[11px] text-[#0F2942]">
+          <span className="font-bold text-[#47637E] text-[10px] uppercase tracking-wider shrink-0 mr-1">Progression:</span>
+          {evolutionList.map((item, idx) => {
+            const hVal = item.horizon_min;
+            const isSelected = horizonMin === hVal;
+            const thu = item.thunderstorm_prob_pct ?? item.p_thunderstorm ?? 0;
+            const lbl = item.label || (hVal === 0 ? 'NOW' : `+${hVal}m`);
+
+            return (
+              <React.Fragment key={`prog-${hVal}`}>
+                <button
+                  type="button"
+                  onClick={() => setHorizonMin && setHorizonMin(hVal)}
+                  className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#0284C7] text-white shadow-2xs ring-1 ring-[#0284C7]'
+                      : 'bg-white hover:bg-[#D4E6F5] text-[#0F2942] border border-[#D0E3F0]'
+                  }`}
+                  title={`Select ${lbl} horizon (${thu}% storm probability)`}
+                >
+                  <span>{lbl}</span>
+                  <span className={`text-[8px] font-normal ${isSelected ? 'text-white/90' : thu > 50 ? 'text-[#DC2626] font-bold' : 'text-[#47637E]'}`}>
+                    ({thu}%)
+                  </span>
+                </button>
+                {idx < evolutionList.length - 1 && (
+                  <ArrowRight className="w-2.5 h-2.5 text-[#64829E] shrink-0" />
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+
+        <div className="text-[10px] text-[#47637E] font-sans flex items-center space-x-1 shrink-0">
+          <Sparkles className="w-3 h-3 text-[#0284C7]" />
+          <span>Click any step to sync map & sensors</span>
+        </div>
+      </div>
+
+      {/* 3. Operational Trend Insight Banner */}
+      <div className="bg-white p-2.5 rounded-lg border border-[#D0E3F0] text-xs font-mono text-[#0F2942] flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Clock className="w-3.5 h-3.5 text-[#0284C7] shrink-0" />
           <span className="text-[11px]">
-            Peak convective threat predicted at <strong className="text-[#DC2626] font-bold">{peakTimeLabel}</strong> ({peakThuVal}% storm prob, {peakDbzVal} dBZ, {peakRainVal} mm/h rain).
+            <strong className="text-[#0284C7]">Evolution Trend:</strong> {trendSummary}
           </span>
         </div>
         <span className="text-[9px] text-[#64829E] font-sans shrink-0 hidden md:inline">
-          Syncs with spatial nowcast grid
+          Peak threat: <strong className="text-[#DC2626]">{peakTimeLabel}</strong> ({peakDbzVal} dBZ, {peakRainVal} mm/h)
         </span>
       </div>
 
-      {/* 8-Horizon Card Array */}
+      {/* 4. Compact 8-Horizon Card Array (15, 30, 45, 60, 90, 120, 180 min) */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 font-mono">
         {evolutionList.map((item) => {
           const hVal = item.horizon_min;
@@ -138,7 +195,7 @@ export default function ForecastEvolutionSection({
                     <Flame className="w-2.5 h-2.5 text-[#DC2626]" />
                     Storm:
                   </span>
-                  <span className="font-bold text-[#0F2942]">{thu}%</span>
+                  <span className={`font-bold ${thu > 50 ? 'text-[#DC2626]' : 'text-[#0F2942]'}`}>{thu}%</span>
                 </div>
 
                 {/* Lightning Risk */}
@@ -168,10 +225,20 @@ export default function ForecastEvolutionSection({
                   <span className="font-bold text-[#DC2626]">{dbz} dBZ</span>
                 </div>
               </div>
+
+              {/* Active Horizon Pulse Dot */}
+              {isSelected && (
+                <div className="flex items-center justify-center pt-1 border-t border-[#0284C7]/20">
+                  <span className="text-[8px] font-bold text-[#0284C7] uppercase tracking-wider">
+                    ● ACTIVE HORIZON
+                  </span>
+                </div>
+              )}
             </div>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }
+

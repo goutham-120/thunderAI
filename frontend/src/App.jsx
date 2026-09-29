@@ -25,7 +25,7 @@ import ForecastEvolutionSection from './components/ForecastEvolutionSection';
 import { REGION_CONFIGS } from './components/WeatherMapConfig';
 import indiaStatesData from './data/india_states.json';
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = 'http://localhost:8008/api';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('live'); // 'live', 'spatial', 'cells', 'forecast', 'alerts', 'replay', 'explainability', 'model', 'datasources'
@@ -104,7 +104,7 @@ export default function App() {
       .catch(err => console.warn('API error, relying on local synthesis', err));
   }, [horizonMin, activeTab, selectedEventId, selectedRegion, selectedLocation]);
 
-  // Update selected location & Area Intelligence whenever selectedRegion changes
+  // Update selected location whenever selectedRegion changes
   useEffect(() => {
     if (!selectedRegion) return;
 
@@ -121,40 +121,43 @@ export default function App() {
       setSelectedLocation({
         name: state_name,
         lat: centerLat.toFixed(4),
-        lon: centerLon.toFixed(4)
+        lon: centerLon.toFixed(4),
+        bounds
       });
-
-      // Fetch Area Threat Assessment nowcast for the selected State/UT
-      fetch(`${API_BASE}/forecast/area?min_lat=${bounds[0]}&max_lat=${bounds[2]}&min_lon=${bounds[1]}&max_lon=${bounds[3]}&horizon_min=${horizonMin}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data && data.selected_area) {
-            data.selected_area.description = `${state_name} Administrative Region`;
-          }
-          setAreaData(data);
-        })
-        .catch(err => console.warn('Area forecast fetch error', err));
     } else if (REGION_CONFIGS[selectedRegion]) {
       const cfg = REGION_CONFIGS[selectedRegion];
       const loc = cfg.mainLocation || { name: selectedRegion, lat: String(cfg.center[1]), lon: String(cfg.center[0]) };
-      setSelectedLocation(loc);
-
       const b = cfg.bounds;
-      if (b) {
-        fetch(`${API_BASE}/forecast/area?min_lat=${b.minLat}&max_lat=${b.maxLat}&min_lon=${b.minLon}&max_lon=${b.maxLon}&horizon_min=${horizonMin}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data && data.selected_area) {
-              data.selected_area.description = `${selectedRegion} Radar Composite`;
-            }
-            setAreaData(data);
-          })
-          .catch(err => console.warn('Area forecast fetch error', err));
-      } else {
-        setAreaData(null);
-      }
+      setSelectedLocation({
+        ...loc,
+        bounds: b ? [b.minLat, b.minLon, b.maxLat, b.maxLon] : null
+      });
     }
-  }, [selectedRegion, horizonMin]);
+  }, [selectedRegion]);
+
+  // Synchronize Area Intelligence whenever selectedLocation or horizonMin changes
+  useEffect(() => {
+    if (!selectedLocation?.lat || !selectedLocation?.lon) return;
+
+    let url = `${API_BASE}/forecast/area?horizon_min=${horizonMin}`;
+    if (selectedLocation.bounds && Array.isArray(selectedLocation.bounds) && selectedLocation.bounds.length === 4) {
+      const b = selectedLocation.bounds;
+      url += `&min_lat=${b[0]}&min_lon=${b[1]}&max_lat=${b[2]}&max_lon=${b[3]}`;
+    } else {
+      url += `&lat=${selectedLocation.lat}&lon=${selectedLocation.lon}`;
+    }
+
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.selected_area) {
+          data.selected_area.description = selectedLocation.name || 'Selected Target';
+        }
+        setAreaData(data);
+      })
+      .catch(err => console.warn('Area forecast fetch error', err));
+  }, [selectedLocation, horizonMin]);
+
 
   return (
     <div className="min-h-screen bg-atmospheric flex flex-col text-[#0F2942] font-sans selection:bg-[#0284C7] selection:text-white">

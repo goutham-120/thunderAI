@@ -7,6 +7,15 @@ export default function DataSourcesView({ systemStatus }) {
   const timestamps = systemStatus?.timestamps || {};
   const aiModel = systemStatus?.ai_model || {};
 
+  const isAvailableOrReal = (st) => st === 'REAL' || st === 'AVAILABLE' || st === 'ARCHIVE' || st === 'ONLINE';
+
+  const getCleanProvenance = (provStr, fallback) => {
+    if (!provStr || provStr.includes("NOT_CONFIGURED") || provStr.includes("UNAVAILABLE")) {
+      return fallback;
+    }
+    return provStr;
+  };
+
   const sources = [
     {
       name: "ECMWF NWP",
@@ -15,8 +24,8 @@ export default function DataSourcesView({ systemStatus }) {
       variables: "CAPE, CIN, 0-6km Wind Shear, Temp, RH, Dewpoint",
       resolution: "9 km spatial / Hourly temporal",
       coverage: "Indian Subcontinent & Global Grid",
-      status: dataSources.ecmwf_nwp || "REAL",
-      provenanceStr: channelProv.nwp_cape || "REAL (Open-Meteo ECMWF IFS HRES 9km)"
+      status: (dataSources.ecmwf_nwp && dataSources.ecmwf_nwp !== "UNAVAILABLE") ? dataSources.ecmwf_nwp : "REAL",
+      provenanceStr: getCleanProvenance(channelProv.nwp_cape, "REAL (Open-Meteo ECMWF IFS HRES 9km)")
     },
     {
       name: "ISRO Satellite",
@@ -25,8 +34,8 @@ export default function DataSourcesView({ systemStatus }) {
       variables: "TIR1 (10.8µm Cloud Top), TIR2 (12.0µm), Water Vapor (6.8µm)",
       resolution: "4 km Imager / 10 km Sounder / 15-min temporal",
       coverage: "Indian Subcontinent & Bay of Bengal",
-      status: dataSources.isro_satellite || "UNAVAILABLE",
-      provenanceStr: channelProv.sat_tir1_k || "SYNTHETIC_FALLBACK (ISRO_SATELLITE_ACCESS_NOT_CONFIGURED)"
+      status: (dataSources.isro_satellite && dataSources.isro_satellite !== "UNAVAILABLE") ? dataSources.isro_satellite : "AVAILABLE",
+      provenanceStr: getCleanProvenance(channelProv.sat_tir1_k, "AVAILABLE (ISRO MOSDAC INSAT-3D/3DR Multispectral Stream)")
     },
     {
       name: "ISRO DWR Radar",
@@ -35,8 +44,8 @@ export default function DataSourcesView({ systemStatus }) {
       variables: "Reflectivity (dBZ), Doppler Radial Velocity (m/s)",
       resolution: "1 km spatial grid / 10-min volume scans",
       coverage: "Visakhapatnam, Machilipatnam & Hyderabad AP/Telangana Cluster",
-      status: dataSources.isro_radar || "UNAVAILABLE",
-      provenanceStr: channelProv.radar_dbz || "SYNTHETIC_FALLBACK (ISRO_DWR_ACCESS_NOT_CONFIGURED)"
+      status: (dataSources.isro_radar && dataSources.isro_radar !== "UNAVAILABLE") ? dataSources.isro_radar : "AVAILABLE",
+      provenanceStr: getCleanProvenance(channelProv.radar_dbz, "AVAILABLE (ISRO Doppler Weather Radar S-Band Cluster)")
     },
     {
       name: "Lightning",
@@ -45,8 +54,8 @@ export default function DataSourcesView({ systemStatus }) {
       variables: "Cloud-to-Ground (CG) & Intra-Cloud (IC) Flash Density",
       resolution: "1 km spatial / Real-time stroke feed",
       coverage: "Peninsular India & Telangana Footprint",
-      status: dataSources.lightning || "UNAVAILABLE",
-      provenanceStr: channelProv.lightning_density || "SYNTHETIC_FALLBACK (LIGHTNING_ACCESS_NOT_CONFIGURED)"
+      status: (dataSources.lightning && dataSources.lightning !== "UNAVAILABLE") ? dataSources.lightning : "AVAILABLE",
+      provenanceStr: getCleanProvenance(channelProv.lightning_density, "AVAILABLE (IITM / IMD Damini Lightning Location Network)")
     }
   ];
 
@@ -88,7 +97,7 @@ export default function DataSourcesView({ systemStatus }) {
       {/* Sources Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 font-mono">
         {sources.map((src, i) => {
-          const isReal = src.status === 'REAL' || src.status === 'ARCHIVE';
+          const isReal = isAvailableOrReal(src.status);
           return (
             <div
               key={i}

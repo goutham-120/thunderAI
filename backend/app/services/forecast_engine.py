@@ -152,13 +152,20 @@ class ForecastEngine:
         prob_curve_rainfall = []
         forecast_evolution = []
 
-        peak_dbz_val = round(float(np.max(last_frame[:, :, 0])), 1)
+        dbz_frame_0 = last_frame[:, :, 0]
+        peak_dbz_val = round(float(np.max(dbz_frame_0)), 1)
+        rain_grid_0 = np.where(dbz_frame_0 > 15.0, ((10.0 ** (dbz_frame_0 / 10.0)) / 200.0) ** (1.0 / 1.6), 0.0)
+        peak_rain_0 = round(float(np.clip(np.max(rain_grid_0), 0.0, 120.0)), 1)
+        peak_lightning_0 = float(np.max(last_frame[:, :, 4]))
+        p_t_0 = round(float(np.clip(1.0 / (1.0 + np.exp(-(peak_dbz_val - 35.0) / 7.0)), 0.02, 0.98)), 2)
+        p_l_0 = round(float(np.clip(peak_lightning_0 * 0.15 + (0.55 if peak_dbz_val > 38.0 else 0.05), 0.01, 0.96)), 2)
+
 
         for h in [0, 15, 30, 45, 60, 90, 120, 180]:
             if h == 0:
-                p_t = round(float(np.max(last_frame[:, :, 0] > 35.0)) * 0.75, 2)
-                p_l = 0.65
-                r_val = 25.0
+                p_t = p_t_0
+                p_l = p_l_0
+                r_val = peak_rain_0
                 h_dbz = peak_dbz_val
             else:
                 p_res = pred_dict.get(h, pred_dict[30])
@@ -174,14 +181,20 @@ class ForecastEngine:
             prob_curve_lightning.append({"time": f"{h}m", "val": lig_pct})
             prob_curve_rainfall.append({"time": f"{h}m", "val": int(r_val)})
 
+            threat_lvl = "CRITICAL" if thu_pct > 70 else "HIGH" if thu_pct > 40 else "MODERATE" if thu_pct > 20 else "LOW"
             forecast_evolution.append({
                 "horizon_min": h,
                 "label": "NOW" if h == 0 else f"+{h}m",
                 "thunderstorm_prob_pct": thu_pct,
+                "p_thunderstorm": thu_pct,
                 "lightning_prob_pct": lig_pct,
+                "p_lightning": lig_pct,
                 "rainfall_rate_mmh": r_val,
+                "rainfall_mmh": r_val,
                 "max_dbz": h_dbz,
-                "threat_level": "CRITICAL" if thu_pct > 70 else "HIGH" if thu_pct > 40 else "MODERATE" if thu_pct > 20 else "LOW"
+                "pred_dbz": h_dbz,
+                "threat_level": threat_lvl,
+                "status": threat_lvl
             })
 
         # 6. Generate Explainability for dominant cell
@@ -328,7 +341,17 @@ class ForecastEngine:
         Analyzes a user-selected point (lat, lon) or bounding area [min_lat, max_lat, min_lon, max_lon]
         against active storm cell trajectories, radar reflectivity grids, and multi-horizon nowcast models.
         """
-        full_nowcast = self.get_complete_nowcast(horizon_min=horizon_min, event_id=event_id)
+        full_nowcast = self.get_complete_nowcast(
+            horizon_min=horizon_min,
+            event_id=event_id,
+            lat=lat,
+            lon=lon,
+            min_lat=min_lat,
+            max_lat=max_lat,
+            min_lon=min_lon,
+            max_lon=max_lon
+        )
+
 
         # 1. Determine Target Geometry
         is_box = min_lat is not None and max_lat is not None and min_lon is not None and max_lon is not None
@@ -428,15 +451,22 @@ class ForecastEngine:
                 rain = 0.0
                 dbz = 15.0
 
+            threat_badge = "CRITICAL" if p_thu > 70 else "HIGH" if p_thu > 40 else "MODERATE" if p_thu > 20 else "LOW"
             area_nowcast_timeline.append({
                 "horizon_min": h,
-                "label": f"T+{h}m" if h > 0 else "NOW",
+                "label": "NOW" if h == 0 else f"+{h}m",
                 "pred_dbz": dbz,
+                "max_dbz": dbz,
                 "p_thunderstorm": p_thu,
+                "thunderstorm_prob_pct": p_thu,
                 "p_lightning": p_lig,
+                "lightning_prob_pct": p_lig,
                 "rainfall_mmh": rain,
+                "rainfall_rate_mmh": rain,
+                "threat_level": threat_badge,
                 "status": "IMPACT" if p_thu > 70 else "MODERATE" if p_thu > 40 else "CLEAR"
             })
+
 
         # 2. Infrastructure Proximity Threat Assessment
         infra_assets = [

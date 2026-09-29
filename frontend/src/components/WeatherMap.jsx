@@ -771,7 +771,19 @@ export default function WeatherMap({
           }
         }
       });
+
+      map.on('click', (e) => {
+        const features = map.queryRenderedFeatures(e.point, { layers: ['cities-points'] });
+        if (features.length === 0 && onLocationSelect) {
+          onLocationSelect({
+            name: `${e.lngLat.lat.toFixed(2)}°N, ${e.lngLat.lng.toFixed(2)}°E (${selectedRegion || 'Target'})`,
+            lat: e.lngLat.lat.toFixed(4),
+            lon: e.lngLat.lng.toFixed(4)
+          });
+        }
+      });
     });
+
 
     mapRef.current = map;
 

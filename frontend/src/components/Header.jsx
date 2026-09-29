@@ -43,7 +43,7 @@ export default function Header({
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/health')
+    fetch('http://localhost:8008/api/health')
       .then(res => res.json())
       .then(data => {
         if (data.dwr_radar_status && data.dwr_radar_status.includes('SYNTHETIC')) {

@@ -256,6 +256,9 @@ class ConsistencyAnalyzer:
             # Check for explicit meteorological divergence
             divergence_found = False
             div_reason = None
+            has_divergence = False
+            divergence_reason = None
+
 
             # Divergence Case 1: High Radar echo but zero/low Lightning
             if radar_level == "STRONG" and light_level in ("MINIMAL", "WEAK"):
