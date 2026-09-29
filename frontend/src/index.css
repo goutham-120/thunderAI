@@ -90,3 +90,12 @@
 .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
   border-top-color: #EEF4FA !important;
 }
+
+/* Page-level fade-in for view transitions */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out both;
+}

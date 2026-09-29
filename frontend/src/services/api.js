@@ -2,7 +2,7 @@
  * VAJRA AI - Centralized Backend API Client Service
  */
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = 'http://localhost:8008/api';
 
 /**
  * Helper wrapper for fetch with standard JSON error handling & fallback

@@ -4,6 +4,7 @@ Renders geographically referenced 2-panel Reflectivity (DBZ) and Radial Velocity
 """
 import os
 import logging
+from typing import Dict, Any
 import numpy as np
 
 try:
@@ -17,7 +18,7 @@ except ImportError:
 logger = logging.getLogger("VAJRA-AI.RadarVisualization")
 
 class RadarVisualization:
-    def __init__(self, output_dir: str = r"c:\Users\nalla\OneDrive\Documents\Thunder\thunderAI\backend\data\radar_plots"):
+    def __init__(self, output_dir: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "data", "radar_plots")):
         self.output_dir = output_dir
         os.makedirs(self.output_dir, exist_ok=True)
 

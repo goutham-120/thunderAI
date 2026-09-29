@@ -63,11 +63,17 @@ def lon_to_col(lon_deg: float, min_lon: float = SECTOR_LEFT_LON, max_lon: float 
     frac = (lon_deg - min_lon) / (max_lon - min_lon)
     return int(np.clip(round(frac * (cols - 1)), 0, cols - 1))
 
+import os as _os
+_THIS_DIR = _os.path.dirname(_os.path.abspath(__file__))
+_BACKEND_DIR = _os.path.normpath(_os.path.join(_THIS_DIR, "..", ".."))
+_DEFAULT_DATA_DIR = _os.path.join(_os.path.expanduser("~"), "Downloads")
+_DEFAULT_CACHE_DIR = _os.path.join(_BACKEND_DIR, "data", "insat_cache")
+
 class INSAT3DSProcessor:
     def __init__(
         self,
-        data_dir: str = r"C:\Users\nalla\Downloads",
-        cache_dir: str = r"C:\Users\nalla\OneDrive\Documents\Thunder\thunderAI\backend\data\insat_cache"
+        data_dir: str = _DEFAULT_DATA_DIR,
+        cache_dir: str = _DEFAULT_CACHE_DIR
     ):
         self.data_dir = data_dir
         self.cache_dir = cache_dir

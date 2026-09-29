@@ -13,9 +13,10 @@ from scipy.io import netcdf_file
 
 logger = logging.getLogger("VAJRA-AI.RadarLoader")
 
+import os as _os
 SEARCH_PATHS = [
-    r"C:\Users\nalla\Downloads",
-    r"c:\Users\nalla\OneDrive\Documents\Thunder\thunderAI\backend\data\radar"
+    _os.path.join(_os.path.expanduser("~"), "Downloads"),
+    _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "..", "data", "radar")
 ]
 
 class RadarLoader:

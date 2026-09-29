@@ -624,6 +624,8 @@ export default function App() {
           {activeTab === 'alerts' && (
             <AlertsView
               alerts={forecastData?.cap_alerts}
+              selectedLocation={selectedLocation}
+              selectedRegion={selectedRegion}
             />
           )}
 

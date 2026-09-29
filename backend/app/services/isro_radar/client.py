@@ -182,6 +182,11 @@ class ISRORadarClient:
         last_error = ""
         attempt = 0
         start_time = time.time()
+        # Safe defaults — set here so they are always in scope for the
+        # UNAVAILABLE fallback return block (avoids NameError when the
+        # API request fails before is_cov / cov_desc are ever assigned).
+        is_cov = False
+        cov_desc = f"ISRO DWR {self.radar_id} (coverage undetermined)"
 
         while attempt < self.max_retries:
             attempt += 1
