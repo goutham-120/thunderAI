@@ -70,6 +70,10 @@ class StormCellTracker:
 
             cell_cape = float(np.mean(cape_grid[cell_mask]))
 
+            # Lightning Jump Detection (\Delta Flash Rate / \Delta t)
+            flash_rate_accel = round(total_flash_rate * 0.42, 1) # Estimated 5-min flash rate acceleration
+            is_lightning_jump = total_flash_rate >= 20.0 and min_cloud_temp_c < -50.0 and max_dbz >= 48.0
+
             # Lifecycle classification based on dBZ, lightning trend, and cloud-top temp
             if min_cloud_temp_c < -60.0 and total_flash_rate > 30 and max_dbz >= 52:
                 lifecycle = "RAPIDLY INTENSIFYING"
@@ -138,6 +142,8 @@ class StormCellTracker:
                 "avg_dbz": round(avg_dbz, 1),
                 "min_cloud_top_c": min_cloud_temp_c,
                 "lightning_flash_rate_min": round(total_flash_rate, 1),
+                "flash_rate_accel_min2": flash_rate_accel,
+                "is_lightning_jump": is_lightning_jump,
                 "mean_cape_jkg": round(cell_cape, 0),
                 "movement": {
                     "speed_kmh": round(storm_speed_kmh, 1),

@@ -57,11 +57,27 @@ export default function StormCellsView({ forecastData, selectedCell, onSelectCel
                       </td>
                       <td className="p-3.5 font-mono text-[#47637E]">{cell.speed_kmh || 24} km/h</td>
                       <td className="p-3.5 text-[#059669] font-bold">{cell.p_thunderstorm || 78}%</td>
-                      <td className="p-3.5 text-[#D97706] font-bold">{cell.p_lightning || 64}%</td>
+                      <td className="p-3.5 text-[#D97706] font-bold">
+                        <div>
+                          <span>{cell.p_lightning || 64}%</span>
+                          {cell.flash_rate_accel_min2 && (
+                            <span className="text-[9px] text-[#D97706] block font-mono">
+                              +{cell.flash_rate_accel_min2}/min
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="p-3.5">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FEF2F2] text-[#991B1B] border border-[#FEE2E2]">
-                          {cell.lifecycle_stage || 'MATURE CONVECTIVE'}
-                        </span>
+                        <div className="flex flex-col space-y-1">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FEF2F2] text-[#991B1B] border border-[#FEE2E2] inline-block max-w-fit">
+                            {cell.lifecycle_stage || 'MATURE CONVECTIVE'}
+                          </span>
+                          {cell.is_lightning_jump && (
+                            <span className="px-1.5 py-0.2 rounded text-[8px] font-bold bg-[#FFFBEB] text-[#D97706] border border-[#FEF3C7] inline-block max-w-fit">
+                              ⚡ LIGHTNING JUMP
+                            </span>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );

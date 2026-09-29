@@ -55,7 +55,7 @@ export default function ForecastView({ forecastData, horizonMin, setHorizonMin }
             <span className="text-xs font-bold uppercase font-sans">Thunderstorm Risk</span>
           </div>
           <div className="text-2xl font-bold text-[#0F2942]">
-            {summary.max_thunderstorm_prob_pct ?? risk.p_thunderstorm_percent ?? 78}%
+            {summary.max_thunderstorm_prob_percent ?? summary.max_thunderstorm_prob_pct ?? risk.p_thunderstorm_percent ?? 78}%
           </div>
           <div className="text-[10px] text-[#47637E] font-sans">
             Horizon +{horizonMin}m Peak Probability
@@ -68,7 +68,7 @@ export default function ForecastView({ forecastData, horizonMin, setHorizonMin }
             <span className="text-xs font-bold uppercase font-sans">Lightning Risk</span>
           </div>
           <div className="text-2xl font-bold text-[#0F2942]">
-            {summary.max_lightning_prob_pct ?? risk.p_lightning_percent ?? 64}%
+            {summary.max_lightning_prob_percent ?? summary.max_lightning_prob_pct ?? risk.p_lightning_percent ?? 64}%
           </div>
           <div className="text-[10px] text-[#47637E] font-sans">
             Stroke Density Potential
@@ -81,7 +81,7 @@ export default function ForecastView({ forecastData, horizonMin, setHorizonMin }
             <span className="text-xs font-bold uppercase font-sans">Rainfall Rate</span>
           </div>
           <div className="text-2xl font-bold text-[#0F2942]">
-            {summary.max_rainfall_rate_mmh ?? 12.4} mm/h
+            {summary.max_rain_intensity_mmh ?? summary.max_rainfall_rate_mmh ?? 12.4} mm/h
           </div>
           <div className="text-[10px] text-[#47637E] font-sans">
             Precipitation Accumulation
@@ -94,7 +94,7 @@ export default function ForecastView({ forecastData, horizonMin, setHorizonMin }
             <span className="text-xs font-bold uppercase font-sans">Radar dBZ Peak</span>
           </div>
           <div className="text-2xl font-bold text-[#0F2942]">
-            {summary.max_reflectivity_dbz ?? 52} dBZ
+            {summary.peak_radar_dbz ?? summary.max_reflectivity_dbz ?? 52} dBZ
           </div>
           <div className="text-[10px] text-[#47637E] font-sans">
             Convective Core Reflectivity
@@ -111,14 +111,17 @@ export default function ForecastView({ forecastData, horizonMin, setHorizonMin }
 
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
           {horizons.map(h => {
-            const decay = Math.max(0.45, 1.0 - (h / 300));
-            const pVal = Math.round(78 * decay);
+            const curve = forecastData?.probability_curves?.thunderstorm || [];
+            const match = curve.find(item => item.time === `${h}m`);
+            const baseProb = summary.max_thunderstorm_prob_percent ?? summary.max_thunderstorm_prob_pct ?? 78;
+            const pVal = match && match.val !== undefined ? match.val : Math.round(baseProb * Math.max(0.45, 1.0 - (h / 300)));
+            
             return (
               <div key={h} className="bg-[#EEF6FB] border border-[#D0E3F0] p-3 rounded-lg text-center space-y-1">
                 <span className="text-[10px] text-[#47637E] font-bold block">+{h} MIN</span>
                 <span className="text-sm font-bold text-[#0284C7]">{pVal}%</span>
                 <div className="w-full bg-[#D0E3F0] h-1.5 rounded-full overflow-hidden mt-1">
-                  <div className="bg-[#0284C7] h-full rounded-full" style={{ width: `${pVal}%` }} />
+                  <div className="bg-[#0284C7] h-full rounded-full" style={{ width: `${Math.min(100, pVal)}%` }} />
                 </div>
               </div>
             );

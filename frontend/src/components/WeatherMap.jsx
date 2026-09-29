@@ -5,9 +5,13 @@ import {
   Plus,
   Minus,
   Crosshair,
-  Zap
+  Zap,
+  MapPin,
+  Square,
+  X
 } from 'lucide-react';
 import { REGION_CONFIGS } from './WeatherMapConfig';
+import indiaStatesData from '../data/india_states.json';
 
 export default function WeatherMap({
   forecastData,
@@ -199,6 +203,144 @@ export default function WeatherMap({
     return canvas.toDataURL();
   };
 
+  const createGeographicSelectionFeatures = (label, bounds, center, isCustom = false) => {
+    let minLat, maxLat, minLon, maxLon;
+    let centerLat, centerLon;
+
+    if (bounds) {
+      if (Array.isArray(bounds)) {
+        [minLat, minLon, maxLat, maxLon] = bounds;
+      } else {
+        ({ minLat, maxLat, minLon, maxLon } = bounds);
+      }
+    }
+
+    if (center) {
+      [centerLon, centerLat] = center;
+    } else if (minLat !== undefined && maxLat !== undefined) {
+      centerLat = (minLat + maxLat) / 2;
+      centerLon = (minLon + maxLon) / 2;
+    }
+
+    if (minLat === undefined && centerLat !== undefined) {
+      minLat = centerLat - 0.8;
+      maxLat = centerLat + 0.8;
+      minLon = centerLon - 1.0;
+      maxLon = centerLon + 1.0;
+    }
+
+    if (centerLat === undefined || centerLon === undefined) return null;
+
+    const radiusLatKm = Math.max(((maxLat - minLat) / 2) * 111.32, 14);
+    const radiusLonKm = Math.max(((maxLon - minLon) / 2) * 111.32 * Math.cos((centerLat * Math.PI) / 180), 14);
+
+    // Generate 64-point smooth geographic ellipse ring
+    const ellipseCoords = [];
+    const points = 64;
+    const kmPerDegreeLat = 111.32;
+    const kmPerDegreeLon = 111.32 * Math.cos((centerLat * Math.PI) / 180);
+
+    for (let i = 0; i < points; i++) {
+      const angle = (i / points) * (2 * Math.PI);
+      const dx = radiusLonKm * Math.cos(angle);
+      const dy = radiusLatKm * Math.sin(angle);
+
+      const lon = centerLon + dx / kmPerDegreeLon;
+      const lat = centerLat + dy / kmPerDegreeLat;
+      ellipseCoords.push([lon, lat]);
+    }
+    ellipseCoords.push(ellipseCoords[0]);
+
+    // Bounding rectangle box ring
+    const boxCoords = [[
+      [minLon, maxLat],
+      [maxLon, maxLat],
+      [maxLon, minLat],
+      [minLon, minLat],
+      [minLon, maxLat]
+    ]];
+
+    const labelText = isCustom ? '● SELECTED AREA TARGET' : `● AREA: ${label.toUpperCase()}`;
+
+    return {
+      boxFill: {
+        type: 'Feature',
+        properties: { name: labelText, type: 'selection-fill', isCustom },
+        geometry: {
+          type: 'Polygon',
+          coordinates: boxCoords
+        }
+      },
+      ellipse: {
+        type: 'Feature',
+        properties: { name: labelText, type: 'selection-ellipse', isCustom },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [ellipseCoords]
+        }
+      },
+      box: {
+        type: 'Feature',
+        properties: { name: labelText, type: 'selection-box', isCustom },
+        geometry: {
+          type: 'Polygon',
+          coordinates: boxCoords
+        }
+      },
+      center: {
+        type: 'Feature',
+        properties: { name: labelText, type: 'selection-center', isCustom },
+        geometry: {
+          type: 'Point',
+          coordinates: [centerLon, centerLat]
+        }
+      },
+      corners: [
+        { type: 'Feature', properties: { type: 'selection-corner' }, geometry: { type: 'Point', coordinates: [minLon, maxLat] } },
+        { type: 'Feature', properties: { type: 'selection-corner' }, geometry: { type: 'Point', coordinates: [maxLon, maxLat] } },
+        { type: 'Feature', properties: { type: 'selection-corner' }, geometry: { type: 'Point', coordinates: [maxLon, minLat] } },
+        { type: 'Feature', properties: { type: 'selection-corner' }, geometry: { type: 'Point', coordinates: [minLon, minLat] } }
+      ],
+      labelBadge: {
+        type: 'Feature',
+        properties: { name: labelText, type: 'selection-label' },
+        geometry: {
+          type: 'Point',
+          coordinates: [minLon, maxLat]
+        }
+      }
+    };
+  };
+
+  const bringSelectionLayersToFront = (map) => {
+    if (!map) return;
+    const layersToMove = [
+      'india-all-states-base-outline',
+      'selected-state-polygon-fill',
+      'selected-state-polygon-glow',
+      'selected-state-polygon-outline',
+      'selected-region-fill',
+      'selected-region-outline-glow',
+      'selected-region-box',
+      'selected-region-outline',
+      'selected-region-corner',
+      'selected-region-center',
+      'selected-region-label',
+      'selected-area-fill',
+      'selected-area-outline-glow',
+      'selected-area-box',
+      'selected-area-outline',
+      'selected-area-corner',
+      'selected-area-center',
+      'selected-area-label'
+    ];
+    layersToMove.forEach(id => {
+      if (map.getLayer(id)) {
+        map.moveLayer(id);
+      }
+    });
+  };
+
   // Initialize MapLibre
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
@@ -248,6 +390,170 @@ export default function WeatherMap({
 
     map.on('load', () => {
       setMapLoaded(true);
+
+      // Register India States GeoJSON boundary source & polygon layers
+      map.addSource('india-states-boundary-source', {
+        type: 'geojson',
+        data: indiaStatesData
+      });
+
+      map.addLayer({
+        id: 'india-all-states-base-outline',
+        type: 'line',
+        source: 'india-states-boundary-source',
+        paint: {
+          'line-color': '#64748B',
+          'line-width': 1.2,
+          'line-opacity': 0.35
+        }
+      });
+
+      map.addLayer({
+        id: 'selected-state-polygon-fill',
+        type: 'fill',
+        source: 'india-states-boundary-source',
+        filter: ['==', 'state_name', ''],
+        paint: {
+          'fill-color': '#0284C7',
+          'fill-opacity': 0.18
+        }
+      });
+
+      map.addLayer({
+        id: 'selected-state-polygon-glow',
+        type: 'line',
+        source: 'india-states-boundary-source',
+        filter: ['==', 'state_name', ''],
+        paint: {
+          'line-color': '#FFFFFF',
+          'line-width': 7.5,
+          'line-opacity': 0.9
+        }
+      });
+
+      map.addLayer({
+        id: 'selected-state-polygon-outline',
+        type: 'line',
+        source: 'india-states-boundary-source',
+        filter: ['==', 'state_name', ''],
+        paint: {
+          'line-color': '#0284C7',
+          'line-width': 3.5,
+          'line-opacity': 1.0
+        }
+      });
+
+      // Helper function to register selection boundary sources & layers
+      const addSelectionLayers = (sourceId, layerPrefix, defaultColor) => {
+        map.addSource(sourceId, {
+          type: 'geojson',
+          data: { type: 'FeatureCollection', features: [] }
+        });
+
+        // 1. Transparent Cyan Fill over entire bounding box
+        map.addLayer({
+          id: `${layerPrefix}-fill`,
+          type: 'fill',
+          source: sourceId,
+          filter: ['in', 'type', 'selection-fill', 'selection-ellipse'],
+          paint: {
+            'fill-color': defaultColor,
+            'fill-opacity': 0.18
+          }
+        });
+
+        // 2. High-Contrast White Casing Outer Glow (7.5px)
+        map.addLayer({
+          id: `${layerPrefix}-outline-glow`,
+          type: 'line',
+          source: sourceId,
+          filter: ['in', 'type', 'selection-box', 'selection-ellipse'],
+          paint: {
+            'line-color': '#FFFFFF',
+            'line-width': 7.5,
+            'line-opacity': 0.9
+          }
+        });
+
+        // 3. Primary Solid Bounding Box Border (3.5px)
+        map.addLayer({
+          id: `${layerPrefix}-box`,
+          type: 'line',
+          source: sourceId,
+          filter: ['==', 'type', 'selection-box'],
+          paint: {
+            'line-color': defaultColor,
+            'line-width': 3.5,
+            'line-opacity': 1.0
+          }
+        });
+
+        // 4. Secondary Inner Dashed Target Ring
+        map.addLayer({
+          id: `${layerPrefix}-outline`,
+          type: 'line',
+          source: sourceId,
+          filter: ['==', 'type', 'selection-ellipse'],
+          paint: {
+            'line-color': '#38BDF8',
+            'line-width': 2.5,
+            'line-dasharray': [4, 3],
+            'line-opacity': 0.9
+          }
+        });
+
+        // 5. Corner Target Dots
+        map.addLayer({
+          id: `${layerPrefix}-corner`,
+          type: 'circle',
+          source: sourceId,
+          filter: ['==', 'type', 'selection-corner'],
+          paint: {
+            'circle-radius': 5.5,
+            'circle-color': defaultColor,
+            'circle-stroke-width': 2.5,
+            'circle-stroke-color': '#FFFFFF'
+          }
+        });
+
+        // 6. Center Point Marker
+        map.addLayer({
+          id: `${layerPrefix}-center`,
+          type: 'circle',
+          source: sourceId,
+          filter: ['==', 'type', 'selection-center'],
+          paint: {
+            'circle-radius': 8,
+            'circle-color': defaultColor,
+            'circle-stroke-width': 2.5,
+            'circle-stroke-color': '#FFFFFF'
+          }
+        });
+
+        // 7. Top-Left "SELECTED AREA" Map Text Badge Label
+        map.addLayer({
+          id: `${layerPrefix}-label`,
+          type: 'symbol',
+          source: sourceId,
+          filter: ['==', 'type', 'selection-label'],
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 11,
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+            'text-offset': [0.6, 0.6],
+            'text-anchor': 'top-left',
+            'text-transform': 'uppercase'
+          },
+          paint: {
+            'text-color': '#0F2942',
+            'text-halo-color': '#F8FCFE',
+            'text-halo-width': 3.5
+          }
+        });
+      };
+
+      addSelectionLayers('selected-region-source', 'selected-region', '#0284C7');
+      addSelectionLayers('selected-area-source', 'selected-area', '#0284C7');
 
       // Add Cities
       const cityFeatures = currentRegion.cities.map(c => ({
@@ -362,6 +668,97 @@ export default function WeatherMap({
         }
       });
 
+      // --- Storm Cells & Trajectory Sources ---
+      map.addSource('storm-cells-source', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      });
+      map.addSource('storm-trajectory-cone-source', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      });
+      map.addSource('storm-trajectory-line-source', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      });
+      map.addSource('storm-trajectory-points-source', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      });
+
+      // 1. Trajectory Expanding Uncertainty Cone Fill
+      map.addLayer({
+        id: 'storm-trajectory-cone-fill',
+        type: 'fill',
+        source: 'storm-trajectory-cone-source',
+        paint: {
+          'fill-color': '#DC2626',
+          'fill-opacity': 0.14
+        }
+      });
+
+      // 2. Trajectory Directional Line Arrow
+      map.addLayer({
+        id: 'storm-trajectory-line',
+        type: 'line',
+        source: 'storm-trajectory-line-source',
+        paint: {
+          'line-color': '#DC2626',
+          'line-width': 3,
+          'line-dasharray': [3, 2]
+        }
+      });
+
+      // 3. Storm Core Polygon Fill & Outline
+      map.addLayer({
+        id: 'storm-cells-polygon-fill',
+        type: 'fill',
+        source: 'storm-cells-source',
+        paint: {
+          'fill-color': '#DC2626',
+          'fill-opacity': 0.35
+        }
+      });
+      map.addLayer({
+        id: 'storm-cells-polygon-outline',
+        type: 'line',
+        source: 'storm-cells-source',
+        paint: {
+          'line-color': '#DC2626',
+          'line-width': 2.5
+        }
+      });
+
+      // 4. Trajectory Point Markers & Horizon Labels
+      map.addLayer({
+        id: 'storm-trajectory-points',
+        type: 'circle',
+        source: 'storm-trajectory-points-source',
+        paint: {
+          'circle-radius': 5,
+          'circle-color': '#DC2626',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#FFFFFF'
+        }
+      });
+      map.addLayer({
+        id: 'storm-trajectory-labels',
+        type: 'symbol',
+        source: 'storm-trajectory-points-source',
+        layout: {
+          'text-field': ['get', 'label'],
+          'text-size': 10,
+          'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+          'text-offset': [0.6, -0.6],
+          'text-anchor': 'left'
+        },
+        paint: {
+          'text-color': '#991B1B',
+          'text-halo-color': '#FFFFFF',
+          'text-halo-width': 2
+        }
+      });
+
       map.on('click', 'cities-points', (e) => {
         if (e.features && e.features[0]) {
           const props = e.features[0].properties;
@@ -384,33 +781,112 @@ export default function WeatherMap({
     };
   }, []);
 
-  // Update Region Dynamic Center & Cities
+  // Update Region Dynamic Center, Cities & State Polygon / Box Selection Overlay
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapLoaded) return;
 
-    map.flyTo({ center: currentRegion.center, zoom: currentRegion.zoom, essential: true });
+    // Check if selectedRegion corresponds to a State or Union Territory polygon feature
+    const matchedState = indiaStatesData.features.find(
+      f => f.properties && f.properties.state_name === selectedRegion
+    );
 
-    const cityFeatures = currentRegion.cities.map(c => ({
-      type: 'Feature',
-      properties: { name: c.name, isMain: !!c.isMain, isState: !!c.isState, lat: c.lat, lon: c.lon },
-      geometry: { type: 'Point', coordinates: [c.lon, c.lat] }
-    }));
+    const regionSource = map.getSource('selected-region-source');
 
-    if (map.getSource('cities')) {
-      map.getSource('cities').setData({ type: 'FeatureCollection', features: cityFeatures });
+    if (matchedState) {
+      // Highlight state polygon using MapLibre filter
+      if (map.getLayer('selected-state-polygon-fill')) {
+        map.setFilter('selected-state-polygon-fill', ['==', 'state_name', selectedRegion]);
+      }
+      if (map.getLayer('selected-state-polygon-glow')) {
+        map.setFilter('selected-state-polygon-glow', ['==', 'state_name', selectedRegion]);
+      }
+      if (map.getLayer('selected-state-polygon-outline')) {
+        map.setFilter('selected-state-polygon-outline', ['==', 'state_name', selectedRegion]);
+      }
+
+      // Clear legacy box overlay so it doesn't overlap exact state polygon
+      if (regionSource) {
+        regionSource.setData({ type: 'FeatureCollection', features: [] });
+      }
+
+      // Fit map camera to exact State/UT bounds: [minLat, minLon, maxLat, maxLon]
+      const b = matchedState.properties.bounds;
+      if (b && b.length === 4) {
+        map.fitBounds([[b[1], b[0]], [b[3], b[2]]], { padding: 60, maxZoom: 9.5, duration: 1000 });
+      } else if (matchedState.properties.center) {
+        map.flyTo({ center: matchedState.properties.center, zoom: 7.5, essential: true });
+      }
+    } else {
+      // Clear State polygon highlights
+      if (map.getLayer('selected-state-polygon-fill')) {
+        map.setFilter('selected-state-polygon-fill', ['==', 'state_name', '']);
+      }
+      if (map.getLayer('selected-state-polygon-glow')) {
+        map.setFilter('selected-state-polygon-glow', ['==', 'state_name', '']);
+      }
+      if (map.getLayer('selected-state-polygon-outline')) {
+        map.setFilter('selected-state-polygon-outline', ['==', 'state_name', '']);
+      }
+
+      // Fallback for Operational Composite Regions
+      if (currentRegion) {
+        map.flyTo({ center: currentRegion.center, zoom: currentRegion.zoom, essential: true });
+
+        if (regionSource && selectedRegion) {
+          const selectionData = createGeographicSelectionFeatures(
+            selectedRegion,
+            currentRegion.bounds,
+            currentRegion.center,
+            false
+          );
+          if (selectionData) {
+            regionSource.setData({
+              type: 'FeatureCollection',
+              features: [
+                selectionData.boxFill,
+                selectionData.box,
+                selectionData.ellipse,
+                selectionData.center,
+                ...selectionData.corners,
+                selectionData.labelBadge
+              ]
+            });
+          }
+        }
+      }
     }
 
-    const lightningPoints = currentRegion.lightning.map((pt, i) => ({
-      type: 'Feature',
-      properties: { id: i },
-      geometry: { type: 'Point', coordinates: pt }
-    }));
+    // Update city markers if currentRegion has cities
+    if (currentRegion && currentRegion.cities) {
+      const cityFeatures = currentRegion.cities.map(c => ({
+        type: 'Feature',
+        properties: { name: c.name, isMain: !!c.isMain, isState: !!c.isState, lat: c.lat, lon: c.lon },
+        geometry: { type: 'Point', coordinates: [c.lon, c.lat] }
+      }));
 
-    if (map.getSource('lightning-strikes')) {
-      map.getSource('lightning-strikes').setData({ type: 'FeatureCollection', features: lightningPoints });
+      if (map.getSource('cities')) {
+        map.getSource('cities').setData({ type: 'FeatureCollection', features: cityFeatures });
+      }
     }
+
+    // Update lightning points if currentRegion has lightning
+    if (currentRegion && currentRegion.lightning) {
+      const lightningPoints = currentRegion.lightning.map((pt, i) => ({
+        type: 'Feature',
+        properties: { id: i },
+        geometry: { type: 'Point', coordinates: pt }
+      }));
+
+      if (map.getSource('lightning-strikes')) {
+        map.getSource('lightning-strikes').setData({ type: 'FeatureCollection', features: lightningPoints });
+      }
+    }
+
+    bringSelectionLayersToFront(map);
   }, [selectedRegion, mapLoaded]);
+
+
 
   // Switch Base Style
   useEffect(() => {
@@ -426,6 +902,7 @@ export default function WeatherMap({
     if (map.getLayer('base-terrain-layer')) {
       map.setLayoutProperty('base-terrain-layer', 'visibility', baseMapStyle === 'terrain' ? 'visible' : 'none');
     }
+    bringSelectionLayersToFront(map);
   }, [baseMapStyle, mapLoaded]);
 
   // Dynamic Rendering for Layers
@@ -569,6 +1046,80 @@ export default function WeatherMap({
       map.setLayoutProperty('boundaries-layer', 'visibility', activeLayers.adminBoundaries ? 'visible' : 'none');
     }
 
+    // 11. Storm Cells, Velocity Vectors & Uncertainty Cones
+    const cells = forecastData?.storm_cells || [];
+    const polyFeatures = [];
+    const lineFeatures = [];
+    const coneFeatures = [];
+    const pointFeatures = [];
+
+    cells.forEach((cell) => {
+      if (cell.polygon_geojson) {
+        polyFeatures.push({
+          ...cell.polygon_geojson,
+          properties: {
+            ...cell.polygon_geojson.properties,
+            cell_id: cell.cell_id,
+            max_dbz: cell.max_dbz
+          }
+        });
+      }
+
+      const traj = cell.trajectory;
+      if (traj && traj.length > 0) {
+        const lineCoords = traj.map(pt => [pt.lon, pt.lat]);
+        lineFeatures.push({
+          type: 'Feature',
+          properties: { cell_id: cell.cell_id },
+          geometry: { type: 'LineString', coordinates: lineCoords }
+        });
+
+        const leftCoords = [];
+        const rightCoords = [];
+
+        traj.forEach((pt) => {
+          const kmPerDegLat = 111.32;
+          const kmPerDegLon = 111.32 * Math.cos((pt.lat * Math.PI) / 180);
+          const rLat = (pt.uncertainty_radius_km || 3.0) / kmPerDegLat;
+          const rLon = (pt.uncertainty_radius_km || 3.0) / kmPerDegLon;
+
+          leftCoords.push([pt.lon - rLon, pt.lat + rLat]);
+          rightCoords.unshift([pt.lon + rLon, pt.lat - rLat]);
+
+          pointFeatures.push({
+            type: 'Feature',
+            properties: {
+              label: pt.horizon_min === 0 ? 'NOW' : `+${pt.horizon_min}m`,
+              dbz: pt.predicted_max_dbz,
+              cell_id: cell.cell_id
+            },
+            geometry: { type: 'Point', coordinates: [pt.lon, pt.lat] }
+          });
+        });
+
+        const coneRing = [...leftCoords, ...rightCoords, leftCoords[0]];
+        coneFeatures.push({
+          type: 'Feature',
+          properties: { cell_id: cell.cell_id },
+          geometry: { type: 'Polygon', coordinates: [coneRing] }
+        });
+      }
+    });
+
+    if (map.getSource('storm-cells-source')) {
+      map.getSource('storm-cells-source').setData({ type: 'FeatureCollection', features: polyFeatures });
+    }
+    if (map.getSource('storm-trajectory-cone-source')) {
+      map.getSource('storm-trajectory-cone-source').setData({ type: 'FeatureCollection', features: coneFeatures });
+    }
+    if (map.getSource('storm-trajectory-line-source')) {
+      map.getSource('storm-trajectory-line-source').setData({ type: 'FeatureCollection', features: lineFeatures });
+    }
+    if (map.getSource('storm-trajectory-points-source')) {
+      map.getSource('storm-trajectory-points-source').setData({ type: 'FeatureCollection', features: pointFeatures });
+    }
+
+    bringSelectionLayersToFront(map);
   }, [forecastData, mapLoaded, activeLayers, horizonMin, selectedRegion]);
 
   // Selected Cell Map Centering & Focus Effect
@@ -594,6 +1145,7 @@ useEffect(() => {
 
   return (
     <div className="relative w-full h-full bg-[#F8FCFE] rounded-xl overflow-hidden border border-[#D0E3F0] shadow-xs flex flex-col min-h-[480px]">
+      
       {/* Map Type Controls (Map, Satellite, Terrain) */}
       <div className="absolute top-3 right-3 z-20 flex items-center space-x-1.5">
         <div className="bg-[#F8FCFE]/95 backdrop-blur-xs p-1 rounded-lg border border-[#D0E3F0] shadow-xs flex items-center space-x-1 text-xs font-medium text-[#0F2942]">

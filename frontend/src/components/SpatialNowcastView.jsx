@@ -13,7 +13,11 @@ export default function SpatialNowcastView({
   selectedLocation,
   onLocationSelect,
   selectedRegion,
-  setSelectedRegion
+  setSelectedRegion,
+  selectedArea,
+  onAreaPointSelect,
+  onAreaBoxSelect,
+  onClearArea
 }) {
   const layerButtons = [
     { key: 'radar', label: 'Radar dBZ', icon: Radio, activeColor: 'bg-[#DC2626] text-white border-[#DC2626]' },
@@ -48,12 +52,35 @@ export default function SpatialNowcastView({
               <select
                 value={selectedRegion}
                 onChange={(e) => setSelectedRegion(e.target.value)}
-                className="bg-[#EEF6FB] border border-[#D0E3F0] text-[#0F2942] text-xs rounded-lg px-3 py-1.5 appearance-none focus:outline-hidden focus:border-[#0284C7] font-mono font-semibold pr-8"
+                className="bg-[#EEF6FB] border border-[#D0E3F0] text-[#0F2942] text-xs rounded-lg px-3 py-1.5 appearance-none focus:outline-hidden focus:border-[#0284C7] font-mono font-semibold pr-8 max-w-[220px]"
               >
-                <option value="Andhra Pradesh & Telangana">AP & Telangana (HYD DWR)</option>
-                <option value="East Coast (Odisha & WB)">East Coast (Odisha/WB)</option>
-                <option value="South Interior Karnataka">Karnataka (BLR Footprint)</option>
-                <option value="All India Composite">All India Composite</option>
+                <optgroup label="Popular States & Regions">
+                  <option value="Telangana">Telangana</option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Odisha">Odisha</option>
+                  <option value="West Bengal">West Bengal</option>
+                  <option value="Chhattisgarh">Chhattisgarh</option>
+                  <option value="Delhi">Delhi (NCT)</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                </optgroup>
+                <optgroup label="States">
+                  {['Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'].map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="Union Territories">
+                  {['Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'].map(u => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </optgroup>
+                <optgroup label="Radar Composites">
+                  <option value="All India Composite">All India Composite</option>
+                  <option value="Andhra Pradesh & Telangana">Andhra Pradesh & Telangana</option>
+                  <option value="East Coast (Odisha & WB)">East Coast (Odisha & WB)</option>
+                  <option value="South Interior Karnataka">South Interior Karnataka</option>
+                </optgroup>
               </select>
               <ChevronDown className="w-3.5 h-3.5 text-[#47637E] absolute right-2.5 top-2.5 pointer-events-none" />
             </div>
@@ -96,6 +123,10 @@ export default function SpatialNowcastView({
           selectedLocation={selectedLocation}
           onLocationSelect={onLocationSelect}
           selectedRegion={selectedRegion}
+          selectedArea={selectedArea}
+          onAreaPointSelect={onAreaPointSelect}
+          onAreaBoxSelect={onAreaBoxSelect}
+          onClearArea={onClearArea}
         />
       </div>
     </div>

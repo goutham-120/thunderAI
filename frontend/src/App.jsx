@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { LayoutDashboard } from 'lucide-react';
 import Header from './components/Header';
 import LeftSidebar from './components/LeftSidebar';
 import WeatherMap from './components/WeatherMap';
@@ -15,17 +16,23 @@ import ModelView from './components/ModelView';
 import DataSourcesView from './components/DataSourcesView';
 import DataProvenanceModal from './components/DataProvenanceModal';
 import HistoricalReplayBar from './components/HistoricalReplayBar';
+import AreaIntelligencePanel from './components/AreaIntelligencePanel';
+import ActiveThreatsPanel from './components/ActiveThreatsPanel';
+import DashboardStatusFooter from './components/DashboardStatusFooter';
+
+import { REGION_CONFIGS } from './components/WeatherMapConfig';
+import indiaStatesData from './data/india_states.json';
 
 const API_BASE = 'http://localhost:8000/api';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('live'); // 'live', 'spatial', 'cells', 'forecast', 'alerts', 'replay', 'explainability', 'model', 'datasources'
   const [horizonMin, setHorizonMin] = useState(30);
-  const [selectedRegion, setSelectedRegion] = useState('Andhra Pradesh & Telangana');
+  const [selectedRegion, setSelectedRegion] = useState('Telangana');
   const [selectedLocation, setSelectedLocation] = useState({
-    name: 'Hyderabad, Telangana',
-    lat: '17.3850',
-    lon: '78.4867'
+    name: 'Telangana',
+    lat: '18.1124',
+    lon: '79.0193'
   });
 
   const [forecastData, setForecastData] = useState(null);
@@ -35,6 +42,7 @@ export default function App() {
   const [benchmarkData, setBenchmarkData] = useState(null);
   const [selectedEventId, setSelectedEventId] = useState('HYD-PREMONSOON-2024');
 
+  const [areaData, setAreaData] = useState(null);
   const [isProvenanceOpen, setIsProvenanceOpen] = useState(false);
 
   const [activeLayers, setActiveLayers] = useState({
@@ -74,10 +82,14 @@ export default function App() {
       .catch(err => console.warn('Benchmark data fallback active'));
   }, []);
 
-  // Fetch forecast data
+  // Fetch forecast data synchronized with selected region and location
   useEffect(() => {
     const eventParam = activeTab === 'replay' ? selectedEventId : 'LIVE';
-    fetch(`${API_BASE}/forecast/latest?horizon_min=${horizonMin}&event_id=${eventParam}`)
+    const regionParam = encodeURIComponent(selectedRegion || '');
+    const latParam = selectedLocation?.lat || '';
+    const lonParam = selectedLocation?.lon || '';
+
+    fetch(`${API_BASE}/forecast/latest?horizon_min=${horizonMin}&event_id=${eventParam}&region_name=${regionParam}&lat=${latParam}&lon=${lonParam}`)
       .then(res => res.json())
       .then(data => {
         setForecastData(data);
@@ -88,20 +100,59 @@ export default function App() {
         }
       })
       .catch(err => console.warn('API error, relying on local synthesis', err));
-  }, [horizonMin, activeTab, selectedEventId]);
+  }, [horizonMin, activeTab, selectedEventId, selectedRegion, selectedLocation]);
 
-  // Update location when region changes
+  // Update selected location & Area Intelligence whenever selectedRegion changes
   useEffect(() => {
-    if (selectedRegion === 'East Coast (Odisha & WB)') {
-      setSelectedLocation({ name: 'Bhubaneswar, Odisha', lat: '20.2961', lon: '85.8245' });
-    } else if (selectedRegion === 'South Interior Karnataka') {
-      setSelectedLocation({ name: 'Bengaluru, Karnataka', lat: '12.9716', lon: '77.5946' });
-    } else if (selectedRegion === 'All India Composite') {
-      setSelectedLocation({ name: 'National Composite, India', lat: '21.5937', lon: '78.9629' });
-    } else {
-      setSelectedLocation({ name: 'Hyderabad, Telangana', lat: '17.3850', lon: '78.4867' });
+    if (!selectedRegion) return;
+
+    // 1. Check if selectedRegion matches a State or UT in indiaStatesData
+    const matchedState = indiaStatesData.features.find(
+      f => f.properties && f.properties.state_name === selectedRegion
+    );
+
+    if (matchedState) {
+      const { state_name, bounds, center } = matchedState.properties; // bounds = [minLat, minLon, maxLat, maxLon]
+      const centerLat = center ? center[1] : (bounds[0] + bounds[2]) / 2;
+      const centerLon = center ? center[0] : (bounds[1] + bounds[3]) / 2;
+
+      setSelectedLocation({
+        name: state_name,
+        lat: centerLat.toFixed(4),
+        lon: centerLon.toFixed(4)
+      });
+
+      // Fetch Area Threat Assessment nowcast for the selected State/UT
+      fetch(`${API_BASE}/forecast/area?min_lat=${bounds[0]}&max_lat=${bounds[2]}&min_lon=${bounds[1]}&max_lon=${bounds[3]}&horizon_min=${horizonMin}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.selected_area) {
+            data.selected_area.description = `${state_name} Administrative Region`;
+          }
+          setAreaData(data);
+        })
+        .catch(err => console.warn('Area forecast fetch error', err));
+    } else if (REGION_CONFIGS[selectedRegion]) {
+      const cfg = REGION_CONFIGS[selectedRegion];
+      const loc = cfg.mainLocation || { name: selectedRegion, lat: String(cfg.center[1]), lon: String(cfg.center[0]) };
+      setSelectedLocation(loc);
+
+      const b = cfg.bounds;
+      if (b) {
+        fetch(`${API_BASE}/forecast/area?min_lat=${b.minLat}&max_lat=${b.maxLat}&min_lon=${b.minLon}&max_lon=${b.maxLon}&horizon_min=${horizonMin}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.selected_area) {
+              data.selected_area.description = `${selectedRegion} Radar Composite`;
+            }
+            setAreaData(data);
+          })
+          .catch(err => console.warn('Area forecast fetch error', err));
+      } else {
+        setAreaData(null);
+      }
     }
-  }, [selectedRegion]);
+  }, [selectedRegion, horizonMin]);
 
   return (
     <div className="min-h-screen bg-atmospheric flex flex-col text-[#0F2942] font-sans selection:bg-[#0284C7] selection:text-white">
@@ -173,13 +224,39 @@ export default function App() {
         {/* Dynamic Main View Container */}
         <main className="flex-1 p-4 overflow-y-auto max-w-[1600px] mx-auto w-full">
           
-          {/* 1. OVERVIEW PAGE */}
+          {/* 1. MAIN OPERATIONAL DASHBOARD */}
           {activeTab === 'live' && (
             <div className="space-y-4">
-              {/* Map Centerpiece (8 cols) + Right Side Location/XAI Panel (4 cols) */}
+              {/* Dashboard Title & Quick Summary Bar */}
+              <div className="flex items-center justify-between bg-[#F8FCFE] border border-[#D0E3F0] px-4 py-3 rounded-xl shadow-xs">
+                <div className="flex items-center space-x-2.5">
+                  <div className="p-2 rounded-lg bg-[#EEF6FB] border border-[#D0E3F0] text-[#0284C7]">
+                    <LayoutDashboard className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h1 className="text-sm font-bold text-[#0F2942] font-mono tracking-tight uppercase flex items-center gap-2">
+                      Main Operational Dashboard
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-[#0284C7] text-white font-sans font-semibold">
+                        LIVE NOWCAST
+                      </span>
+                    </h1>
+                    <p className="text-xs text-[#47637E] font-sans">
+                      Spatial Overview & Unified Atmospheric Intelligence Workstation
+                    </p>
+                  </div>
+                </div>
+                <div className="hidden sm:flex items-center space-x-3 text-xs font-mono">
+                  <span className="text-[#47637E]">Active Target:</span>
+                  <span className="px-2.5 py-1 rounded-md bg-[#EEF6FB] text-[#0284C7] font-bold border border-[#D0E3F0]">
+                    {selectedLocation?.name || selectedRegion}
+                  </span>
+                </div>
+              </div>
+
+              {/* Spatial Overview Centerpiece (8-9 cols) + Operational Decision Support Panel (3-4 cols) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                 
-                {/* Center Map (8 cols) */}
+                {/* Spatial Overview Map (8-9 cols) */}
                 <div className="lg:col-span-8 xl:col-span-9 flex flex-col min-h-[500px]">
                   <WeatherMap
                     forecastData={forecastData}
@@ -194,26 +271,50 @@ export default function App() {
                   />
                 </div>
 
-                {/* Right Panel (4 cols) */}
-                <div className="lg:col-span-4 xl:col-span-3 flex flex-col">
-                  <RightPanel
-                    xaiData={forecastData?.xai_explanation}
-                    selectedCell={selectedCell}
-                    summaryMetrics={forecastData?.summary_metrics}
-                    selectedLocation={selectedLocation}
-                  />
+                {/* Part 6: Operational Decision Information (3-4 cols) */}
+                <div className="lg:col-span-4 xl:col-span-3 flex flex-col space-y-3">
+                  {areaData ? (
+                    <AreaIntelligencePanel
+                      areaData={areaData}
+                      onClose={() => setAreaData(null)}
+                      horizonMin={horizonMin}
+                      setHorizonMin={setHorizonMin}
+                    />
+                  ) : (
+                    <RightPanel
+                      xaiData={forecastData?.xai_explanation}
+                      selectedCell={selectedCell}
+                      summaryMetrics={forecastData?.summary_metrics}
+                      selectedLocation={selectedLocation}
+                    />
+                  )}
                 </div>
               </div>
 
-              {/* FORECAST TIMELINE */}
+              {/* Part 3: Current Atmospheric Conditions */}
+              <NowcastSummaryBar
+                forecastData={forecastData}
+              />
+
+              {/* Part 4: Active Threat Areas & Alerts */}
+              <ActiveThreatsPanel
+                forecastData={forecastData}
+                selectedCell={selectedCell}
+                onSelectCell={setSelectedCell}
+                onNavigateTab={setActiveTab}
+              />
+
+              {/* Part 5: Forecast Outlook */}
               <ForecastTimelineBar
                 horizonMin={horizonMin}
                 setHorizonMin={setHorizonMin}
               />
 
-              {/* COMPACT NOWCAST SUMMARY */}
-              <NowcastSummaryBar
+              {/* Part 7: Data Sources & Model Status Bar */}
+              <DashboardStatusFooter
+                systemStatus={systemStatus}
                 forecastData={forecastData}
+                onOpenProvenance={() => setIsProvenanceOpen(true)}
               />
             </div>
           )}
