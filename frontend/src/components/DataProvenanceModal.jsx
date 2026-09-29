@@ -76,26 +76,26 @@ export default function DataProvenanceModal({ isOpen, onClose, systemStatus }) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#0F2942]/40 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-[#F8FCFE] border border-[#D0E3F0] rounded-xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-xl overflow-hidden font-sans text-[#0F2942]">
+    <div className="fixed inset-0 z-50 bg-[#12324E]/40 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-[#F8FCFE] border border-[#D0E3F0] rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col shadow-xl overflow-hidden font-sans text-[#12324E]">
         {/* Modal Header */}
         <div className="p-4 border-b border-[#D0E3F0] flex items-center justify-between bg-[#EEF6FB]">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-[#F8FCFE] border border-[#D0E3F0] flex items-center justify-center text-[#0284C7]">
+            <div className="w-8 h-8 rounded-md bg-[#F8FCFE] border border-[#D0E3F0] flex items-center justify-center text-[#0284C7]">
               <Database className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-[#0F2942] flex items-center gap-2 font-mono">
+              <h2 className="text-sm font-bold text-[#12324E] flex items-center gap-2 font-sora">
                 Data Provenance & System Status Log
               </h2>
-              <p className="text-xs text-[#47637E] font-mono">
-                Multimodal Source Traceability & AI Inference Pipeline Metadata
+              <p className="text-xs text-[#5E82A6] font-sans">
+                Multimodal Source Traceability & Inference Pipeline Metadata
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#47637E] hover:text-[#0F2942] hover:bg-[#EEF6FB] transition-colors"
+            className="p-1.5 rounded-md text-[#5E82A6] hover:text-[#12324E] hover:bg-[#EEF6FB] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -105,37 +105,37 @@ export default function DataProvenanceModal({ isOpen, onClose, systemStatus }) {
         <div className="p-5 overflow-y-auto space-y-5 text-xs font-sans">
           
           {/* AI Model Summary Card */}
-          <div className="bg-[#EEF6FB] p-4 rounded-lg border border-[#D0E3F0] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 font-mono">
+          <div className="bg-[#EEF6FB] p-4 rounded-md border border-[#D0E3F0] grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 font-mono">
             <div>
-              <span className="text-[10px] font-bold text-[#47637E] uppercase tracking-wider block mb-1 font-sans">
-                AI MODEL ENGINE
+              <span className="text-[10px] font-bold text-[#5E82A6] uppercase tracking-wider block mb-1 font-sans">
+                MODEL BACKBONE
               </span>
-              <span className="text-xs font-bold text-[#0284C7]">
+              <span className="text-xs font-bold text-[#0284C7] font-mono">
                 {aiModel.backbone}
               </span>
             </div>
             <div>
-              <span className="text-[10px] font-bold text-[#47637E] uppercase tracking-wider block mb-1 font-sans">
+              <span className="text-[10px] font-bold text-[#5E82A6] uppercase tracking-wider block mb-1 font-sans">
                 CHECKPOINT STATUS
               </span>
-              <span className="inline-flex items-center gap-1 font-bold text-[#047857]">
-                <CheckCircle2 className="w-3.5 h-3.5" />
+              <span className="inline-flex items-center gap-1 font-bold text-[#047857] font-mono">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#047857]" />
                 {aiModel.model_status}
               </span>
             </div>
             <div>
-              <span className="text-[10px] font-bold text-[#47637E] uppercase tracking-wider block mb-1 font-sans">
+              <span className="text-[10px] font-bold text-[#5E82A6] uppercase tracking-wider block mb-1 font-sans">
                 INFERENCE MODE
               </span>
-              <span className="text-xs font-bold text-[#0369A1]">
+              <span className="text-xs font-bold text-[#12324E] font-mono">
                 {aiModel.inference_mode}
               </span>
             </div>
             <div>
-              <span className="text-[10px] font-bold text-[#47637E] uppercase tracking-wider block mb-1 font-sans">
+              <span className="text-[10px] font-bold text-[#5E82A6] uppercase tracking-wider block mb-1 font-sans">
                 DATA QUALITY
               </span>
-              <span className="text-xs font-bold text-[#0F2942]">
+              <span className="text-xs font-bold text-[#12324E] font-mono">
                 {systemStatus?.data_quality || "PARTIAL"}
               </span>
             </div>
@@ -143,13 +143,13 @@ export default function DataProvenanceModal({ isOpen, onClose, systemStatus }) {
 
           {/* Data Sources Provenance Table */}
           <div>
-            <h3 className="text-xs font-bold text-[#0F2942] uppercase tracking-wider mb-2 font-mono">
+            <h3 className="text-xs font-bold text-[#12324E] uppercase tracking-wider mb-2 font-sora">
               Multimodal Ingestion Provenance Trace
             </h3>
 
-            <div className="overflow-x-auto rounded-lg border border-[#D0E3F0]">
+            <div className="overflow-x-auto rounded-md border border-[#D0E3F0]">
               <table className="w-full text-left font-mono text-xs">
-                <thead className="bg-[#EEF6FB] text-[#47637E] border-b border-[#D0E3F0] uppercase text-[10px]">
+                <thead className="bg-[#EEF6FB] text-[#5E82A6] border-b border-[#D0E3F0] uppercase text-[10px] font-sans">
                   <tr>
                     <th className="p-3">Data Source / Provider</th>
                     <th className="p-3">Variables</th>
@@ -158,18 +158,18 @@ export default function DataProvenanceModal({ isOpen, onClose, systemStatus }) {
                     <th className="p-3">Provenance Detail</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#E2EAF0] bg-[#F8FCFE] text-[#0F2942]">
+                <tbody className="divide-y divide-[#D0E3F0] bg-[#F8FCFE] text-[#12324E]">
                   {provenanceItems.map((item, idx) => (
                     <tr key={idx} className="hover:bg-[#EEF6FB]">
-                      <td className="p-3 font-bold text-[#0F2942]">{item.source}</td>
-                      <td className="p-3 text-[#47637E]">{item.variables}</td>
-                      <td className="p-3 text-[#64829E]">{item.resolution}</td>
+                      <td className="p-3 font-bold text-[#12324E] font-sans">{item.source}</td>
+                      <td className="p-3 text-[#5E82A6]">{item.variables}</td>
+                      <td className="p-3 text-[#5E82A6]">{item.resolution}</td>
                       <td className="p-3">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${item.badgeColor}`}>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono border ${item.badgeColor}`}>
                           {item.status}
                         </span>
                       </td>
-                      <td className="p-3 text-[#64829E] text-[10px] truncate max-w-xs" title={item.provenanceStr}>
+                      <td className="p-3 text-[#5E82A6] text-[10px] truncate max-w-xs font-mono" title={item.provenanceStr}>
                         {item.provenanceStr}
                       </td>
                     </tr>
@@ -180,10 +180,10 @@ export default function DataProvenanceModal({ isOpen, onClose, systemStatus }) {
           </div>
 
           {/* Timestamps Card */}
-          <div className="bg-[#EEF6FB] p-3 rounded-lg border border-[#D0E3F0] flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-[#47637E]">
-            <div>Observation: <strong className="text-[#0F2942]">{timestamps.observation_time || "N/A"}</strong></div>
-            <div>Ingestion: <strong className="text-[#0F2942]">{timestamps.ingestion_time || "N/A"}</strong></div>
-            <div>Forecast: <strong className="text-[#0F2942]">{timestamps.forecast_generation_time || "N/A"}</strong></div>
+          <div className="bg-[#EEF6FB] p-3 rounded-md border border-[#D0E3F0] flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-[#5E82A6]">
+            <div>Observation: <strong className="text-[#12324E]">{timestamps.observation_time || "N/A"}</strong></div>
+            <div>Ingestion: <strong className="text-[#12324E]">{timestamps.ingestion_time || "N/A"}</strong></div>
+            <div>Forecast: <strong className="text-[#12324E]">{timestamps.forecast_generation_time || "N/A"}</strong></div>
           </div>
 
         </div>
@@ -192,7 +192,7 @@ export default function DataProvenanceModal({ isOpen, onClose, systemStatus }) {
         <div className="p-3 border-t border-[#D0E3F0] bg-[#EEF6FB] flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-[#0F2942] hover:bg-[#1E3A5A] text-white font-semibold text-xs transition-all"
+            className="px-4 py-1.5 rounded-md bg-[#12324E] hover:bg-[#1C3A57] text-white font-semibold text-xs font-sans transition-all"
           >
             Close Provenance Log
           </button>

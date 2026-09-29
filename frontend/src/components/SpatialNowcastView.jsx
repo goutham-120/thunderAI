@@ -1,6 +1,6 @@
 import React from 'react';
 import WeatherMap from './WeatherMap';
-import { Layers, ChevronDown, Radio, Zap, Satellite, Wind, ShieldAlert, CloudRain, Thermometer, Sparkles } from 'lucide-react';
+import { Layers, ChevronDown, Radio, Zap, Satellite, Wind, ShieldAlert, CloudRain, Thermometer, Activity } from 'lucide-react';
 
 export default function SpatialNowcastView({
   forecastData,
@@ -23,7 +23,7 @@ export default function SpatialNowcastView({
     { key: 'radar', label: 'Radar dBZ', icon: Radio, activeColor: 'bg-[#DC2626] text-white border-[#DC2626]' },
     { key: 'satellite', label: 'Satellite IR', icon: Satellite, activeColor: 'bg-[#4F46E5] text-white border-[#4F46E5]' },
     { key: 'lightning', label: 'Lightning Feed', icon: Zap, activeColor: 'bg-[#D97706] text-white border-[#D97706]' },
-    { key: 'aiRisk', label: 'Storm AI Risk', icon: Sparkles, activeColor: 'bg-[#0284C7] text-white border-[#0284C7]' },
+    { key: 'aiRisk', label: 'Storm Risk Index', icon: Activity, activeColor: 'bg-[#0284C7] text-white border-[#0284C7]' },
     { key: 'lightningRisk', label: 'Lightning Risk', icon: ShieldAlert, activeColor: 'bg-[#EA580C] text-white border-[#EA580C]' },
     { key: 'rainfall', label: 'Rainfall Isohyets', icon: CloudRain, activeColor: 'bg-[#0284C7] text-white border-[#0284C7]' },
     { key: 'cloudTop', label: 'Cloud Top Temp', icon: Thermometer, activeColor: 'bg-[#7C3AED] text-white border-[#7C3AED]' },
@@ -31,28 +31,28 @@ export default function SpatialNowcastView({
   ];
 
   return (
-    <div className="space-y-4 font-sans text-[#0F2942]">
+    <div className="space-y-4 font-sans text-[#12324E]">
       {/* Top Header & Layer Bar */}
-      <div className="bg-[#F8FCFE] border border-[#D0E3F0] p-4 rounded-xl shadow-xs space-y-3">
+      <div className="bg-[#F8FCFE] border border-[#D0E3F0] p-4 rounded-lg shadow-2xs space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-sm font-bold text-[#0F2942] tracking-tight flex items-center gap-2 font-mono">
+            <h2 className="text-sm font-bold text-[#12324E] tracking-tight flex items-center gap-2 font-sora">
               <Layers className="w-4 h-4 text-[#0284C7]" />
               SPATIAL ATMOSPHERIC NOWCAST
             </h2>
-            <p className="text-xs text-[#47637E] font-mono">
+            <p className="text-xs text-[#5E82A6] font-sans">
               Multimodal Sensor Layers & Spatiotemporal Radar/Satellite Overlays
             </p>
           </div>
 
           {/* Region Dropdown Selector */}
           <div className="flex items-center space-x-2">
-            <span className="text-xs font-mono font-bold text-[#47637E] uppercase">Region:</span>
-            <div className="relative">
+            <span className="text-xs font-mono font-bold text-[#5E82A6] uppercase">Sector:</span>
+            <div className="relative font-mono">
               <select
                 value={selectedRegion}
                 onChange={(e) => setSelectedRegion(e.target.value)}
-                className="bg-[#EEF6FB] border border-[#D0E3F0] text-[#0F2942] text-xs rounded-lg px-3 py-1.5 appearance-none focus:outline-hidden focus:border-[#0284C7] font-mono font-semibold pr-8 max-w-[220px]"
+                className="bg-[#EEF6FB] border border-[#D0E3F0] text-[#12324E] text-xs rounded-md px-3 py-1.5 appearance-none focus:outline-hidden focus:border-[#0284C7] font-mono font-semibold pr-8 max-w-[220px]"
               >
                 <optgroup label="Popular States & Regions">
                   <option value="Telangana">Telangana</option>
@@ -82,14 +82,14 @@ export default function SpatialNowcastView({
                   <option value="South Interior Karnataka">South Interior Karnataka</option>
                 </optgroup>
               </select>
-              <ChevronDown className="w-3.5 h-3.5 text-[#47637E] absolute right-2.5 top-2.5 pointer-events-none" />
+              <ChevronDown className="w-3.5 h-3.5 text-[#5E82A6] absolute right-2.5 top-2.5 pointer-events-none" />
             </div>
           </div>
         </div>
 
         {/* Dynamic Layer Toggles Bar */}
-        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-[#E2EAF0] text-xs font-mono">
-          <span className="text-[10px] text-[#64829E] uppercase font-bold mr-1">Active Layers:</span>
+        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-[#D0E3F0] text-xs font-sans">
+          <span className="text-[10px] text-[#5E82A6] uppercase font-bold mr-1 font-mono">Active Layers:</span>
           {layerButtons.map(layer => {
             const Icon = layer.icon;
             const isActive = activeLayers[layer.key];
@@ -100,7 +100,7 @@ export default function SpatialNowcastView({
                 className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium border transition-all ${
                   isActive
                     ? layer.activeColor
-                    : 'bg-[#EEF6FB] text-[#47637E] border-[#D0E3F0] hover:bg-[#E5F0F7] hover:text-[#0F2942]'
+                    : 'bg-[#EEF6FB] text-[#5E82A6] border-[#D0E3F0] hover:bg-[#E5F0F7] hover:text-[#12324E]'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />

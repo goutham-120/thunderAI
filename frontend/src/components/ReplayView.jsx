@@ -33,22 +33,22 @@ export default function ReplayView({ historicalEvents, selectedEventId, setSelec
   ];
 
   return (
-    <div className="space-y-4 font-sans text-[#0F2942]">
+    <div className="space-y-4 font-sans text-[#12324E]">
       {/* View Header */}
-      <div className="bg-[#F8FCFE] border border-[#D0E3F0] p-4 rounded-xl flex items-center justify-between shadow-xs">
+      <div className="bg-[#F8FCFE] border border-[#D0E3F0] p-4 rounded-lg flex items-center justify-between shadow-2xs">
         <div>
-          <h2 className="text-sm font-bold text-[#0F2942] flex items-center gap-2 font-mono">
+          <h2 className="text-sm font-bold text-[#12324E] flex items-center gap-2 font-sora">
             <RotateCcw className="w-4 h-4 text-[#0284C7]" />
             HISTORICAL SEVERE WEATHER REPLAY
           </h2>
-          <p className="text-xs text-[#47637E] font-mono">
+          <p className="text-xs text-[#5E82A6] font-sans">
             High-Resolution Radar & Satellite Replay Archive
           </p>
         </div>
       </div>
 
       {/* Events Selection Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 font-mono">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 font-sans">
         {events.map((evt) => {
           const isSelected = selectedEventId === evt.event_id;
           const isReal = evt.data_type === 'REAL_HISTORICAL';
@@ -57,31 +57,31 @@ export default function ReplayView({ historicalEvents, selectedEventId, setSelec
             <div
               key={evt.event_id}
               onClick={() => setSelectedEventId(evt.event_id)}
-              className={`p-4 rounded-xl border cursor-pointer transition-all space-y-3 ${
+              className={`p-4 rounded-lg border cursor-pointer transition-all space-y-3 ${
                 isSelected
-                  ? 'bg-[#D4E6F5]/70 border-[#0284C7] shadow-xs'
-                  : 'bg-[#F8FCFE] border-[#D0E3F0] hover:border-[#B8D6EB]'
+                  ? 'bg-[#E0F2FE] border-[#0284C7] shadow-2xs ring-1 ring-[#0284C7]'
+                  : 'bg-[#F8FCFE] border-[#D0E3F0] hover:border-[#5E82A6]'
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${
+                <span className={`px-2 py-0.5 rounded text-[9px] font-bold font-mono border ${
                   isReal
                     ? 'bg-[#ECFDF5] text-[#047857] border-[#A7F3D0]'
                     : 'bg-[#FFFBEB] text-[#92400E] border-[#FEF3C7]'
                 }`}>
                   {isReal ? 'REAL HISTORICAL EVENT' : 'DEMO / SYNTHETIC EVENT'}
                 </span>
-                <span className="text-[10px] text-[#64829E]">{evt.date}</span>
+                <span className="text-[10px] text-[#5E82A6] font-mono">{evt.date}</span>
               </div>
 
               <div>
-                <h3 className="text-xs font-bold text-[#0F2942] font-sans">{evt.name}</h3>
-                <p className="text-[11px] text-[#47637E] mt-1 line-clamp-2">{evt.description}</p>
+                <h3 className="text-xs font-bold text-[#12324E] font-sora">{evt.name}</h3>
+                <p className="text-[11px] text-[#5E82A6] mt-1 line-clamp-2 font-sans">{evt.description}</p>
               </div>
 
-              <div className="flex items-center justify-between text-[10px] text-[#47637E] pt-2 border-t border-[#E2EAF0]">
-                <span>Peak Reflectivity: <strong className="text-[#DC2626]">{evt.peak_dbz} dBZ</strong></span>
-                <span>Strikes: <strong className="text-[#D97706]">{evt.strikes_count}</strong></span>
+              <div className="flex items-center justify-between text-[10px] text-[#5E82A6] pt-2 border-t border-[#D0E3F0] font-sans">
+                <span>Peak Reflectivity: <strong className="text-[#DC2626] font-mono">{evt.peak_dbz} dBZ</strong></span>
+                <span>Strikes: <strong className="text-[#D97706] font-mono">{evt.strikes_count}</strong></span>
               </div>
             </div>
           );

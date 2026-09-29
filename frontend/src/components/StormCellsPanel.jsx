@@ -4,7 +4,7 @@ import {
   Zap, 
   Wind, 
   ChevronRight,
-  Flame
+  CloudLightning
 } from 'lucide-react';
 
 export default function StormCellsPanel({ 
@@ -14,7 +14,7 @@ export default function StormCellsPanel({
 }) {
   if (!stormCells || stormCells.length === 0) {
     return (
-      <div className="glass-panel p-4 rounded-2xl border border-slate-800 text-center text-slate-400 text-xs">
+      <div className="meteo-card p-4 rounded-2xl border border-[#D0E3F0] text-center text-[#5E82A6] text-xs font-sans">
         No severe convective storm cells currently tracked in radar footprint.
       </div>
     );
@@ -23,34 +23,34 @@ export default function StormCellsPanel({
   const getSeverityBadge = (severity) => {
     switch (severity) {
       case 'EXTREME':
-        return 'bg-red-500/20 text-red-400 border-red-500/40 shadow-[0_0_8px_rgba(239,68,68,0.2)]';
+        return 'bg-red-100 text-red-700 border-red-200';
       case 'SEVERE':
-        return 'bg-orange-500/20 text-orange-400 border-orange-500/40';
+        return 'bg-amber-100 text-amber-800 border-amber-200';
       case 'MODERATE':
-        return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/40';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       default:
-        return 'bg-blue-500/20 text-blue-300 border-blue-500/40';
+        return 'bg-sky-100 text-[#12324E] border-sky-200';
     }
   };
 
   return (
-    <div className="glass-panel p-4 rounded-2xl border border-slate-800/90 shadow-xl flex flex-col h-full">
+    <div className="meteo-card p-4 rounded-2xl border border-[#D0E3F0] shadow-sm flex flex-col h-full bg-[#F8FCFE] font-sans">
       {/* Panel Title */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+      <div className="flex items-center justify-between pb-3 border-b border-[#D0E3F0] mb-3">
         <div className="flex items-center space-x-2">
-          <div className="p-1.5 rounded-lg bg-red-500/20 text-red-400 border border-red-500/30">
-            <Flame className="w-4 h-4" />
+          <div className="p-1.5 rounded-lg bg-red-100 text-red-600 border border-red-200">
+            <CloudLightning className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+            <h3 className="text-xs font-sora font-semibold text-[#12324E] uppercase tracking-wider">
               Active Storm Cells
             </h3>
-            <p className="text-[10px] text-slate-400 font-medium">
+            <p className="text-[10px] text-[#5E82A6] font-medium font-sans">
               TITAN/SCIT-Segmented Convective Clusters
             </p>
           </div>
         </div>
-        <span className="text-xs font-mono font-bold bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full border border-slate-700">
+        <span className="text-xs font-mono font-bold bg-[#EEF6FB] text-[#12324E] px-2.5 py-0.5 rounded-full border border-[#D0E3F0]">
           {stormCells.length} Tracked
         </span>
       </div>
@@ -65,54 +65,54 @@ export default function StormCellsPanel({
               onClick={() => onSelectCell(cell)}
               className={`p-3 rounded-xl border transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-blue-950/70 border-cyan-400/80 shadow-[0_0_15px_rgba(34,211,238,0.2)]'
-                  : 'bg-slate-900/60 hover:bg-slate-800/80 border-slate-800'
+                  ? 'bg-sky-50 border-[#0284C7] shadow-xs'
+                  : 'bg-white hover:bg-[#EEF6FB] border-[#D0E3F0]'
               }`}
             >
               {/* Header */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-2">
-                  <span className="font-bold text-xs text-white font-mono">
+                  <span className="font-bold text-xs text-[#12324E] font-mono">
                     {cell.cell_id}
                   </span>
                   <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md border font-mono ${getSeverityBadge(cell.severity)}`}>
                     {cell.lifecycle_state}
                   </span>
                 </div>
-                <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? 'text-cyan-400 translate-x-0.5' : 'text-slate-500'}`} />
+                <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? 'text-[#0284C7] translate-x-0.5' : 'text-[#5E82A6]'}`} />
               </div>
 
               {/* Metrics Grid */}
-              <div className="grid grid-cols-3 gap-2 text-[11px] font-mono bg-slate-950/60 p-2 rounded-lg border border-slate-800/80">
+              <div className="grid grid-cols-3 gap-2 text-[11px] font-mono bg-[#EEF6FB] p-2 rounded-lg border border-[#D0E3F0]">
                 <div>
-                  <span className="text-[9px] text-slate-400 block font-sans">Max dBZ</span>
-                  <span className="font-bold text-red-400 flex items-center gap-0.5">
-                    <Radio className="w-3 h-3 text-red-400" />
+                  <span className="text-[9px] text-[#5E82A6] block font-sans">Max dBZ</span>
+                  <span className="font-bold text-red-600 flex items-center gap-0.5">
+                    <Radio className="w-3 h-3 text-red-600" />
                     {cell.max_dbz}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[9px] text-slate-400 block font-sans">Motion</span>
-                  <span className="font-bold text-slate-300 flex items-center gap-0.5">
-                    <Wind className="w-3 h-3 text-cyan-400" />
+                  <span className="text-[9px] text-[#5E82A6] block font-sans">Motion</span>
+                  <span className="font-bold text-[#12324E] flex items-center gap-0.5">
+                    <Wind className="w-3 h-3 text-[#0284C7]" />
                     {cell.movement.speed_kmh}k {cell.movement.direction_compass}
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[9px] text-slate-400 block font-sans">Lightning</span>
-                  <span className="font-bold text-amber-400 flex items-center gap-0.5">
-                    <Zap className="w-3 h-3 text-amber-400" />
+                  <span className="text-[9px] text-[#5E82A6] block font-sans">Lightning</span>
+                  <span className="font-bold text-amber-600 flex items-center gap-0.5">
+                    <Zap className="w-3 h-3 text-amber-600" />
                     {cell.lightning_flash_rate_min}/m
                   </span>
                 </div>
               </div>
 
               {/* Coordinates & Cloud-top footer */}
-              <div className="flex items-center justify-between text-[10px] text-slate-400 mt-2 font-mono">
+              <div className="flex items-center justify-between text-[10px] text-[#5E82A6] mt-2 font-mono">
                 <span>{cell.center.lat}°N, {cell.center.lon}°E</span>
-                <span className="text-cyan-400 font-semibold">T_top: {cell.min_cloud_top_c}°C</span>
+                <span className="text-[#0284C7] font-semibold">T_top: {cell.min_cloud_top_c}°C</span>
               </div>
             </div>
           );

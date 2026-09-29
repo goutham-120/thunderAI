@@ -1,0 +1,264 @@
+{
+  "audit_timestamp": "2026-09-29T14:24:07.600994+00:00",
+  "status": "MATHEMATICALLY_VERIFIED_NUMERICAL_AUDIT",
+  "system_provenance": {
+    "satellite_source": "INSAT-3DS L1C SGP Calibrated Observations",
+    "observation_dates": "Sept 28, 2026 (18:00 to 23:30 UTC)",
+    "sequence_split": "Scans 0-5 Train / Scans 6-8 Validation (Non-overlapping frames)",
+    "generalization_limitation": "Single-date sequence validation. Multi-date generalization remains untested."
+  },
+  "audited_horizon_metrics": {
+    "30": {
+      "horizon_minutes": 30,
+      "train_samples_count": 12288,
+      "val_samples_count": 12288,
+      "train_selected_optimal_threshold": 0.278,
+      "hgb_model_default_threshold_0_5": {
+        "sample_count_N": 12288,
+        "confusion_matrix": {
+          "TP": 562,
+          "FP": 65,
+          "FN": 1240,
+          "TN": 10421
+        },
+        "class_prevalence_pct": 14.66,
+        "threshold_dependent_metrics": {
+          "decision_threshold": 0.5,
+          "precision": 0.8963,
+          "recall_pod": 0.3119,
+          "false_alarm_ratio_far": 0.1037,
+          "critical_success_index_csi": 0.301,
+          "f1_score": 0.4627
+        },
+        "threshold_independent_ranking_metrics": {
+          "roc_auc_score": 0.8841,
+          "pr_auc_score": 0.6574,
+          "brier_calibration_score": 0.0798
+        }
+      },
+      "hgb_model_calibrated_threshold": {
+        "sample_count_N": 12288,
+        "confusion_matrix": {
+          "TP": 962,
+          "FP": 680,
+          "FN": 840,
+          "TN": 9806
+        },
+        "class_prevalence_pct": 14.66,
+        "threshold_dependent_metrics": {
+          "decision_threshold": 0.278,
+          "precision": 0.5859,
+          "recall_pod": 0.5339,
+          "false_alarm_ratio_far": 0.4141,
+          "critical_success_index_csi": 0.3876,
+          "f1_score": 0.5587
+        },
+        "threshold_independent_ranking_metrics": {
+          "roc_auc_score": 0.8841,
+          "pr_auc_score": 0.6574,
+          "brier_calibration_score": 0.0798
+        }
+      },
+      "persistence_baseline": {
+        "sample_count_N": 12288,
+        "confusion_matrix": {
+          "TP": 637,
+          "FP": 151,
+          "FN": 1165,
+          "TN": 10335
+        },
+        "class_prevalence_pct": 14.66,
+        "threshold_dependent_metrics": {
+          "decision_threshold": 0.5,
+          "precision": 0.8084,
+          "recall_pod": 0.3535,
+          "false_alarm_ratio_far": 0.1916,
+          "critical_success_index_csi": 0.3262,
+          "f1_score": 0.4919
+        },
+        "threshold_independent_ranking_metrics": {
+          "roc_auc_score": 0.6695,
+          "pr_auc_score": 0.6283,
+          "brier_calibration_score": 0.1071
+        }
+      },
+      "saved_predictions_npz_path": "c:\\Users\\nalla\\OneDrive\\Documents\\Thunder\\thunderAI\\backend\\data\\val_predictions_h30.npz"
+    },
+    "60": {
+      "horizon_minutes": 60,
+      "train_samples_count": 12288,
+      "val_samples_count": 8192,
+      "train_selected_optimal_threshold": 0.311,
+      "hgb_model_default_threshold_0_5": {
+        "sample_count_N": 8192,
+        "confusion_matrix": {
+          "TP": 356,
+          "FP": 81,
+          "FN": 1032,
+          "TN": 6723
+        },
+        "class_prevalence_pct": 16.94,
+        "threshold_dependent_metrics": {
+          "decision_threshold": 0.5,
+          "precision": 0.8146,
+          "recall_pod": 0.2565,
+          "false_alarm_ratio_far": 0.1854,
+          "critical_success_index_csi": 0.2423,
+          "f1_score": 0.3901
+        },
+        "threshold_independent_ranking_metrics": {
+          "roc_auc_score": 0.8496,
+          "pr_auc_score": 0.5924,
+          "brier_calibration_score": 0.1002
+        }
+      },
+      "hgb_model_calibrated_threshold": {
+        "sample_count_N": 8192,
+        "confusion_matrix": {
+          "TP": 748,
+          "FP": 740,
+          "FN": 640,
+          "TN": 6064
+        },
+        "class_prevalence_pct": 16.94,
+        "threshold_dependent_metrics": {
+          "decision_threshold": 0.311,
+          "precision": 0.5027,
+          "recall_pod": 0.5389,
+          "false_alarm_ratio_far": 0.4973,
+          "critical_success_index_csi": 0.3515,
+          "f1_score": 0.5202
+        },
+        "threshold_independent_ranking_metrics": {
+          "roc_auc_score": 0.8496,
+          "pr_auc_score": 0.5924,
+          "brier_calibration_score": 0.1002
+        }
+      },
+      "persistence_baseline": {
+        "sample_count_N": 8192,
+        "confusion_matrix": {
+          "TP": 389,
+          "FP": 155,
+          "FN": 999,
+          "TN": 6649
+        },
+        "class_prevalence_pct": 16.94,
+        "threshold_dependent_metrics": {
+          "decision_threshold": 0.5,
+          "precision": 0.7151,
+          "recall_pod": 0.2803,
+          "false_alarm_ratio_far": 0.2849,
+          "critical_success_index_csi": 0.2521,
+          "f1_score": 0.4027
+        },
+        "threshold_independent_ranking_metrics": {
+          "roc_auc_score": 0.6287,
+          "pr_auc_score": 0.5586,
+          "brier_calibration_score": 0.1409
+        }
+      },
+      "saved_predictions_npz_path": "c:\\Users\\nalla\\OneDrive\\Documents\\Thunder\\thunderAI\\backend\\data\\val_predictions_h60.npz"
+    },
+    "90": {
+      "horizon_minutes": 90,
+      "train_samples_count": 16384,
+      "val_samples_count": 4096,
+      "train_selected_optimal_threshold": 0.34,
+      "hgb_model_default_threshold_0_5": {
+        "sample_count_N": 4096,
+        "confusion_matrix": {
+          "TP": 198,
+          "FP": 86,
+          "FN": 552,
+          "TN": 3260
+        },
+        "class_prevalence_pct": 18.31,
+        "threshold_dependent_metrics": {
+          "decision_threshold": 0.5,
+          "precision": 0.6972,
+          "recall_pod": 0.264,
+          "false_alarm_ratio_far": 0.3028,
+          "critical_success_index_csi": 0.2368,
+          "f1_score": 0.383
+        },
+        "threshold_independent_ranking_metrics": {
+          "roc_auc_score": 0.8313,
+          "pr_auc_score": 0.5632,
+          "brier_calibration_score": 0.1151
+        }
+      },
+      "hgb_model_calibrated_threshold": {
+        "sample_count_N": 4096,
+        "confusion_matrix": {
+          "TP": 487,
+          "FP": 661,
+          "FN": 263,
+          "TN": 2685
+        },
+        "class_prevalence_pct": 18.31,
+        "threshold_dependent_metrics": {
+          "decision_threshold": 0.34,
+          "precision": 0.4242,
+          "recall_pod": 0.6493,
+          "false_alarm_ratio_far": 0.5758,
+          "critical_success_index_csi": 0.3451,
+          "f1_score": 0.5132
+        },
+        "threshold_independent_ranking_metrics": {
+          "roc_auc_score": 0.8313,
+          "pr_auc_score": 0.5632,
+          "brier_calibration_score": 0.1151
+        }
+      },
+      "persistence_baseline": {
+        "sample_count_N": 4096,
+        "confusion_matrix": {
+          "TP": 179,
+          "FP": 88,
+          "FN": 571,
+          "TN": 3258
+        },
+        "class_prevalence_pct": 18.31,
+        "threshold_dependent_metrics": {
+          "decision_threshold": 0.5,
+          "precision": 0.6704,
+          "recall_pod": 0.2387,
+          "false_alarm_ratio_far": 0.3296,
+          "critical_success_index_csi": 0.2136,
+          "f1_score": 0.352
+        },
+        "threshold_independent_ranking_metrics": {
+          "roc_auc_score": 0.6062,
+          "pr_auc_score": 0.5242,
+          "brier_calibration_score": 0.1609
+        }
+      },
+      "saved_predictions_npz_path": "c:\\Users\\nalla\\OneDrive\\Documents\\Thunder\\thunderAI\\backend\\data\\val_predictions_h90.npz"
+    }
+  },
+  "convlstm_pixel_reconciliation": {
+    "validation_population_total_pixels": 65536,
+    "derivation": "16 Validation Sequences x 64 Rows x 64 Cols = 65,536 Total Pixels",
+    "confusion_matrix_at_threshold_0_15": {
+      "TP": 7,
+      "FP": 9,
+      "FN": 3372,
+      "TN": 62148,
+      "total_sum": 65536
+    },
+    "positive_target_pixels_total": 3379,
+    "target_prevalence_pct": 5.16,
+    "exact_precision_at_threshold_0_15": "7 / (7 + 9) = 7 / 16 = 0.4375 (43.75%)",
+    "mathematical_reconciliation_note": "Because ConvLSTM probability percentiles are compressed (P10=0.0146, P50=0.0146, P90=0.0147, P99=0.0654), only 16 pixels out of 65,536 reached probability >= 0.15. Of those 16 active predictions, 7 were True Positives and 9 were False Positives, giving exact Precision = 7/16 = 0.4375. Applying threshold 0.50 yields 0 active predictions (Precision=0, Recall=0)."
+  },
+  "reproduction_commands": [
+    "python scratch/numerical_consistency_audit.py",
+    "python scratch/test_endpoints.py"
+  ],
+  "mandatory_next_steps": [
+    "1. Download multi-month INSAT-3DS L1C HDF5 archives across Premonsoon and Monsoon seasons from MOSDAC.",
+    "2. Establish multi-date Train / Validation / Test event splits grouped strictly by storm event date.",
+    "3. Connect live IITM / IMD Damini lightning flash rate network to establish true ground-truth lightning observation target labels."
+  ]
+}
