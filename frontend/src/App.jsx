@@ -14,6 +14,7 @@ import ReplayView from './components/ReplayView';
 import ExplainabilityView from './components/ExplainabilityView';
 import ModelView from './components/ModelView';
 import DataSourcesView from './components/DataSourcesView';
+import StormTrackingPage from './components/StormTrackingPage';
 import DataProvenanceModal from './components/DataProvenanceModal';
 import HistoricalReplayBar from './components/HistoricalReplayBar';
 import AreaIntelligencePanel from './components/AreaIntelligencePanel';
@@ -618,6 +619,11 @@ export default function App() {
               selectedCell={selectedCell}
               onSelectCell={setSelectedCell}
             />
+          )}
+
+          {/* 3b. STORM TRACKING PAGE — feature/storm-tracking */}
+          {activeTab === 'storm-tracking' && (
+            <StormTrackingPage />
           )}
 
           {/* 4. CAP ALERTS PAGE */}
