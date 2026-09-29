@@ -150,21 +150,39 @@ class ForecastEngine:
         prob_curve_thunder = []
         prob_curve_lightning = []
         prob_curve_rainfall = []
+        forecast_evolution = []
+
+        peak_dbz_val = round(float(np.max(last_frame[:, :, 0])), 1)
 
         for h in [0, 15, 30, 45, 60, 90, 120, 180]:
             if h == 0:
                 p_t = round(float(np.max(last_frame[:, :, 0] > 35.0)) * 0.75, 2)
                 p_l = 0.65
                 r_val = 25.0
+                h_dbz = peak_dbz_val
             else:
                 p_res = pred_dict.get(h, pred_dict[30])
                 p_t = round(float(np.max(p_res["p_thunderstorm"])), 2)
                 p_l = round(float(np.max(p_res["p_lightning"])), 2)
                 r_val = round(float(np.max(p_res["rainfall_mmh"])), 1)
+                h_dbz = round(float(np.max(p_res["pred_dbz"])), 1) if "pred_dbz" in p_res else round(max(15.0, peak_dbz_val * (1.0 - h / 350.0)), 1)
 
-            prob_curve_thunder.append({"time": f"{h}m", "val": int(p_t * 100)})
-            prob_curve_lightning.append({"time": f"{h}m", "val": int(p_l * 100)})
+            thu_pct = int(p_t * 100)
+            lig_pct = int(p_l * 100)
+
+            prob_curve_thunder.append({"time": f"{h}m", "val": thu_pct})
+            prob_curve_lightning.append({"time": f"{h}m", "val": lig_pct})
             prob_curve_rainfall.append({"time": f"{h}m", "val": int(r_val)})
+
+            forecast_evolution.append({
+                "horizon_min": h,
+                "label": "NOW" if h == 0 else f"+{h}m",
+                "thunderstorm_prob_pct": thu_pct,
+                "lightning_prob_pct": lig_pct,
+                "rainfall_rate_mmh": r_val,
+                "max_dbz": h_dbz,
+                "threat_level": "CRITICAL" if thu_pct > 70 else "HIGH" if thu_pct > 40 else "MODERATE" if thu_pct > 20 else "LOW"
+            })
 
         # 6. Generate Explainability for dominant cell
         if active_cells:
@@ -280,6 +298,7 @@ class ForecastEngine:
             },
             "summary_metrics": summary_metrics_dict,
             "multi_source_consistency": multi_source_consistency,
+            "forecast_evolution": forecast_evolution,
             "storm_cells": active_cells,
             "cap_alerts": cap_alerts,
             "xai_explanation": xai_explanation,
