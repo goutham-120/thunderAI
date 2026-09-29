@@ -1,0 +1,774 @@
+{
+  "generated_at": "2026-09-29T15:21:10.664958+00:00",
+  "total_satellite_scans": 9,
+  "total_radar_scans": 20,
+  "satellite_inventory": [
+    {
+      "filename": "3SIMG_28SEP2026_1800_L1C_SGP_V01R00.h5",
+      "filepath": "C:\\Users\\nalla\\Downloads\\3SIMG_28SEP2026_1800_L1C_SGP_V01R00.h5",
+      "size_mb": 75.72,
+      "timestamp_iso": "2026-09-28T18:00:00+00:00",
+      "product_type": "INSAT-3DS Imager L1C SGP HDF5",
+      "channels": [
+        "TIR1 (10.8\u00b5m)",
+        "TIR2 (12.0\u00b5m)",
+        "WV (6.8\u00b5m)",
+        "MIR (3.8\u00b5m)",
+        "VIS",
+        "SWIR"
+      ],
+      "spatial_extent": "Mercator Imager (50\u00b0N-50\u00b0S, 20\u00b0E-130\u00b0E)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "3SIMG_28SEP2026_1930_L1C_SGP_V01R00.h5",
+      "filepath": "C:\\Users\\nalla\\Downloads\\3SIMG_28SEP2026_1930_L1C_SGP_V01R00.h5",
+      "size_mb": 76.33,
+      "timestamp_iso": "2026-09-28T19:30:00+00:00",
+      "product_type": "INSAT-3DS Imager L1C SGP HDF5",
+      "channels": [
+        "TIR1 (10.8\u00b5m)",
+        "TIR2 (12.0\u00b5m)",
+        "WV (6.8\u00b5m)",
+        "MIR (3.8\u00b5m)",
+        "VIS",
+        "SWIR"
+      ],
+      "spatial_extent": "Mercator Imager (50\u00b0N-50\u00b0S, 20\u00b0E-130\u00b0E)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "3SIMG_28SEP2026_2000_L1C_SGP_V01R00.h5",
+      "filepath": "C:\\Users\\nalla\\Downloads\\3SIMG_28SEP2026_2000_L1C_SGP_V01R00.h5",
+      "size_mb": 75.65,
+      "timestamp_iso": "2026-09-28T20:00:00+00:00",
+      "product_type": "INSAT-3DS Imager L1C SGP HDF5",
+      "channels": [
+        "TIR1 (10.8\u00b5m)",
+        "TIR2 (12.0\u00b5m)",
+        "WV (6.8\u00b5m)",
+        "MIR (3.8\u00b5m)",
+        "VIS",
+        "SWIR"
+      ],
+      "spatial_extent": "Mercator Imager (50\u00b0N-50\u00b0S, 20\u00b0E-130\u00b0E)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "3SIMG_28SEP2026_2030_L1C_SGP_V01R00.h5",
+      "filepath": "C:\\Users\\nalla\\Downloads\\3SIMG_28SEP2026_2030_L1C_SGP_V01R00.h5",
+      "size_mb": 75.66,
+      "timestamp_iso": "2026-09-28T20:30:00+00:00",
+      "product_type": "INSAT-3DS Imager L1C SGP HDF5",
+      "channels": [
+        "TIR1 (10.8\u00b5m)",
+        "TIR2 (12.0\u00b5m)",
+        "WV (6.8\u00b5m)",
+        "MIR (3.8\u00b5m)",
+        "VIS",
+        "SWIR"
+      ],
+      "spatial_extent": "Mercator Imager (50\u00b0N-50\u00b0S, 20\u00b0E-130\u00b0E)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "3SIMG_28SEP2026_2130_L1C_SGP_V01R00.h5",
+      "filepath": "C:\\Users\\nalla\\Downloads\\3SIMG_28SEP2026_2130_L1C_SGP_V01R00.h5",
+      "size_mb": 76.57,
+      "timestamp_iso": "2026-09-28T21:30:00+00:00",
+      "product_type": "INSAT-3DS Imager L1C SGP HDF5",
+      "channels": [
+        "TIR1 (10.8\u00b5m)",
+        "TIR2 (12.0\u00b5m)",
+        "WV (6.8\u00b5m)",
+        "MIR (3.8\u00b5m)",
+        "VIS",
+        "SWIR"
+      ],
+      "spatial_extent": "Mercator Imager (50\u00b0N-50\u00b0S, 20\u00b0E-130\u00b0E)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "3SIMG_28SEP2026_2200_L1C_SGP_V01R00.h5",
+      "filepath": "C:\\Users\\nalla\\Downloads\\3SIMG_28SEP2026_2200_L1C_SGP_V01R00.h5",
+      "size_mb": 77.23,
+      "timestamp_iso": "2026-09-28T22:00:00+00:00",
+      "product_type": "INSAT-3DS Imager L1C SGP HDF5",
+      "channels": [
+        "TIR1 (10.8\u00b5m)",
+        "TIR2 (12.0\u00b5m)",
+        "WV (6.8\u00b5m)",
+        "MIR (3.8\u00b5m)",
+        "VIS",
+        "SWIR"
+      ],
+      "spatial_extent": "Mercator Imager (50\u00b0N-50\u00b0S, 20\u00b0E-130\u00b0E)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "3SIMG_28SEP2026_2230_L1C_SGP_V01R00.h5",
+      "filepath": "C:\\Users\\nalla\\Downloads\\3SIMG_28SEP2026_2230_L1C_SGP_V01R00.h5",
+      "size_mb": 77.9,
+      "timestamp_iso": "2026-09-28T22:30:00+00:00",
+      "product_type": "INSAT-3DS Imager L1C SGP HDF5",
+      "channels": [
+        "TIR1 (10.8\u00b5m)",
+        "TIR2 (12.0\u00b5m)",
+        "WV (6.8\u00b5m)",
+        "MIR (3.8\u00b5m)",
+        "VIS",
+        "SWIR"
+      ],
+      "spatial_extent": "Mercator Imager (50\u00b0N-50\u00b0S, 20\u00b0E-130\u00b0E)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "3SIMG_28SEP2026_2300_L1C_SGP_V01R00.h5",
+      "filepath": "C:\\Users\\nalla\\Downloads\\3SIMG_28SEP2026_2300_L1C_SGP_V01R00.h5",
+      "size_mb": 78.32,
+      "timestamp_iso": "2026-09-28T23:00:00+00:00",
+      "product_type": "INSAT-3DS Imager L1C SGP HDF5",
+      "channels": [
+        "TIR1 (10.8\u00b5m)",
+        "TIR2 (12.0\u00b5m)",
+        "WV (6.8\u00b5m)",
+        "MIR (3.8\u00b5m)",
+        "VIS",
+        "SWIR"
+      ],
+      "spatial_extent": "Mercator Imager (50\u00b0N-50\u00b0S, 20\u00b0E-130\u00b0E)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "3SIMG_28SEP2026_2330_L1C_SGP_V01R00.h5",
+      "filepath": "C:\\Users\\nalla\\Downloads\\3SIMG_28SEP2026_2330_L1C_SGP_V01R00.h5",
+      "size_mb": 78.08,
+      "timestamp_iso": "2026-09-28T23:30:00+00:00",
+      "product_type": "INSAT-3DS Imager L1C SGP HDF5",
+      "channels": [
+        "TIR1 (10.8\u00b5m)",
+        "TIR2 (12.0\u00b5m)",
+        "WV (6.8\u00b5m)",
+        "MIR (3.8\u00b5m)",
+        "VIS",
+        "SWIR"
+      ],
+      "spatial_extent": "Mercator Imager (50\u00b0N-50\u00b0S, 20\u00b0E-130\u00b0E)",
+      "readability": "READABLE_VALID"
+    }
+  ],
+  "radar_inventory": [
+    {
+      "filename": "RSCHR_28SEP2026_001401_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_001401_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T00:14:01+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_001546_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_001546_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T00:15:46+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_005227_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_005227_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T00:52:27+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_005408_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_005408_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T00:54:08+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_013052_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_013052_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T01:30:52+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_015005_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_015005_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T01:50:05+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_015149_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_015149_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T01:51:49+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_022830_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_022830_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T02:28:30+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_024927_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_024927_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T02:49:27+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_030837_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_030837_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T03:08:37+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_034521_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_034521_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T03:45:21+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_040618_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_040618_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T04:06:18+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_042527_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_042527_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T04:25:27+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_050356_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_050356_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T05:03:56+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_155353_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_155353_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T15:53:53+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_155534_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_155534_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T15:55:34+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_161450_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_161450_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T16:14:50+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_165131_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_165131_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T16:51:31+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_165316_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_165316_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T16:53:16+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    },
+    {
+      "filename": "RSCHR_28SEP2026_171044_L2B_STD.nc",
+      "filepath": "C:\\Users\\nalla\\Downloads\\RSCHR_28SEP2026_171044_L2B_STD.nc",
+      "timestamp_iso": "2026-09-28T17:10:44+00:00",
+      "product_type": "Cherrapunji DWR (RSCHR) NetCDF3 Volume Scan",
+      "station_location": [
+        25.268,
+        91.7332
+      ],
+      "altitude_m": 1313.0,
+      "max_range_km": 490.0,
+      "variables": [
+        "DBZ",
+        "VEL",
+        "WIDTH",
+        "ZDR",
+        "PHIDP",
+        "RHOHV"
+      ],
+      "spatial_extent": "23.11\u00b0N-27.43\u00b0N, 89.35\u00b0E-94.12\u00b0E (Northeast India)",
+      "readability": "READABLE_VALID"
+    }
+  ],
+  "spatiotemporal_alignment_matrix": {
+    "NATIONAL": {
+      "tolerance_5min": {
+        "spatial_status": "SPATIALLY_ALIGNED",
+        "overlap_percentage": 100.0,
+        "matched_pairs_count": 0
+      },
+      "tolerance_10min": {
+        "spatial_status": "SPATIALLY_ALIGNED",
+        "overlap_percentage": 100.0,
+        "matched_pairs_count": 0
+      },
+      "tolerance_15min": {
+        "spatial_status": "SPATIALLY_ALIGNED",
+        "overlap_percentage": 100.0,
+        "matched_pairs_count": 0
+      }
+    },
+    "NORTHEAST_MEGHALAYA": {
+      "tolerance_5min": {
+        "spatial_status": "NO_SPATIAL_OVERLAP",
+        "overlap_percentage": 0.0,
+        "matched_pairs_count": 0
+      },
+      "tolerance_10min": {
+        "spatial_status": "NO_SPATIAL_OVERLAP",
+        "overlap_percentage": 0.0,
+        "matched_pairs_count": 0
+      },
+      "tolerance_15min": {
+        "spatial_status": "NO_SPATIAL_OVERLAP",
+        "overlap_percentage": 0.0,
+        "matched_pairs_count": 0
+      }
+    },
+    "AP_TELANGANA": {
+      "tolerance_5min": {
+        "spatial_status": "NO_SPATIAL_OVERLAP",
+        "overlap_percentage": 0.0,
+        "matched_pairs_count": 0
+      },
+      "tolerance_10min": {
+        "spatial_status": "NO_SPATIAL_OVERLAP",
+        "overlap_percentage": 0.0,
+        "matched_pairs_count": 0
+      },
+      "tolerance_15min": {
+        "spatial_status": "NO_SPATIAL_OVERLAP",
+        "overlap_percentage": 0.0,
+        "matched_pairs_count": 0
+      }
+    },
+    "EAST_COAST": {
+      "tolerance_5min": {
+        "spatial_status": "SPATIALLY_ALIGNED",
+        "overlap_percentage": 2.8,
+        "matched_pairs_count": 0
+      },
+      "tolerance_10min": {
+        "spatial_status": "SPATIALLY_ALIGNED",
+        "overlap_percentage": 2.8,
+        "matched_pairs_count": 0
+      },
+      "tolerance_15min": {
+        "spatial_status": "SPATIALLY_ALIGNED",
+        "overlap_percentage": 2.8,
+        "matched_pairs_count": 0
+      }
+    },
+    "KARNATAKA": {
+      "tolerance_5min": {
+        "spatial_status": "NO_SPATIAL_OVERLAP",
+        "overlap_percentage": 0.0,
+        "matched_pairs_count": 0
+      },
+      "tolerance_10min": {
+        "spatial_status": "NO_SPATIAL_OVERLAP",
+        "overlap_percentage": 0.0,
+        "matched_pairs_count": 0
+      },
+      "tolerance_15min": {
+        "spatial_status": "NO_SPATIAL_OVERLAP",
+        "overlap_percentage": 0.0,
+        "matched_pairs_count": 0
+      }
+    }
+  },
+  "satellite_sequence_targets": {
+    "horizon_30min": {
+      "valid_sequences_count": 6,
+      "pairs": [
+        {
+          "origin": "3SIMG_28SEP2026_1930_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2000_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2000_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2030_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2130_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2200_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2200_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2230_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2230_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2300_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2300_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2330_L1C_SGP_V01R00.h5"
+        }
+      ]
+    },
+    "horizon_60min": {
+      "valid_sequences_count": 5,
+      "pairs": [
+        {
+          "origin": "3SIMG_28SEP2026_1930_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2030_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2030_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2130_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2130_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2230_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2200_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2300_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2230_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2330_L1C_SGP_V01R00.h5"
+        }
+      ]
+    },
+    "horizon_90min": {
+      "valid_sequences_count": 5,
+      "pairs": [
+        {
+          "origin": "3SIMG_28SEP2026_1800_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_1930_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2000_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2130_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2030_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2200_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2130_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2300_L1C_SGP_V01R00.h5"
+        },
+        {
+          "origin": "3SIMG_28SEP2026_2200_L1C_SGP_V01R00.h5",
+          "target": "3SIMG_28SEP2026_2330_L1C_SGP_V01R00.h5"
+        }
+      ]
+    }
+  },
+  "multimodal_readiness_verdict": {
+    "is_multimodal_training_justified": false,
+    "reason": "Satellite observations (18:00-23:30 UTC) and Cherrapunji DWR radar observations (00:14-17:10 UTC) on 28-SEP-2026 are temporally non-overlapping (49.3 min gap between 17:10 UTC radar end and 18:00 UTC satellite start). Zero coincident pairs exist."
+  }
+}

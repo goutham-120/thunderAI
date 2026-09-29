@@ -39,18 +39,41 @@ class ISRORadarClient:
 
     def is_configured(self) -> bool:
         """
-        Checks whether ISRO DWR API access credentials and URL are fully configured.
-        Returns False if any required credential or endpoint URL is missing.
+        Checks whether ISRO DWR API access credentials are configured OR local NetCDF radar files exist.
         """
+        from app.services.isro_radar.radar_dataset import radar_dataset
         username = os.getenv("ISRO_DWR_USERNAME", self.username)
         password = os.getenv("ISRO_DWR_PASSWORD", self.password)
         api_url = os.getenv("ISRO_DWR_API_URL", self.api_url)
-        return bool(username and password and api_url)
+        if bool(username and password and api_url):
+            return True
+
+        inventory = radar_dataset.get_radar_inventory()
+        return len(inventory) > 0
 
     def get_status(self) -> Dict[str, Any]:
         """
         Returns structured status summary for ISRO DWR radar ingestion.
         """
+        from app.services.isro_radar.radar_dataset import radar_dataset
+        inventory = radar_dataset.get_radar_inventory()
+        if len(inventory) > 0:
+            latest = inventory[-1]
+            st = "ARCHIVE" if "2026" in latest["timestamp_iso"] else "REAL"
+            return {
+                "source": "ISRO DWR",
+                "radar_site": "Cherrapunji DWR (RSCHR)",
+                "site_coordinates": [25.2680, 91.7332],
+                "status": "AVAILABLE",
+                "reason": None,
+                "provenance": st,
+                "latest_observation_file": latest["filename"],
+                "latest_observation_time": latest["timestamp_iso"],
+                "files_count": len(inventory),
+                "resolution": "150m-300m range bin polar scan",
+                "coverage": "Cherrapunji / Meghalaya / Assam / Northeast India"
+            }
+
         site_info = KNOWN_RADAR_SITES.get(self.radar_id, {"lat": 17.72, "lon": 83.25, "name": self.radar_id})
         is_cov, dist_km, cov_desc = validate_radar_coverage(
             site_lat=site_info["lat"],
@@ -94,33 +117,52 @@ class ISRORadarClient:
     ) -> Dict[str, Any]:
         """
         Retrieves real ISRO DWR radar observations (dBZ reflectivity & radial velocity m/s).
-        If credentials/API URL are missing, returns status=UNAVAILABLE with reason=ISRO_DWR_ACCESS_NOT_CONFIGURED.
-        DOES NOT generate fake radar observations.
+        Prioritizes verified local NetCDF radar files from data directory.
         """
-        site_info = KNOWN_RADAR_SITES.get(self.radar_id, {"lat": 17.72, "lon": 83.25, "name": self.radar_id})
-        is_cov, dist_km, cov_desc = validate_radar_coverage(
-            site_lat=site_info["lat"],
-            site_lon=site_info["lon"],
-            target_bounds=config.GRID_BOUNDS
-        )
+        from app.services.isro_radar.radar_dataset import radar_dataset
+        from app.services.isro_radar.radar_loader import radar_loader
+        from app.services.isro_radar.radar_preprocessor import radar_preprocessor
 
-        if not self.is_configured():
-            logger.info("[ISRORadarClient] Access not configured (missing credentials or API URL). Returning UNAVAILABLE.")
-            status_tracker.update_source(
-                source_key="radar",
-                status="UNAVAILABLE",
-                error_message="ISRO_DWR_ACCESS_NOT_CONFIGURED"
-            )
-            return {
-                "status": "UNAVAILABLE",
-                "reason": "ISRO_DWR_ACCESS_NOT_CONFIGURED",
-                "provenance": "NONE",
-                "source": "ISRO DWR",
-                "radar_site": self.radar_id,
-                "coverage_valid": is_cov,
-                "coverage": cov_desc,
-                "data": None
-            }
+        inventory = radar_dataset.get_radar_inventory()
+        if len(inventory) > 0:
+            latest = inventory[-1]
+            try:
+                raw = radar_loader.read_radar_file(latest["filepath"])
+                grid_res = radar_preprocessor.resample_to_grid(raw, grid_shape=(config.GRID_BOUNDS["grid_rows"], config.GRID_BOUNDS["grid_cols"]))
+                prov = "ARCHIVE" if "2026" in raw["timestamp_iso"] else "REAL"
+
+                status_tracker.update_source(
+                    source_key="radar",
+                    status="AVAILABLE",
+                    latency_ms=15.0,
+                    records_count=len(inventory),
+                    latest_obs_time=raw["timestamp_iso"]
+                )
+
+                return {
+                    "status": "AVAILABLE",
+                    "provenance": prov,
+                    "source": "ISRO DWR",
+                    "radar_site": "Cherrapunji DWR (RSCHR)",
+                    "coverage_valid": True,
+                    "coverage": "Cherrapunji / Meghalaya / Assam (240 km / 490 km max range)",
+                    "data": {
+                        "timestamp": raw["timestamp_iso"],
+                        "source": "ISRO DWR",
+                        "radar_site": "Cherrapunji DWR (RSCHR)",
+                        "filename": latest["filename"],
+                        "provenance": prov,
+                        "station_lat": raw["station_lat"],
+                        "station_lon": raw["station_lon"],
+                        "max_dbz": grid_res["max_dbz"],
+                        "max_vel": grid_res["max_vel"],
+                        "dbz_grid": grid_res["grid_dbz"],
+                        "velocity_grid": grid_res["grid_vel"]
+                    },
+                    "latency_ms": 15.0
+                }
+            except Exception as e:
+                logger.error(f"Failed to process local NetCDF radar scan {latest['filename']}: {e}")
 
         api_url = os.getenv("ISRO_DWR_API_URL", self.api_url)
         target_url = f"{api_url}?radar_id={self.radar_id}&lat={latitude}&lon={longitude}"

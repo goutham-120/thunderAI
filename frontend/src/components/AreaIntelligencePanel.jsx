@@ -2,11 +2,7 @@ import React from 'react';
 import { 
   MapPin, 
   ShieldAlert, 
-  Clock, 
-  CloudLightning, 
   Zap, 
-  CloudRain, 
-  Radio, 
   Compass, 
   Info, 
   X,
@@ -26,7 +22,6 @@ export default function AreaIntelligencePanel({
   const cell = areaData.closest_cell;
   const timeline = areaData.area_nowcast_timeline || [];
   const xai = areaData.xai_explanation || {};
-  const atmos = areaData.atmospheric_conditions || {};
   const provenance = areaData.data_provenance || {};
 
   const statusColorMap = {
@@ -39,22 +34,22 @@ export default function AreaIntelligencePanel({
   const style = statusColorMap[threat.badge_color] || statusColorMap.green;
 
   return (
-    <div className="bg-[#F8FCFE] p-4 rounded-xl border border-[#D0E3F0] shadow-xs flex flex-col space-y-3.5 text-[#0F2942] text-xs font-sans">
+    <div className="bg-[#F8FCFE] p-4 rounded-lg border border-[#D0E3F0] shadow-2xs flex flex-col space-y-3.5 text-[#12324E] text-xs font-sans">
       
       {/* Panel Header & Clear Action */}
       <div className="flex items-center justify-between border-b border-[#D0E3F0] pb-2.5">
         <div className="flex items-center space-x-2">
-          <div className="p-1.5 rounded-lg bg-[#EEF6FB] text-[#0284C7] border border-[#D0E3F0]">
+          <div className="p-1.5 rounded-md bg-[#EEF6FB] text-[#0284C7] border border-[#D0E3F0]">
             <MapPin className="w-4 h-4 text-[#DC2626]" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-[#0F2942] uppercase tracking-wider font-mono flex items-center gap-1.5">
+            <h3 className="text-xs font-bold text-[#12324E] uppercase tracking-wider font-sora flex items-center gap-1.5">
               Area Intelligence
               <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#0284C7] text-white font-mono">
                 {area.type === 'box' ? 'BOUNDING AREA' : 'POINT TARGET'}
               </span>
             </h3>
-            <p className="text-[10px] text-[#47637E] font-medium truncate max-w-[220px]">
+            <p className="text-[10px] text-[#5E82A6] font-medium truncate max-w-[220px] font-sans">
               {area.description}
             </p>
           </div>
@@ -62,7 +57,7 @@ export default function AreaIntelligencePanel({
 
         <button
           onClick={onClose}
-          className="p-1.5 rounded-lg bg-[#EEF6FB] hover:bg-[#E5F0F7] text-[#47637E] hover:text-[#0F2942] transition-colors border border-[#D0E3F0]"
+          className="p-1.5 rounded-md bg-[#EEF6FB] hover:bg-[#E5F0F7] text-[#5E82A6] hover:text-[#12324E] transition-colors border border-[#D0E3F0]"
           title="Clear Area Selection"
         >
           <X className="w-4 h-4" />
@@ -70,7 +65,7 @@ export default function AreaIntelligencePanel({
       </div>
 
       {/* Threat Assessment Banner */}
-      <div className={`p-3 rounded-lg border ${style.bg} ${style.border} ${style.text} space-y-1.5`}>
+      <div className={`p-3 rounded-md border ${style.bg} ${style.border} ${style.text} space-y-1.5`}>
         <div className="flex items-center justify-between">
           <span className={`text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded ${style.badge}`}>
             {threat.status_badge || 'GREEN (CLEAR)'}
@@ -81,43 +76,43 @@ export default function AreaIntelligencePanel({
             </span>
           )}
         </div>
-        <p className="text-xs font-semibold leading-snug">
+        <p className="text-xs font-semibold leading-snug font-sans">
           {threat.headline}
         </p>
       </div>
 
       {/* Closest Storm Cell Info if Present */}
       {cell && (
-        <div className="bg-[#EEF6FB] p-3 rounded-lg border border-[#D0E3F0] space-y-2">
+        <div className="bg-[#EEF6FB] p-3 rounded-md border border-[#D0E3F0] space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-[#47637E] uppercase tracking-wider block">
+            <span className="text-[10px] font-bold text-[#5E82A6] uppercase tracking-wider block font-sans">
               Tracked Convective Cell Details
             </span>
             {cell.is_lightning_jump && (
               <span className="text-[9px] font-mono font-bold text-[#D97706] bg-[#FFFBEB] px-1.5 py-0.5 rounded border border-[#FEF3C7] flex items-center gap-1">
-                <Zap className="w-3 h-3 fill-amber-500" />
+                <Zap className="w-3 h-3 text-[#D97706]" />
                 LIGHTNING JUMP
               </span>
             )}
           </div>
           <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
             <div>
-              <span className="text-[9px] text-[#47637E] block font-sans">Cell ID & Lifecycle</span>
-              <span className="font-bold text-[#0F2942]">{cell.cell_id} ({cell.lifecycle_state})</span>
+              <span className="text-[9px] text-[#5E82A6] block font-sans">Cell ID & Lifecycle</span>
+              <span className="font-bold text-[#12324E] font-sans">{cell.cell_id} ({cell.lifecycle_state})</span>
             </div>
             <div>
-              <span className="text-[9px] text-[#47637E] block font-sans">Movement</span>
-              <span className="font-bold text-[#0F2942] flex items-center gap-1">
+              <span className="text-[9px] text-[#5E82A6] block font-sans">Movement</span>
+              <span className="font-bold text-[#12324E] flex items-center gap-1 font-mono">
                 <Compass className="w-3 h-3 text-[#0284C7]" />
                 {cell.movement?.direction_compass} @ {cell.movement?.speed_kmh} km/h
               </span>
             </div>
             <div>
-              <span className="text-[9px] text-[#47637E] block font-sans">Max dBZ Core</span>
+              <span className="text-[9px] text-[#5E82A6] block font-sans">Max dBZ Core</span>
               <span className="font-bold text-[#DC2626]">{cell.max_dbz} dBZ</span>
             </div>
             <div>
-              <span className="text-[9px] text-[#47637E] block font-sans">Lightning Rate</span>
+              <span className="text-[9px] text-[#5E82A6] block font-sans">Lightning Rate</span>
               <span className="font-bold text-[#D97706]">{cell.lightning_flash_rate_min} flashes/min</span>
             </div>
           </div>
@@ -126,13 +121,13 @@ export default function AreaIntelligencePanel({
 
       {/* Critical Infrastructure Threat Proximity Card */}
       {areaData.infrastructure_threats && areaData.infrastructure_threats.length > 0 && (
-        <div className="bg-[#FFF7ED] p-3 rounded-lg border border-[#FFEDD5] space-y-2 text-xs font-mono">
+        <div className="bg-[#FFF7ED] p-3 rounded-md border border-[#FFEDD5] space-y-2 text-xs font-sans">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-[#C2410C] uppercase tracking-wider font-sans flex items-center gap-1.5">
+            <span className="text-[10px] font-bold text-[#C2410C] uppercase tracking-wider font-sora flex items-center gap-1.5">
               <ShieldAlert className="w-3.5 h-3.5 text-[#EA580C]" />
               Critical Infrastructure Proximity ETA
             </span>
-            <span className="text-[9px] bg-[#EA580C] text-white px-1.5 py-0.2 rounded font-bold">
+            <span className="text-[9px] bg-[#EA580C] text-white px-1.5 py-0.2 rounded font-bold font-mono">
               {areaData.infrastructure_threats.length} ASSETS AT RISK
             </span>
           </div>
@@ -140,14 +135,14 @@ export default function AreaIntelligencePanel({
             {areaData.infrastructure_threats.map((infra) => (
               <div key={infra.id} className="bg-white/80 p-2 rounded border border-[#FED7AA] flex items-center justify-between text-[11px]">
                 <div>
-                  <span className="font-bold text-[#0F2942] font-sans block">{infra.name}</span>
-                  <span className="text-[9px] text-[#64829E] font-sans">{infra.type} • Dist: {infra.distance_km} km</span>
+                  <span className="font-bold text-[#12324E] font-sans block">{infra.name}</span>
+                  <span className="text-[9px] text-[#5E82A6] font-sans">{infra.type} • Dist: {infra.distance_km} km</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[10px] font-bold text-[#C2410C] block">
+                  <span className="text-[10px] font-bold text-[#C2410C] block font-mono">
                     ETA: T+{infra.eta_minutes}m
                   </span>
-                  <span className="text-[8px] font-bold uppercase px-1 py-0.2 rounded bg-[#FEF2F2] text-[#991B1B]">
+                  <span className="text-[8px] font-bold uppercase px-1 py-0.2 rounded bg-[#FEF2F2] text-[#991B1B] font-mono">
                     {infra.status}
                   </span>
                 </div>
@@ -159,7 +154,7 @@ export default function AreaIntelligencePanel({
 
       {/* Area 15-180 Min Prediction Timeline */}
       <div className="space-y-1.5">
-        <span className="text-[10px] font-bold text-[#47637E] uppercase tracking-wider block flex items-center justify-between">
+        <span className="text-[10px] font-bold text-[#5E82A6] uppercase tracking-wider block flex items-center justify-between font-sans">
           <span>Area Horizon Predictions (0–180 min)</span>
           <span className="font-mono text-[#0284C7] font-semibold text-[9px]">ConvLSTM Rollout</span>
         </span>
@@ -173,17 +168,17 @@ export default function AreaIntelligencePanel({
                 onClick={() => setHorizonMin && setHorizonMin(item.horizon_min)}
                 className={`p-1.5 rounded border transition-all ${
                   isSelected 
-                    ? 'bg-[#0284C7] text-white border-[#0284C7] shadow-xs' 
+                    ? 'bg-[#0284C7] text-white border-[#0284C7] shadow-2xs font-bold' 
                     : item.p_thunderstorm > 70 
                     ? 'bg-[#FEF2F2] text-[#991B1B] border-[#FEE2E2]' 
                     : item.p_thunderstorm > 40
                     ? 'bg-[#FFFBEB] text-[#92400E] border-[#FEF3C7]'
-                    : 'bg-[#EEF6FB] text-[#0F2942] border-[#D0E3F0] hover:bg-[#E5F0F7]'
+                    : 'bg-[#EEF6FB] text-[#12324E] border-[#D0E3F0] hover:bg-[#E5F0F7]'
                 }`}
               >
                 <span className="font-bold block">{item.label}</span>
                 <span className="text-[9px]">{item.p_thunderstorm}% P(Thu)</span>
-                <span className="text-[9px] block text-slate-500">{item.rainfall_mmh} mm/h</span>
+                <span className="text-[9px] block text-[#5E82A6]">{item.rainfall_mmh} mm/h</span>
               </button>
             );
           })}
@@ -191,10 +186,10 @@ export default function AreaIntelligencePanel({
       </div>
 
       {/* Meteorological Explanation Rationale */}
-      <div className="bg-[#EEF6FB] p-2.5 rounded-lg border border-[#D0E3F0] space-y-1 text-[11px] text-[#47637E]">
-        <div className="flex items-center space-x-1 text-[#0284C7] font-bold text-[10px] uppercase font-mono">
+      <div className="bg-[#EEF6FB] p-2.5 rounded-md border border-[#D0E3F0] space-y-1 text-[11px] text-[#5E82A6] font-sans">
+        <div className="flex items-center space-x-1 text-[#0284C7] font-bold text-[10px] uppercase font-sora">
           <Info className="w-3.5 h-3.5" />
-          <span>Area Atmospheric Explanation</span>
+          <span>Area Atmospheric Synthesis</span>
         </div>
         <p className="italic leading-relaxed">
           "{xai.meteorological_rationale || 'Multimodal sensor fusion indicates atmospheric column state evaluated over selected coordinates.'}"
@@ -202,12 +197,12 @@ export default function AreaIntelligencePanel({
       </div>
 
       {/* Provenance Footer */}
-      <div className="text-[9px] font-mono text-[#64829E] flex items-center justify-between pt-1 border-t border-[#D0E3F0]">
-        <span className="flex items-center gap-1">
+      <div className="text-[9px] font-mono text-[#5E82A6] flex items-center justify-between pt-1 border-t border-[#D0E3F0]">
+        <span className="flex items-center gap-1 font-sans">
           <Database className="w-3 h-3 text-[#0284C7]" />
           Source: {provenance.source || 'Multimodal DWR + ConvLSTM'}
         </span>
-        <span>Mode: {provenance.data_mode || 'SYNTHETIC'}</span>
+        <span className="font-mono">Mode: {provenance.data_mode || 'SYNTHETIC'}</span>
       </div>
 
     </div>

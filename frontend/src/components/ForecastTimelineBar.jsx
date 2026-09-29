@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Play, Pause, RotateCcw } from 'lucide-react';
+import { Clock, Play, Pause } from 'lucide-react';
 
 export default function ForecastTimelineBar({ horizonMin, setHorizonMin }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -31,12 +31,12 @@ export default function ForecastTimelineBar({ horizonMin, setHorizonMin }) {
   }, [isPlaying, setHorizonMin]);
 
   return (
-    <div className="bg-[#F8FCFE] border border-[#D0E3F0] rounded-xl p-3 shadow-xs font-mono select-none">
+    <div className="bg-[#F8FCFE] border border-[#D0E3F0] rounded-lg p-3 shadow-2xs font-sans select-none">
       <div className="flex items-center justify-between mb-2 px-1">
         <div className="flex items-center space-x-3">
-          <span className="text-[11px] text-[#47637E] font-bold uppercase tracking-wider flex items-center gap-1.5 font-sans">
+          <span className="text-[11px] text-[#12324E] font-bold uppercase tracking-wider flex items-center gap-1.5 font-sora">
             <Clock className="w-3.5 h-3.5 text-[#0284C7]" />
-            Forecast Timeline Loop
+            Forecast Lead Time Control
           </span>
 
           {/* Time-lapse Play / Pause Control Button */}
@@ -47,7 +47,7 @@ export default function ForecastTimelineBar({ horizonMin, setHorizonMin }) {
                 ? 'bg-[#FEF2F2] text-[#DC2626] border-[#FEE2E2]'
                 : 'bg-[#EEF6FB] text-[#0284C7] border-[#D0E3F0] hover:bg-[#E5F0F7]'
             }`}
-            title={isPlaying ? 'Pause Nowcast Loop' : 'Play Automated 0-180m Loop'}
+            title={isPlaying ? 'Pause Loop' : 'Play Automated 0-180m Loop'}
           >
             {isPlaying ? (
               <>
@@ -65,7 +65,7 @@ export default function ForecastTimelineBar({ horizonMin, setHorizonMin }) {
 
         <div className="flex items-center space-x-2">
           <span className="text-xs text-[#0284C7] font-bold font-mono">
-            Target: T + {horizonMin} minutes
+            Target: T + {horizonMin} min
           </span>
         </div>
       </div>
@@ -73,9 +73,9 @@ export default function ForecastTimelineBar({ horizonMin, setHorizonMin }) {
       {/* Scientific Timeline Selector */}
       <div className="relative pt-1">
         {/* Baseline Track Line */}
-        <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-[#E2EAF0] -translate-y-1/2 z-0" />
+        <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-[#D0E3F0] -translate-y-1/2 z-0" />
 
-        <div className="grid grid-cols-8 gap-1 relative z-10">
+        <div className="grid grid-cols-8 gap-1 relative z-10 font-mono">
           {horizons.map((item) => {
             const isSelected = horizonMin === item.value || (horizonMin === 0 && item.value === 0);
             return (
@@ -86,7 +86,7 @@ export default function ForecastTimelineBar({ horizonMin, setHorizonMin }) {
                   setHorizonMin(item.value === 0 ? 15 : item.value);
                 }}
                 className={`flex flex-col items-center py-1 transition-all group ${
-                  isSelected ? 'text-[#0284C7] font-bold' : 'text-[#47637E] hover:text-[#0F2942]'
+                  isSelected ? 'text-[#0284C7] font-bold' : 'text-[#5E82A6] hover:text-[#12324E]'
                 }`}
               >
                 <span className="text-[11px] tracking-tight mb-1">{item.label}</span>
@@ -94,7 +94,7 @@ export default function ForecastTimelineBar({ horizonMin, setHorizonMin }) {
                   className={`w-full h-1 rounded-full transition-all ${
                     isSelected
                       ? 'bg-[#0284C7] shadow-2xs'
-                      : 'bg-[#D0E3F0] group-hover:bg-[#B8D6EB]'
+                      : 'bg-[#D0E3F0] group-hover:bg-[#5E82A6]'
                   }`}
                 />
               </button>

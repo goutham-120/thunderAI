@@ -1,8 +1,5 @@
 import React from 'react';
-import { 
-  Sparkles, 
-  BrainCircuit
-} from 'lucide-react';
+import { Activity, Gauge, Info } from 'lucide-react';
 
 export default function ExplainableAIPanel({ 
   xaiData, 
@@ -25,66 +22,64 @@ export default function ExplainableAIPanel({
   };
 
   return (
-    <div className="glass-panel p-4 rounded-2xl border border-slate-800/90 shadow-xl flex flex-col h-full">
+    <div className="bg-[#F8FCFE] p-4 rounded-lg border border-[#D0E3F0] shadow-2xs flex flex-col h-full font-sans text-[#12324E]">
       {/* Panel Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+      <div className="flex items-center justify-between pb-3 border-b border-[#D0E3F0] mb-3">
         <div className="flex items-center space-x-2">
-          <div className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
-            <BrainCircuit className="w-4 h-4" />
+          <div className="p-1.5 rounded-md bg-[#EEF6FB] text-[#0284C7] border border-[#D0E3F0]">
+            <Activity className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-              Explainable AI (XAI)
-              <span className="text-[9px] px-1.5 py-0.2 rounded-md bg-indigo-500/20 text-indigo-300 font-mono border border-indigo-500/30">
-                SHAP Attributions
+            <h3 className="text-xs font-bold text-[#12324E] uppercase tracking-wider font-sora flex items-center gap-1.5">
+              Physical Driver Attribution
+              <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#EEF6FB] text-[#0284C7] font-mono border border-[#D0E3F0]">
+                SHAP Weights
               </span>
             </h3>
-            <p className="text-[10px] text-slate-400 font-medium">
+            <p className="text-[10px] text-[#5E82A6] font-medium font-sans">
               Thermodynamic & Multi-Sensor Convective Drivers
             </p>
           </div>
         </div>
-        <div className="text-right">
-          <span className="text-[10px] text-slate-400 block font-sans">Confidence</span>
-          <span className="text-xs font-mono font-bold text-emerald-400">
+        <div className="text-right font-mono">
+          <span className="text-[10px] text-[#5E82A6] block font-sans">Confidence</span>
+          <span className="text-xs font-bold text-[#047857]">
             {data.confidence_index_percent || 88.5}%
           </span>
         </div>
       </div>
 
       {/* Probability Dual Gauges */}
-      <div className="grid grid-cols-2 gap-3 mb-3.5">
-        <div className="p-2.5 rounded-xl bg-red-950/40 border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
-          <span className="text-[10px] font-bold text-red-300 block uppercase tracking-wider">
+      <div className="grid grid-cols-2 gap-3 mb-3.5 font-mono">
+        <div className="p-2.5 rounded-md bg-[#FEF2F2] border border-[#FEE2E2]">
+          <span className="text-[10px] font-bold text-[#991B1B] block uppercase tracking-wider font-sans">
             Thunderstorm Risk
           </span>
           <div className="flex items-baseline space-x-1 mt-1">
-            <span className="text-2xl font-bold font-mono text-red-400 tracking-tight">
+            <span className="text-2xl font-bold text-[#991B1B] tracking-tight">
               {data.p_thunderstorm_percent}%
             </span>
-            <span className="text-[9px] font-bold text-red-400 font-mono px-1 rounded bg-red-500/20">EXTREME</span>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
+          <div className="w-full bg-[#E2EAF0] rounded-full h-1.5 mt-2 overflow-hidden">
             <div 
-              className="bg-gradient-to-r from-orange-500 to-red-500 h-1.5 rounded-full transition-all duration-500 shadow-[0_0_8px_#ef4444]" 
+              className="bg-[#DC2626] h-1.5 rounded-full" 
               style={{ width: `${data.p_thunderstorm_percent}%` }}
             ></div>
           </div>
         </div>
 
-        <div className="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
-          <span className="text-[10px] font-bold text-amber-300 block uppercase tracking-wider">
-            Lightning Risk (0-30m)
+        <div className="p-2.5 rounded-md bg-[#FFFBEB] border border-[#FEF3C7]">
+          <span className="text-[10px] font-bold text-[#92400E] block uppercase tracking-wider font-sans">
+            Lightning Risk
           </span>
           <div className="flex items-baseline space-x-1 mt-1">
-            <span className="text-2xl font-bold font-mono text-amber-400 tracking-tight">
+            <span className="text-2xl font-bold text-[#92400E] tracking-tight">
               {data.p_lightning_percent}%
             </span>
-            <span className="text-[9px] font-bold text-amber-400 font-mono px-1 rounded bg-amber-500/20">SEVERE</span>
           </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
+          <div className="w-full bg-[#E2EAF0] rounded-full h-1.5 mt-2 overflow-hidden">
             <div 
-              className="bg-gradient-to-r from-yellow-400 to-amber-500 h-1.5 rounded-full transition-all duration-500 shadow-[0_0_8px_#f59e0b]" 
+              className="bg-[#D97706] h-1.5 rounded-full" 
               style={{ width: `${data.p_lightning_percent}%` }}
             ></div>
           </div>
@@ -93,36 +88,36 @@ export default function ExplainableAIPanel({
 
       {/* Atmospheric Driver Attribution Bars */}
       <div className="space-y-2 mb-3.5 flex-1 overflow-y-auto pr-1">
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+        <span className="text-[10px] font-bold text-[#5E82A6] uppercase tracking-wider block font-sans">
           Key Atmospheric Triggers:
         </span>
         {data.drivers?.map((driver, i) => (
-          <div key={i} className="p-2 rounded-lg bg-slate-900/70 border border-slate-800 text-xs">
-            <div className="flex items-center justify-between mb-1">
-              <span className="font-semibold text-slate-200 text-[11px]">{driver.feature}</span>
-              <span className="font-mono font-bold text-cyan-400 text-[11px]">{driver.value}</span>
+          <div key={i} className="p-2 rounded-md bg-[#EEF6FB] border border-[#D0E3F0] text-xs">
+            <div className="flex items-center justify-between mb-1 font-sans">
+              <span className="font-semibold text-[#12324E] text-[11px]">{driver.feature}</span>
+              <span className="font-mono font-bold text-[#0284C7] text-[11px]">{driver.value}</span>
             </div>
-            <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+            <div className="w-full bg-[#E2EAF0] rounded-full h-1.5 overflow-hidden">
               <div 
-                className="bg-gradient-to-r from-blue-500 to-cyan-400 h-1.5 rounded-full shadow-[0_0_8px_#38bdf8]" 
+                className="bg-[#0284C7] h-1.5 rounded-full" 
                 style={{ width: `${driver.impact_percent}%` }}
               ></div>
             </div>
-            <div className="flex justify-between items-center text-[9px] text-slate-400 mt-1 font-medium">
+            <div className="flex justify-between items-center text-[9px] text-[#5E82A6] mt-1 font-medium font-sans">
               <span>{driver.trend}</span>
-              <span className="font-mono text-indigo-400 font-bold">{driver.impact_percent}% Impact</span>
+              <span className="font-mono text-[#0284C7] font-bold">{driver.impact_percent}% Weight</span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Meteorological AI Rationale Box */}
-      <div className="p-3 rounded-xl bg-blue-950/40 border border-blue-500/30 text-xs shadow-[0_0_15px_rgba(59,130,246,0.1)]">
-        <div className="flex items-center space-x-1.5 font-bold text-blue-300 mb-1 text-[11px]">
-          <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-          <span>Meteorological AI Synthesis</span>
+      {/* Meteorological Rationale Box */}
+      <div className="p-3 rounded-md bg-[#EEF6FB] border border-[#D0E3F0] text-xs font-sans">
+        <div className="flex items-center space-x-1.5 font-bold text-[#0284C7] mb-1 text-[11px] font-sora">
+          <Info className="w-3.5 h-3.5 text-[#0284C7]" />
+          <span>Meteorological Synthesis</span>
         </div>
-        <p className="text-[11px] text-blue-200 leading-relaxed font-normal">
+        <p className="text-[11px] text-[#5E82A6] leading-relaxed italic font-normal">
           "{data.meteorological_rationale}"
         </p>
       </div>
