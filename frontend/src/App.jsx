@@ -19,6 +19,7 @@ import HistoricalReplayBar from './components/HistoricalReplayBar';
 import AreaIntelligencePanel from './components/AreaIntelligencePanel';
 import ActiveThreatsPanel from './components/ActiveThreatsPanel';
 import DashboardStatusFooter from './components/DashboardStatusFooter';
+import MultiSourceConsistencyPanel from './components/MultiSourceConsistencyPanel';
 
 import { REGION_CONFIGS } from './components/WeatherMapConfig';
 import indiaStatesData from './data/india_states.json';
@@ -291,9 +292,23 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Part 3: Current Atmospheric Conditions */}
+              {/* Current Atmospheric Conditions */}
               <NowcastSummaryBar
                 forecastData={forecastData}
+              />
+
+              {/* Multi-Source Cross-Observation Consistency Analysis */}
+              <MultiSourceConsistencyPanel
+                consistencyData={forecastData?.multi_source_consistency}
+                selectedLocation={selectedLocation}
+                selectedCell={selectedCell}
+                onFocusTarget={() => {
+                  if (selectedCell) {
+                    setSelectedCell({ ...selectedCell });
+                  } else if (forecastData?.storm_cells && forecastData.storm_cells.length > 0) {
+                    setSelectedCell(forecastData.storm_cells[0]);
+                  }
+                }}
               />
 
               {/* Part 4: Active Threat Areas & Alerts */}

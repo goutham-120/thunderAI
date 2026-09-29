@@ -10,6 +10,7 @@ from app.models.spatiotemporal_net import ai_engine
 from app.services.storm_tracker import storm_tracker
 from app.services.xai_engine import xai_engine
 from app.services.cap_alert_engine import cap_engine
+from app.services.consistency_analyzer import consistency_analyzer
 from app.config import config
 
 REGION_COORDINATES = {
@@ -205,6 +206,49 @@ class ForecastEngine:
         max_rain_val = round(float(np.max(selected_pred["rainfall_mmh"])), 1)
         peak_dbz_val = round(float(np.max(last_frame[:, :, 0])), 1)
 
+        atmospheric_conditions_dict = {
+            "temperature_c": cube_data["nwp_variables"]["temperature_2m"] if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("temperature_2m") is not None else base_temp,
+            "relative_humidity_percent": cube_data["nwp_variables"]["relative_humidity_2m"] if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("relative_humidity_2m") is not None else base_rh,
+            "cape_jkg": int(cube_data["nwp_variables"]["cape_jkg"]) if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("cape_jkg") is not None else int(base_cape),
+            "wind_speed_direction": f"10m Wind: {cube_data['nwp_variables']['wind_speed_10m']} km/h" if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("wind_speed_10m") is not None else base_wind,
+            "pressure_hpa": int(base_press),
+            "precipitable_water_mm": int(cube_data["nwp_variables"]["total_precipitable_water_mm"]) if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("total_precipitable_water_mm") is not None else int(base_tpw)
+        }
+
+        summary_metrics_dict = {
+            "max_thunderstorm_prob_percent": max_thu_pct,
+            "max_thunderstorm_prob_pct": max_thu_pct,
+            "max_lightning_prob_percent": max_lig_pct,
+            "max_lightning_prob_pct": max_lig_pct,
+            "max_rain_intensity_mmh": max_rain_val,
+            "max_rainfall_rate_mmh": max_rain_val,
+            "peak_radar_dbz": peak_dbz_val,
+            "max_reflectivity_dbz": peak_dbz_val,
+            "active_storm_cells_count": len(active_cells),
+            "system_confidence_percent": 88.5,
+            "uncertainty_index": selected_pred["uncertainty_index"]
+        }
+
+        timestamps_dict = {
+            "observation_time": obs_iso,
+            "ingestion_time": cube_data.get("ingestion_timestamp") or now_dt.isoformat(),
+            "forecast_generation_time": now_dt.isoformat(),
+            "forecast_valid_time": valid_dt.isoformat()
+        }
+
+        top_cell = active_cells[0] if active_cells else None
+        loc_name = region_name or "Selected Region"
+
+        multi_source_consistency = consistency_analyzer.analyze_consistency(
+            summary_metrics=summary_metrics_dict,
+            atmospheric_conditions=atmospheric_conditions_dict,
+            channel_provenance=cube_data.get("channel_provenance", {}),
+            channel_status=cube_data.get("channel_status", {}),
+            timestamps=timestamps_dict,
+            selected_cell=top_cell,
+            selected_location_name=loc_name
+        )
+
         return {
             "status": "success",
             "event_id": event_id,
@@ -218,12 +262,7 @@ class ForecastEngine:
             "model_provenance": ai_engine.get_model_provenance(),
             "horizon_minutes": horizon_min,
             "timestamp": obs_iso,
-            "timestamps": {
-                "observation_time": obs_iso,
-                "ingestion_time": cube_data.get("ingestion_timestamp") or now_dt.isoformat(),
-                "forecast_generation_time": now_dt.isoformat(),
-                "forecast_valid_time": valid_dt.isoformat()
-            },
+            "timestamps": timestamps_dict,
             "bounds": cube_data["bounds"],
             "grid_dimensions": {"rows": 32, "cols": 32},
             "channel_provenance": cube_data.get("channel_provenance", {}),
@@ -233,32 +272,14 @@ class ForecastEngine:
             "missing_channels": cube_data.get("missing_channels", []),
             "fallback_used": cube_data.get("fallback_used", False),
             "source_statuses": cube_data.get("source_statuses", {}),
-            "atmospheric_conditions": {
-                "temperature_c": cube_data["nwp_variables"]["temperature_2m"] if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("temperature_2m") is not None else base_temp,
-                "relative_humidity_percent": cube_data["nwp_variables"]["relative_humidity_2m"] if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("relative_humidity_2m") is not None else base_rh,
-                "cape_jkg": int(cube_data["nwp_variables"]["cape_jkg"]) if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("cape_jkg") is not None else int(base_cape),
-                "wind_speed_direction": f"10m Wind: {cube_data['nwp_variables']['wind_speed_10m']} km/h" if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("wind_speed_10m") is not None else base_wind,
-                "pressure_hpa": int(base_press),
-                "precipitable_water_mm": int(cube_data["nwp_variables"]["total_precipitable_water_mm"]) if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("total_precipitable_water_mm") is not None else int(base_tpw)
-            },
+            "atmospheric_conditions": atmospheric_conditions_dict,
             "probability_curves": {
                 "thunderstorm": prob_curve_thunder,
                 "lightning": prob_curve_lightning,
                 "rainfall": prob_curve_rainfall
             },
-            "summary_metrics": {
-                "max_thunderstorm_prob_percent": max_thu_pct,
-                "max_thunderstorm_prob_pct": max_thu_pct,
-                "max_lightning_prob_percent": max_lig_pct,
-                "max_lightning_prob_pct": max_lig_pct,
-                "max_rain_intensity_mmh": max_rain_val,
-                "max_rainfall_rate_mmh": max_rain_val,
-                "peak_radar_dbz": peak_dbz_val,
-                "max_reflectivity_dbz": peak_dbz_val,
-                "active_storm_cells_count": len(active_cells),
-                "system_confidence_percent": 88.5,
-                "uncertainty_index": selected_pred["uncertainty_index"]
-            },
+            "summary_metrics": summary_metrics_dict,
+            "multi_source_consistency": multi_source_consistency,
             "storm_cells": active_cells,
             "cap_alerts": cap_alerts,
             "xai_explanation": xai_explanation,
@@ -438,6 +459,16 @@ class ForecastEngine:
 
         relevant_alerts = full_nowcast.get("cap_alerts", [])
 
+        area_consistency = consistency_analyzer.analyze_consistency(
+            summary_metrics=full_nowcast.get("summary_metrics", {}),
+            atmospheric_conditions=full_nowcast.get("atmospheric_conditions", {}),
+            channel_provenance=full_nowcast.get("channel_provenance", {}),
+            channel_status=full_nowcast.get("channel_status", {}),
+            timestamps=full_nowcast.get("timestamps", {}),
+            selected_cell=closest_cell,
+            selected_location_name=area_desc
+        )
+
         return {
             "status": "success",
             "selected_area": {
@@ -460,6 +491,7 @@ class ForecastEngine:
             "area_nowcast_timeline": area_nowcast_timeline,
             "infrastructure_threats": infrastructure_threats,
             "atmospheric_conditions": full_nowcast.get("atmospheric_conditions", {}),
+            "multi_source_consistency": area_consistency,
             "xai_explanation": full_nowcast.get("xai_explanation", {}),
             "cap_alerts": relevant_alerts,
             "data_provenance": {
