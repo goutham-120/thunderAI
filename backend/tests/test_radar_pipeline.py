@@ -67,7 +67,7 @@ def test_radar_api_status():
     response = client.get("/api/data/radar/status")
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "AVAILABLE"
+    assert data["status"] in ("AVAILABLE", "OUT_OF_COVERAGE")
     assert data["scans_count"] == 20
     assert "RSCHR" in data["station_name"]
 

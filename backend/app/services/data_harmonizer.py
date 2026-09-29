@@ -91,17 +91,13 @@ class DataHarmonizer:
         """
         logger.info("[Harmonizer] Constructing 4D atmospheric tensor in REAL data mode...")
 
-        # Default synthetic baseline tensor for fallback channels
-        synth_cube = self.generate_synthetic_convective_cube(
-            time_steps=time_steps,
-            storm_center=storm_center,
-            storm_speed_kmh=storm_speed_kmh,
-            storm_heading_deg=storm_heading_deg,
-            intensity_factor=intensity_factor,
-            t_offset_minutes=t_offset_minutes
-        )
-        tensor_4d = synth_cube["tensor"] # [T, 64, 64, 8]
-        provenance = {ch: "SYNTHETIC_FALLBACK" for ch in self.channel_names}
+        # Clean real-observation baseline tensor [T, Rows, Cols, 8]
+        # Channels 0 (radar), 1 (vel), 4 (lightning), 5-7 (NWP) default to 0.0
+        # Channels 2 (TIR1), 3 (WV) default to ambient clear-sky brightness temperatures (290K, 240K)
+        tensor_4d = np.zeros((time_steps, self.rows, self.cols, 8), dtype=np.float32)
+        tensor_4d[:, :, :, 2] = 290.0  # Ambient TIR1 (K)
+        tensor_4d[:, :, :, 3] = 240.0  # Ambient WV (K)
+        provenance = {ch: "UNAVAILABLE" for ch in self.channel_names}
 
         # Apply Open-Meteo ECMWF NWP layers (CAPE, CIN, Shear)
         tensor_4d, provenance, nwp_vars = self._apply_open_meteo_nwp_layers(tensor_4d, provenance)
@@ -113,7 +109,7 @@ class DataHarmonizer:
         tensor_4d, provenance = self._apply_isro_radar_layers(tensor_4d, provenance)
 
         # Legacy IMD radar/AWS fallback check if ISRO radar client didn't supply real data
-        if "SYNTHETIC_FALLBACK" in provenance.get("radar_dbz", ""):
+        if provenance.get("radar_dbz") == "UNAVAILABLE":
             aws_res = aws_connector.fetch_observations()
             radar_res = radar_connector.fetch_radar_data()
             if radar_res.get("success") and radar_res.get("has_raster_grid"):
@@ -135,7 +131,7 @@ class DataHarmonizer:
 
         # Apply Lightning layers (Density)
         tensor_4d, provenance = self._apply_lightning_layers(tensor_4d, provenance)
-        if "SYNTHETIC_FALLBACK" in provenance.get("lightning_density", ""):
+        if provenance.get("lightning_density") == "UNAVAILABLE":
             lightning_res = lightning_connector.fetch_lightning_strikes()
             if lightning_res.get("success"):
                 strikes = lightning_res.get("strikes", [])
@@ -143,6 +139,7 @@ class DataHarmonizer:
                     strikes, config.GRID_BOUNDS, self.rows, self.cols
                 )
                 tensor_4d[:, :, :, 4] = grid_light
+                provenance["lightning_density"] = "REAL (IMD LLN Network)" if len(strikes) > 0 else "REAL (0 STRIKES DETECTED)"
                 provenance["lightning_density"] = "REAL (IMD LLN Network)" if len(strikes) > 0 else "REAL (0 STRIKES DETECTED)"
 
         return self._build_metadata_for_cube(
@@ -309,9 +306,6 @@ class DataHarmonizer:
         # Apply real MOSDAC INSAT-3D/3DR satellite layers if available
         tensor_4d, channel_provenance = self._apply_mosdac_satellite_layers(tensor_4d, channel_provenance)
 
-        # Apply real ISRO Doppler Weather Radar (DWR) layers if available
-        tensor_4d, channel_provenance = self._apply_isro_radar_layers(tensor_4d, channel_provenance)
-
         # Apply real IITM / IMD Damini lightning detection layers if available
         tensor_4d, channel_provenance = self._apply_lightning_layers(tensor_4d, channel_provenance)
 
@@ -474,10 +468,19 @@ class DataHarmonizer:
     ) -> Tuple[np.ndarray, Dict[str, str]]:
         """
         Attempts to ingest real ISRO Doppler Weather Radar (DWR) reflectivity (dBZ) & radial velocity (m/s) into Channels 0 and 1.
-        If ISRO DWR access is unconfigured or unavailable, retains fallback baseline values and updates provenance truthfully.
+        Validates spatial coverage before applying radar grids.
         """
         radar_res = isro_radar_client.fetch_radar_observations()
-        if (radar_res.get("status") in ("AVAILABLE", "REAL", "SYNTHETIC_FALLBACK")) and radar_res.get("data") is not None:
+        status = radar_res.get("status", "UNAVAILABLE")
+        cov_valid = radar_res.get("coverage_valid", False)
+
+        if status == "OUT_OF_COVERAGE" or cov_valid is False:
+            tensor_4d[:, :, :, 0] = 0.0
+            tensor_4d[:, :, :, 1] = 0.0
+            site = radar_res.get("radar_site", "DWR")
+            provenance["radar_dbz"] = f"OUT_OF_COVERAGE ({site} outside requested region)"
+            provenance["radial_velocity"] = f"OUT_OF_COVERAGE ({site} outside requested region)"
+        elif status in ("AVAILABLE", "REAL") and radar_res.get("data") is not None:
             r_data = radar_res["data"]
             dbz_grid = r_data.get("dbz_grid")
             vel_grid = r_data.get("velocity_grid")
@@ -488,16 +491,20 @@ class DataHarmonizer:
                 tensor_4d[:, :, :, 0] = dbz_grid
                 provenance["radar_dbz"] = f"{prov_tag} (ISRO DWR {site})"
             else:
-                provenance["radar_dbz"] = "AVAILABLE (ISRO Doppler Weather Radar S-Band Cluster)"
+                tensor_4d[:, :, :, 0] = 0.0
+                provenance["radar_dbz"] = f"REAL ({site} No Reflectivity Grid)"
 
             if vel_grid is not None:
                 tensor_4d[:, :, :, 1] = vel_grid
                 provenance["radial_velocity"] = f"{prov_tag} (ISRO DWR {site})"
             else:
-                provenance["radial_velocity"] = "AVAILABLE (ISRO DWR Radial Velocity Vector)"
+                tensor_4d[:, :, :, 1] = 0.0
+                provenance["radial_velocity"] = f"REAL ({site} No Velocity Grid)"
         else:
-            provenance["radar_dbz"] = "AVAILABLE (ISRO Doppler Weather Radar S-Band Cluster)"
-            provenance["radial_velocity"] = "AVAILABLE (ISRO DWR Radial Velocity Vector)"
+            tensor_4d[:, :, :, 0] = 0.0
+            tensor_4d[:, :, :, 1] = 0.0
+            provenance["radar_dbz"] = "UNAVAILABLE (No active regional radar coverage)"
+            provenance["radial_velocity"] = "UNAVAILABLE (No active regional velocity telemetry)"
 
         return tensor_4d, provenance
 

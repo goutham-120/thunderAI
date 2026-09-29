@@ -13,6 +13,7 @@ import AlertsView from './components/AlertsView';
 import ReplayView from './components/ReplayView';
 import ExplainabilityView from './components/ExplainabilityView';
 import ModelView from './components/ModelView';
+import ReportsValidationPage from './components/ReportsValidationPage';
 import DataSourcesView from './components/DataSourcesView';
 import DataProvenanceModal from './components/DataProvenanceModal';
 import HistoricalReplayBar from './components/HistoricalReplayBar';
@@ -617,6 +618,14 @@ export default function App() {
               forecastData={forecastData}
               selectedCell={selectedCell}
               onSelectCell={setSelectedCell}
+              activeLayers={activeLayers}
+              toggleLayer={toggleLayer}
+              horizonMin={horizonMin}
+              setHorizonMin={setHorizonMin}
+              selectedLocation={selectedLocation}
+              onLocationSelect={setSelectedLocation}
+              selectedRegion={selectedRegion}
+              setSelectedRegion={setSelectedRegion}
             />
           )}
 
@@ -661,7 +670,12 @@ export default function App() {
             />
           )}
 
-          {/* 9. DATA SOURCES PAGE */}
+          {/* 9. REPORTS & VALIDATION PAGE */}
+          {activeTab === 'reports' && (
+            <ReportsValidationPage />
+          )}
+
+          {/* 10. DATA SOURCES PAGE */}
           {activeTab === 'datasources' && (
             <DataSourcesView
               systemStatus={systemStatus}

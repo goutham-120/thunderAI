@@ -60,18 +60,26 @@ class ISRORadarClient:
         if len(inventory) > 0:
             latest = inventory[-1]
             st = "ARCHIVE" if "2026" in latest["timestamp_iso"] else "REAL"
+            site_lat, site_lon = 25.2680, 91.7332
+            is_cov, dist_km, cov_desc = validate_radar_coverage(
+                site_lat=site_lat,
+                site_lon=site_lon,
+                max_range_km=240.0,
+                target_bounds=config.GRID_BOUNDS
+            )
             return {
                 "source": "ISRO DWR",
                 "radar_site": "Cherrapunji DWR (RSCHR)",
-                "site_coordinates": [25.2680, 91.7332],
-                "status": "AVAILABLE",
-                "reason": None,
+                "site_coordinates": [site_lat, site_lon],
+                "status": "OUT_OF_COVERAGE" if not is_cov else "AVAILABLE",
+                "reason": cov_desc if not is_cov else None,
                 "provenance": st,
                 "latest_observation_file": latest["filename"],
                 "latest_observation_time": latest["timestamp_iso"],
                 "files_count": len(inventory),
                 "resolution": "150m-300m range bin polar scan",
-                "coverage": "Cherrapunji / Meghalaya / Assam / Northeast India"
+                "coverage_valid": is_cov,
+                "coverage": cov_desc
             }
 
         site_info = KNOWN_RADAR_SITES.get(self.radar_id, {"lat": 17.72, "lon": 83.25, "name": self.radar_id})
@@ -118,6 +126,7 @@ class ISRORadarClient:
         """
         Retrieves real ISRO DWR radar observations (dBZ reflectivity & radial velocity m/s).
         Prioritizes verified local NetCDF radar files from data directory.
+        Performs explicit spatial coverage validation against requested grid bounds.
         """
         from app.services.isro_radar.radar_dataset import radar_dataset
         from app.services.isro_radar.radar_loader import radar_loader
@@ -128,8 +137,51 @@ class ISRORadarClient:
             latest = inventory[-1]
             try:
                 raw = radar_loader.read_radar_file(latest["filepath"])
-                grid_res = radar_preprocessor.resample_to_grid(raw, grid_shape=(config.GRID_BOUNDS["grid_rows"], config.GRID_BOUNDS["grid_cols"]))
                 prov = "ARCHIVE" if "2026" in raw["timestamp_iso"] else "REAL"
+
+                # Perform explicit spatial-coverage validation against target grid bounds
+                is_cov, dist_km, cov_desc = validate_radar_coverage(
+                    site_lat=raw["station_lat"],
+                    site_lon=raw["station_lon"],
+                    max_range_km=raw.get("max_range_km", 240.0),
+                    target_bounds=config.GRID_BOUNDS
+                )
+
+                if not is_cov:
+                    logger.warning(f"[ISRORadarClient] Radar site {raw['station_name']} ({raw['station_lat']}N, {raw['station_lon']}E) is out of range for target grid bounds: {cov_desc}")
+                    status_tracker.update_source(
+                        source_key="radar",
+                        status="OUT_OF_COVERAGE",
+                        latency_ms=15.0,
+                        records_count=len(inventory),
+                        latest_obs_time=raw["timestamp_iso"],
+                        error_message=cov_desc
+                    )
+
+                    return {
+                        "status": "OUT_OF_COVERAGE",
+                        "provenance": prov,
+                        "source": "ISRO DWR",
+                        "radar_site": raw["station_name"],
+                        "coverage_valid": False,
+                        "coverage": cov_desc,
+                        "data": {
+                            "timestamp": raw["timestamp_iso"],
+                            "source": "ISRO DWR",
+                            "radar_site": raw["station_name"],
+                            "filename": latest["filename"],
+                            "provenance": prov,
+                            "station_lat": raw["station_lat"],
+                            "station_lon": raw["station_lon"],
+                            "max_dbz": 0.0,
+                            "max_vel": 0.0,
+                            "dbz_grid": None,
+                            "velocity_grid": None
+                        },
+                        "latency_ms": 15.0
+                    }
+
+                grid_res = radar_preprocessor.resample_to_grid(raw, grid_shape=(config.GRID_BOUNDS["grid_rows"], config.GRID_BOUNDS["grid_cols"]))
 
                 status_tracker.update_source(
                     source_key="radar",
@@ -143,13 +195,13 @@ class ISRORadarClient:
                     "status": "AVAILABLE",
                     "provenance": prov,
                     "source": "ISRO DWR",
-                    "radar_site": "Cherrapunji DWR (RSCHR)",
+                    "radar_site": raw["station_name"],
                     "coverage_valid": True,
-                    "coverage": "Cherrapunji / Meghalaya / Assam (240 km / 490 km max range)",
+                    "coverage": cov_desc,
                     "data": {
                         "timestamp": raw["timestamp_iso"],
                         "source": "ISRO DWR",
-                        "radar_site": "Cherrapunji DWR (RSCHR)",
+                        "radar_site": raw["station_name"],
                         "filename": latest["filename"],
                         "provenance": prov,
                         "station_lat": raw["station_lat"],
