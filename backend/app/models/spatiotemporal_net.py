@@ -317,35 +317,34 @@ class SpatioTemporalInferenceEngine:
                 neural_dbz = np.zeros((H, W), dtype=np.float32)
 
             # Calibrated Reflectivity: blend neural representation with physical advection
-            if np.max(neural_dbz) < 5.0:
+            if np.max(neural_dbz) < 5.0 or np.allclose(neural_dbz, neural_dbz[0, 0], atol=0.08):
                 pred_dbz = phys_dbz
             else:
                 pred_dbz = np.clip(0.4 * neural_dbz + 0.6 * phys_dbz, 0.0, 65.0)
 
             # Calibrated Thunderstorm Probability
-            z_norm = (pred_dbz - 35.0) / 7.0
-            phys_thunder = np.clip(1.0 / (1.0 + np.exp(-z_norm)) * (instability_mod * 0.95), 0.0, 0.98)
-            phys_thunder[pred_dbz < 20.0] = 0.02
+            z_norm = (pred_dbz - 30.0) / 6.0
+            phys_thunder = np.clip((1.0 / (1.0 + np.exp(-z_norm))) * (instability_mod * 0.95), 0.01, 0.98)
 
-            if np.max(neural_thunder) < 0.5 or np.allclose(neural_thunder, neural_thunder[0, 0], atol=0.05):
+            if np.allclose(neural_thunder, neural_thunder[0, 0], atol=0.08) or np.max(neural_thunder) < 0.1:
                 p_thunder = phys_thunder
             else:
-                p_thunder = np.clip(0.35 * neural_thunder + 0.65 * phys_thunder, 0.0, 0.98)
+                p_thunder = np.clip(0.35 * neural_thunder + 0.65 * phys_thunder, 0.01, 0.98)
 
             # Calibrated Lightning Risk Probability
-            l_drive = (pred_dbz - 38.0) / 6.0 + np.where(shifted_sat < 235.0, 1.2, 0.0)
-            phys_lightning = np.clip(1.0 / (1.0 + np.exp(-l_drive)) * 0.96, 0.0, 0.96)
-            phys_lightning[pred_dbz < 30.0] = 0.01
+            l_drive = (pred_dbz - 34.0) / 5.5 + np.where(shifted_sat < 235.0, 1.2, 0.0)
+            phys_lightning = np.clip((1.0 / (1.0 + np.exp(-l_drive))) * 0.96, 0.005, 0.96)
 
-            if np.max(neural_lightning) < 0.1 or np.allclose(neural_lightning, neural_lightning[0, 0], atol=0.05):
+            if np.allclose(neural_lightning, neural_lightning[0, 0], atol=0.08) or np.max(neural_lightning) < 0.1:
                 p_lightning = phys_lightning
             else:
-                p_lightning = np.clip(0.35 * neural_lightning + 0.65 * phys_lightning, 0.0, 0.96)
+                p_lightning = np.clip(0.35 * neural_lightning + 0.65 * phys_lightning, 0.005, 0.96)
 
             # Marshall-Palmer Physical Quantitative Precipitation Estimation
             z_linear = 10.0 ** (pred_dbz / 10.0)
-            phys_rain = np.where(pred_dbz > 15.0, (z_linear / 200.0) ** (1.0 / 1.6), 0.0)
-            if np.max(neural_rain) < 1.0:
+            phys_rain = np.where(pred_dbz > 5.0, (z_linear / 200.0) ** (1.0 / 1.6), 0.0)
+
+            if np.allclose(neural_rain, neural_rain[0, 0], atol=0.08) or np.max(neural_rain) < 0.5:
                 rainfall_mmh = np.clip(phys_rain, 0.0, 120.0)
             else:
                 rainfall_mmh = np.clip(0.3 * neural_rain + 0.7 * phys_rain, 0.0, 120.0)

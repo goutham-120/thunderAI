@@ -47,9 +47,10 @@ export default function SpatialLocationInspector({
   const gridRain = layers.pred_rainfall_mmh || forecastData?.pred_rainfall_mmh;
   const gridDbz = layers.radar_dbz || layers.pred_dbz || forecastData?.pred_radar_dbz || forecastData?.radar_dbz;
 
-  if (Array.isArray(gridProb) && gridProb.length > 0 && !isNaN(latNum) && !isNaN(lonNum)) {
-    const numRows = gridProb.length;
-    const numCols = gridProb[0].length;
+  const sampleGrid = (grid) => {
+    if (!Array.isArray(grid) || grid.length === 0 || isNaN(latNum) || isNaN(lonNum)) return null;
+    const numRows = grid.length;
+    const numCols = grid[0].length;
     const minLat = bounds[0] ?? 15.0;
     const minLon = bounds[1] ?? 76.5;
     const maxLat = bounds[2] ?? 19.8;
@@ -63,30 +64,50 @@ export default function SpatialLocationInspector({
     const r = Math.max(0, Math.min(numRows - 1, Math.round(latNorm * (numRows - 1))));
     const c = Math.max(0, Math.min(numCols - 1, Math.round(lonNorm * (numCols - 1))));
 
-    const rawThunder = gridProb?.[r]?.[c];
-    const rawLightning = gridLight?.[r]?.[c] ?? rawThunder;
-    const rawRain = gridRain?.[r]?.[c];
-    const rawDbz = gridDbz?.[r]?.[c];
+    const val = grid?.[r]?.[c];
+    return val !== undefined && val !== null ? val : null;
+  };
 
-    if (rawThunder !== undefined && rawThunder !== null) {
-      thunderProb = Number(rawThunder <= 1.0 ? rawThunder * 100 : rawThunder).toFixed(1);
-    }
-    if (rawLightning !== undefined && rawLightning !== null) {
-      lightningProb = Number(rawLightning <= 1.0 ? rawLightning * 100 : rawLightning).toFixed(1);
-    }
-    if (rawRain !== undefined && rawRain !== null) {
-      rainRate = Number(rawRain).toFixed(1);
-    }
-    if (rawDbz !== undefined && rawDbz !== null) {
-      dbz = Number(rawDbz).toFixed(1);
-    }
+  const rawDbz = sampleGrid(gridDbz);
+  const rawThunder = sampleGrid(gridProb);
+  const rawLightning = sampleGrid(gridLight);
+  const rawRain = sampleGrid(gridRain);
+
+  if (rawDbz !== null) {
+    dbz = Number(rawDbz).toFixed(1);
   }
 
-  // Fallback to regional summary metrics if point grid is unavailable
-  if (thunderProb === null) thunderProb = metrics.max_thunderstorm_prob_pct ?? metrics.max_thunderstorm_prob_percent ?? 45;
-  if (lightningProb === null) lightningProb = metrics.max_lightning_prob_pct ?? metrics.max_lightning_prob_percent ?? 30;
-  if (rainRate === null) rainRate = metrics.max_rainfall_rate_mmh ?? metrics.max_rain_intensity_mmh ?? 12.5;
-  if (dbz === null) dbz = metrics.peak_radar_dbz ?? metrics.max_reflectivity_dbz ?? 42.0;
+  if (rawThunder !== null) {
+    const val = Number(rawThunder <= 1.0 ? rawThunder * 100 : rawThunder);
+    thunderProb = val.toFixed(1);
+  } else if (dbz !== null) {
+    const d = parseFloat(dbz);
+    const pT = 1.0 / (1.0 + Math.exp(-(d - 30.0) / 6.0));
+    thunderProb = (pT * 100).toFixed(1);
+  }
+
+  if (rawLightning !== null) {
+    const val = Number(rawLightning <= 1.0 ? rawLightning * 100 : rawLightning);
+    lightningProb = val.toFixed(1);
+  } else if (dbz !== null) {
+    const d = parseFloat(dbz);
+    const pL = 1.0 / (1.0 + Math.exp(-(d - 34.0) / 5.5));
+    lightningProb = (pL * 96).toFixed(1);
+  }
+
+  if (rawRain !== null) {
+    rainRate = Number(rawRain).toFixed(1);
+  } else if (dbz !== null) {
+    const d = parseFloat(dbz);
+    const rr = d > 5.0 ? Math.pow(Math.pow(10, d / 10.0) / 200.0, 1.0 / 1.6) : 0.0;
+    rainRate = rr.toFixed(1);
+  }
+
+  // Fallback to regional summary metrics if point grid is completely unavailable
+  if (thunderProb === null) thunderProb = (metrics.max_thunderstorm_prob_pct ?? metrics.max_thunderstorm_prob_percent ?? 45).toFixed(1);
+  if (lightningProb === null) lightningProb = (metrics.max_lightning_prob_pct ?? metrics.max_lightning_prob_percent ?? 30).toFixed(1);
+  if (rainRate === null) rainRate = (metrics.max_rainfall_rate_mmh ?? metrics.max_rain_intensity_mmh ?? 12.5).toFixed(1);
+  if (dbz === null) dbz = (metrics.peak_radar_dbz ?? metrics.max_reflectivity_dbz ?? 42.0).toFixed(1);
 
   return (
     <div className="bg-[#F8FCFE] border border-[#D0E3F0] p-4 rounded-xl shadow-xs space-y-3 font-sans text-[#12324E] h-full flex flex-col justify-between">

@@ -253,24 +253,45 @@ class DataHarmonizer:
             curr_center_lat = storm_center[0] + v_lat * dt_min
             curr_center_lon = storm_center[1] + v_lon * dt_min
 
-            dist_sq = (lat_grid - curr_center_lat)**2 + (lon_grid - curr_center_lon)**2
-            r_core = 0.35 # Approx 35-40 km core radius
+            # Cell A (Primary Convective Core - Rapidly Intensifying)
+            dist_sq_a = (lat_grid - curr_center_lat)**2 + (lon_grid - curr_center_lon)**2
+            r_core_a = 0.30
+            dbz_a = 56.5 * intensity_factor * np.exp(-dist_sq_a / (2 * r_core_a**2))
 
-            base_dbz = 55.0 * intensity_factor * np.exp(-dist_sq / (2 * r_core**2))
-            dist_sq2 = (lat_grid - (curr_center_lat + 0.3))**2 + (lon_grid - (curr_center_lon - 0.4))**2
-            secondary_dbz = 45.0 * intensity_factor * np.exp(-dist_sq2 / (2 * 0.25**2))
-            radar_dbz = np.clip(base_dbz + secondary_dbz + np.random.normal(0, 1.5, (self.rows, self.cols)), 0.0, 65.0)
+            # Cell B (Secondary Convective Core - Mature Cell ~90km SE)
+            cell_b_lat = curr_center_lat - 0.75 + (v_lat * dt_min * 0.2)
+            cell_b_lon = curr_center_lon + 0.85 + (v_lon * dt_min * 0.2)
+            dist_sq_b = (lat_grid - cell_b_lat)**2 + (lon_grid - cell_b_lon)**2
+            r_core_b = 0.26
+            dbz_b = 48.0 * intensity_factor * np.exp(-dist_sq_b / (2 * r_core_b**2))
 
-            rad_vel = -25.0 * np.sin((lon_grid - curr_center_lon) * 8) * np.exp(-dist_sq / (2 * (r_core * 1.5)**2))
-            sat_tir = 295.0 - (85.0 * intensity_factor * np.exp(-dist_sq / (2 * (r_core * 2.0)**2)))
-            sat_tir = np.clip(sat_tir + np.random.normal(0, 1.0, (self.rows, self.cols)), 195.0, 310.0)
-            sat_wv = 245.0 - (35.0 * intensity_factor * np.exp(-dist_sq / (2 * (r_core * 2.2)**2)))
+            # Cell C (Tertiary Convective Core - Developing Cell ~110km NW)
+            cell_c_lat = curr_center_lat + 0.80 - (v_lat * dt_min * 0.1)
+            cell_c_lon = curr_center_lon - 0.95 - (v_lon * dt_min * 0.1)
+            dist_sq_c = (lat_grid - cell_c_lat)**2 + (lon_grid - cell_c_lon)**2
+            r_core_c = 0.22
+            dbz_c = 41.5 * intensity_factor * np.exp(-dist_sq_c / (2 * r_core_c**2))
 
-            lightning_prob = np.where(radar_dbz > 35, (radar_dbz - 35) / 30.0, 0.0)
-            lightning_density = lightning_prob * 18.0 * intensity_factor * np.exp(-dist_sq / (2 * (r_core * 0.8)**2))
-            lightning_density = np.clip(lightning_density + np.random.poisson(0.2, (self.rows, self.cols)), 0.0, 25.0)
+            radar_dbz = np.clip(
+                np.maximum.reduce([dbz_a, dbz_b, dbz_c]) + np.random.normal(0, 1.2, (self.rows, self.cols)),
+                0.0, 65.0
+            )
 
-            nwp_cape = 2400.0 - 600.0 * np.exp(-dist_sq / (2 * r_core**2)) + 300.0 * np.sin(lat_grid * 3)
+            rad_vel = -22.0 * np.sin((lon_grid - curr_center_lon) * 6) * np.exp(-dist_sq_a / (2 * (r_core_a * 1.5)**2))
+            
+            sat_cooling_a = 85.0 * intensity_factor * np.exp(-dist_sq_a / (2 * (r_core_a * 2.0)**2))
+            sat_cooling_b = 65.0 * intensity_factor * np.exp(-dist_sq_b / (2 * (r_core_b * 1.8)**2))
+            sat_cooling_c = 45.0 * intensity_factor * np.exp(-dist_sq_c / (2 * (r_core_c * 1.6)**2))
+            sat_tir = np.clip(295.0 - np.maximum.reduce([sat_cooling_a, sat_cooling_b, sat_cooling_c]), 195.0, 310.0)
+            sat_wv = np.clip(245.0 - 0.4 * np.maximum.reduce([sat_cooling_a, sat_cooling_b, sat_cooling_c]), 200.0, 260.0)
+
+            lightning_prob = np.where(radar_dbz > 35, (radar_dbz - 35) / 25.0, 0.0)
+            lightning_density = lightning_prob * 18.0 * intensity_factor * (
+                np.exp(-dist_sq_a / (2 * (r_core_a * 0.8)**2)) + 0.6 * np.exp(-dist_sq_b / (2 * (r_core_b * 0.8)**2))
+            )
+            lightning_density = np.clip(lightning_density + np.random.poisson(0.15, (self.rows, self.cols)), 0.0, 25.0)
+
+            nwp_cape = 2400.0 - 600.0 * np.exp(-dist_sq_a / (2 * r_core_a**2)) + 300.0 * np.sin(lat_grid * 3)
             nwp_cin = np.clip(35.0 + 40.0 * np.cos(lon_grid * 4), 5.0, 120.0)
             nwp_shear = 18.0 + 8.0 * np.sin(lat_grid * 2 + lon_grid * 2)
 
