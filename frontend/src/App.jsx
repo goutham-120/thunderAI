@@ -537,6 +537,7 @@ export default function App() {
               {/* Current Atmospheric Conditions */}
               <NowcastSummaryBar
                 forecastData={forecastData}
+                selectedLocation={selectedLocation}
               />
 
               {/* Forecast Evolution */}

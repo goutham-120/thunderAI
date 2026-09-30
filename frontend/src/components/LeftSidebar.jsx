@@ -51,7 +51,7 @@ export default function LeftSidebar({
 
   return (
     <aside
-      className={`bg-[#F8FCFE] border-r border-[#D0E3F0] flex flex-col justify-between h-[calc(100vh-53px)] select-none font-sans shrink-0 sticky top-[53px] transition-all duration-300 z-20 ${
+      className={`bg-[#0B3552] border-r border-[#0C4F78] flex flex-col justify-between h-[calc(100vh-53px)] select-none font-sans shrink-0 sticky top-[53px] transition-all duration-300 z-20 ${
         isCollapsed ? 'w-16' : 'w-60'
       }`}
     >
@@ -59,14 +59,14 @@ export default function LeftSidebar({
       <div className="p-3 space-y-3 overflow-y-auto">
 
         {/* VAJRA Workstation Branding */}
-        <div className="border-b border-[#D0E3F0] pb-2.5 px-1 flex items-center justify-between">
+        <div className="border-b border-[#0C4F78] pb-2.5 px-1 flex items-center justify-between">
           {!isCollapsed && (
             <div>
-              <h2 className="text-sm font-bold text-[#12324E] font-sora tracking-tight flex items-center space-x-1.5">
-                <span className="text-base text-[#0284C7]">VAJRA</span>
-                <span className="text-xs font-sans text-[#5E82A6] font-semibold">WORKSTATION</span>
+              <h2 className="text-sm font-bold text-white tracking-tight flex items-center space-x-1.5">
+                <span className="text-base text-[#19BCE8]">VAJRA</span>
+                <span className="text-xs text-[#90CAF9] font-semibold">WORKSTATION</span>
               </h2>
-              <p className="text-[10px] text-[#5E82A6] font-medium tracking-tight mt-0.5 uppercase font-sans">
+              <p className="text-[10px] text-[#90CAF9]/80 font-medium tracking-tight mt-0.5 uppercase">
                 Thunderstorm & Lightning Nowcasting
               </p>
             </div>
@@ -74,7 +74,7 @@ export default function LeftSidebar({
 
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 rounded-md hover:bg-[#EEF6FB] text-[#5E82A6] hover:text-[#12324E] transition-colors ml-auto"
+            className="p-1 rounded-md hover:bg-[#0C4F78] text-[#90CAF9] hover:text-white transition-colors ml-auto"
             title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
           >
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -86,7 +86,7 @@ export default function LeftSidebar({
           {navSections.map((section) => (
             <div key={section.title} className="space-y-1">
               {!isCollapsed && (
-                <div className="px-2 text-[9px] font-mono font-bold text-[#5E82A6] uppercase tracking-wider">
+                <div className="px-2 text-[9px] font-mono font-bold text-[#19BCE8] uppercase tracking-wider">
                   {section.title}
                 </div>
               )}
@@ -99,13 +99,13 @@ export default function LeftSidebar({
                       key={item.id}
                       onClick={() => setActiveTab(item.id)}
                       title={isCollapsed ? item.label : undefined}
-                      className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0 py-2' : 'space-x-2.5 px-2.5 py-1.5'} rounded-md text-xs font-sans transition-all ${
+                      className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0 py-2' : 'space-x-2.5 px-2.5 py-2'} rounded-md text-xs font-sans transition-all ${
                         isActive
-                          ? 'bg-[#0284C7] text-white font-bold shadow-2xs'
-                          : 'text-[#12324E] hover:text-[#0284C7] hover:bg-[#EEF6FB] font-medium'
+                          ? 'bg-[#19BCE8] text-[#0E2C45] font-bold shadow-md'
+                          : 'text-[#E5EAF0] hover:text-white hover:bg-[#0C4F78] font-medium'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-[#5E82A6]'}`} />
+                      <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#0E2C45]' : 'text-[#90CAF9]'}`} />
                       {!isCollapsed && <span className="truncate">{item.label}</span>}
                     </button>
                   );
@@ -118,7 +118,7 @@ export default function LeftSidebar({
 
       {/* Footer info */}
       {!isCollapsed && (
-        <div className="p-3 border-t border-[#D0E3F0] text-[10px] text-[#5E82A6] font-mono text-center bg-[#EEF6FB]/50">
+        <div className="p-3 border-t border-[#0C4F78] text-[10px] text-[#90CAF9] font-mono text-center bg-[#0E2C45]/80">
           VAJRA Workstation v1.0.0 • OPERATIONAL
         </div>
       )}
