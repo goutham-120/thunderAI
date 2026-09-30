@@ -13,6 +13,7 @@ import AlertsView from './components/AlertsView';
 import ReplayView from './components/ReplayView';
 import ExplainabilityView from './components/ExplainabilityView';
 import ModelView from './components/ModelView';
+import ReportsValidationPage from './components/ReportsValidationPage';
 import DataSourcesView from './components/DataSourcesView';
 import StormTrackingPage from './components/StormTrackingPage';
 import DataProvenanceModal from './components/DataProvenanceModal';
@@ -667,6 +668,11 @@ export default function App() {
               systemStatus={systemStatus}
               benchmarkData={benchmarkData}
             />
+          )}
+
+          {/* 8b. REPORTS & MODEL VALIDATION PAGE */}
+          {activeTab === 'reports' && (
+            <ReportsValidationPage />
           )}
 
           {/* 9. DATA SOURCES PAGE */}
