@@ -7,13 +7,14 @@
   body {
     background-color: #EAF0F6;
     color: #12324E;
-    font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Sora', sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     color: #12324E;
   }
 }
@@ -81,7 +82,7 @@
   color: #12324E !important;
   padding: 12px !important;
   box-shadow: 0 4px 16px rgba(18, 50, 78, 0.12) !important;
-  font-family: 'Manrope', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
 }
 
 .maplibregl-popup-anchor-top .maplibregl-popup-tip {
