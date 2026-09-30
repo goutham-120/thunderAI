@@ -45,11 +45,6 @@ export default function LoginPage({ onNavigateToRegister }) {
     }
   };
 
-  const handleAdminPreset = () => {
-    setEmail('admin@vajra.gov.in');
-    setPassword('VajraAdmin@2026');
-  };
-
   return (
     <div className="min-h-screen bg-[#0A1929] flex flex-col justify-center items-center p-4 relative overflow-hidden font-sans">
       {/* Background ambient decorative glow */}
@@ -177,18 +172,6 @@ export default function LoginPage({ onNavigateToRegister }) {
               )}
             </button>
           </form>
-
-          {/* Quick Demo Credentials Helper */}
-          <div className="mt-4 pt-3 border-t border-[#1E3A5F]/70 flex items-center justify-between text-[11px] font-mono text-[#94A3B8]">
-            <span>Initial Admin Account:</span>
-            <button
-              type="button"
-              onClick={handleAdminPreset}
-              className="text-[#38BDF8] hover:underline font-semibold"
-            >
-              Fill Admin Credentials
-            </button>
-          </div>
 
           {/* Registration link */}
           <div className="mt-4 pt-3 border-t border-[#1E3A5F]/70 text-center">
