@@ -198,7 +198,7 @@ export default function Header({
   return (
     <header className="bg-[#F8FCFE] border-b border-[#D0E3F0] px-4 py-2 flex flex-wrap items-center justify-between sticky top-0 z-30 font-sans shadow-2xs gap-2">
 
-      {/* Left: Hamburger Sidebar Toggle & Page Title */}
+      {/* Left: Menu Sidebar Toggle & Primary Sector Selector */}
       <div className="flex items-center space-x-3">
 
         <button
@@ -214,22 +214,10 @@ export default function Header({
           )}
         </button>
 
-        <div>
-          <h1 className="text-sm font-bold text-[#12324E] tracking-tight font-sora flex items-center space-x-2">
-            <span>
-              {currentMeta.title}
-            </span>
-          </h1>
-
-          <p className="text-[11px] text-[#5E82A6] font-medium tracking-tight font-sans">
-            {currentMeta.desc}
-          </p>
-        </div>
-
-        {/* Searchable Location Selector */}
+        {/* Primary Sector Selector */}
         {setSelectedRegion && (
           <div
-            className="relative font-sans ml-2"
+            className="relative font-sans"
             ref={dropdownRef}
           >
 
