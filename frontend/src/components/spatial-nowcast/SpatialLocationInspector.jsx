@@ -41,7 +41,12 @@ export default function SpatialLocationInspector({
   let rainRate = null;
   let dbz = null;
 
-  const gridProb = forecastData?.pred_thunderstorm_prob;
+  const layers = forecastData?.layers || {};
+  const gridProb = layers.pred_thunderstorm_prob || forecastData?.pred_thunderstorm_prob;
+  const gridLight = layers.pred_lightning_prob || forecastData?.pred_lightning_prob;
+  const gridRain = layers.pred_rainfall_mmh || forecastData?.pred_rainfall_mmh;
+  const gridDbz = layers.radar_dbz || layers.pred_dbz || forecastData?.pred_radar_dbz || forecastData?.radar_dbz;
+
   if (Array.isArray(gridProb) && gridProb.length > 0 && !isNaN(latNum) && !isNaN(lonNum)) {
     const numRows = gridProb.length;
     const numCols = gridProb[0].length;
@@ -58,10 +63,10 @@ export default function SpatialLocationInspector({
     const r = Math.max(0, Math.min(numRows - 1, Math.round(latNorm * (numRows - 1))));
     const c = Math.max(0, Math.min(numCols - 1, Math.round(lonNorm * (numCols - 1))));
 
-    const rawThunder = forecastData.pred_thunderstorm_prob?.[r]?.[c];
-    const rawLightning = forecastData.pred_lightning_prob?.[r]?.[c];
-    const rawRain = forecastData.pred_rainfall_mmh?.[r]?.[c];
-    const rawDbz = forecastData.pred_radar_dbz?.[r]?.[c];
+    const rawThunder = gridProb?.[r]?.[c];
+    const rawLightning = gridLight?.[r]?.[c] ?? rawThunder;
+    const rawRain = gridRain?.[r]?.[c];
+    const rawDbz = gridDbz?.[r]?.[c];
 
     if (rawThunder !== undefined && rawThunder !== null) {
       thunderProb = Number(rawThunder <= 1.0 ? rawThunder * 100 : rawThunder).toFixed(1);
