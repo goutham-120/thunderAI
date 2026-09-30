@@ -237,6 +237,24 @@ class ForecastEngine:
         max_rain_val = round(float(np.max(selected_pred["rainfall_mmh"])), 1)
         peak_dbz_val = round(float(np.max(last_frame[:, :, 0])), 1)
 
+        radar_prov = cube_data.get("channel_provenance", {}).get("radar_dbz", "")
+        if "OUT_OF_COVERAGE" in radar_prov:
+            radar_status = "OUT_OF_COVERAGE"
+            radar_cov_valid = False
+            radar_msg = "Available radar site (Cherrapunji DWR, 25.27°N, 91.73°E) is out of range for the requested regional grid (Telangana/AP, 17.5°N, 80.5°E)."
+        elif "UNAVAILABLE" in radar_prov:
+            radar_status = "UNAVAILABLE"
+            radar_cov_valid = False
+            radar_msg = "Live regional Doppler Weather Radar feed is unconfigured or unavailable."
+        elif cube_data.get("data_mode") == "synthetic":
+            radar_status = "SYNTHETIC"
+            radar_cov_valid = True
+            radar_msg = "Synthetic convective radar simulation mode active for testing."
+        else:
+            radar_status = "REAL"
+            radar_cov_valid = True
+            radar_msg = f"Valid regional radar telemetry active ({radar_prov})."
+
         atmospheric_conditions_dict = {
             "temperature_c": cube_data["nwp_variables"]["temperature_2m"] if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("temperature_2m") is not None else base_temp,
             "relative_humidity_percent": cube_data["nwp_variables"]["relative_humidity_2m"] if cube_data.get("nwp_variables") and cube_data["nwp_variables"].get("relative_humidity_2m") is not None else base_rh,
@@ -257,7 +275,10 @@ class ForecastEngine:
             "max_reflectivity_dbz": peak_dbz_val,
             "active_storm_cells_count": len(active_cells),
             "system_confidence_percent": 88.5,
-            "uncertainty_index": selected_pred["uncertainty_index"]
+            "uncertainty_index": selected_pred["uncertainty_index"],
+            "radar_status": radar_status,
+            "radar_coverage_valid": radar_cov_valid,
+            "radar_coverage_message": radar_msg
         }
 
         timestamps_dict = {
@@ -288,6 +309,9 @@ class ForecastEngine:
             "data_mode": cube_data.get("data_mode", "synthetic"),
             "data_quality": cube_data.get("data_quality", "SYNTHETIC"),
             "is_valid": cube_data.get("is_valid", True),
+            "radar_status": radar_status,
+            "radar_coverage_valid": radar_cov_valid,
+            "radar_coverage_message": radar_msg,
             "model_status": ai_engine.model_status,
             "inference_mode": ai_engine.inference_mode,
             "model_provenance": ai_engine.get_model_provenance(),

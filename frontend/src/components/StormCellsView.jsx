@@ -84,8 +84,19 @@ export default function StormCellsView({ forecastData, selectedCell, onSelectCel
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className="p-6 text-center text-[#5E82A6] italic font-sans">
-                    No active convective storm cells tracked in current footprint.
+                  <td colSpan={7} className="p-6 text-center text-[#5E82A6] font-sans">
+                    <div className="space-y-1 font-mono text-xs">
+                      <span className="font-bold uppercase text-[#0F2942] block">
+                        {forecastData?.radar_status === 'OUT_OF_COVERAGE' 
+                          ? 'RADAR DATA SOURCE OUTSIDE REQUESTED REGION'
+                          : forecastData?.radar_status === 'UNAVAILABLE'
+                          ? 'REGIONAL RADAR TELEMETRY UNAVAILABLE'
+                          : 'NO CONVECTIVE STORM CELLS DETECTED'}
+                      </span>
+                      <p className="text-[11px] font-sans italic text-[#5E82A6]">
+                        {forecastData?.radar_coverage_message || 'No active convective storm cells tracked in current footprint (Threshold: dBZ ≥ 35.0).'}
+                      </p>
+                    </div>
                   </td>
                 </tr>
               )}
