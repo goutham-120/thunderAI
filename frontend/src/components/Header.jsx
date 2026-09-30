@@ -74,7 +74,8 @@ export default function Header({
   selectedLocation,
   onRefresh,
   isRefreshing,
-  onToggleMobileSidebar
+  onToggleSidebar,
+  isCollapsed
 }) {
   const [isOpen, setIsOpen] =
     useState(false);
@@ -197,19 +198,16 @@ export default function Header({
   return (
     <header className="bg-[#F8FCFE] border-b border-[#D0E3F0] px-4 py-2 flex flex-wrap items-center justify-between sticky top-0 z-30 font-sans shadow-2xs gap-2">
 
-      {/* Left: Mobile Menu & Page Title */}
+      {/* Left: Hamburger Sidebar Toggle & Page Title */}
       <div className="flex items-center space-x-3">
 
-        {onToggleMobileSidebar && (
-          <button
-            onClick={
-              onToggleMobileSidebar
-            }
-            className="md:hidden p-1.5 rounded-md text-[#5E82A6] hover:bg-[#EEF6FB]"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-        )}
+        <button
+          onClick={onToggleSidebar}
+          className="p-2 rounded-lg bg-[#EEF6FB] hover:bg-[#E5F0F7] border border-[#D0E3F0] text-[#0B3552] transition-colors flex items-center justify-center shadow-2xs"
+          title={isCollapsed ? "Expand Sidebar (Slide Out)" : "Collapse Sidebar (Slide In)"}
+        >
+          <Menu className="w-5 h-5 text-[#0284C7]" />
+        </button>
 
         <div>
           <h1 className="text-sm font-bold text-[#12324E] tracking-tight font-sora flex items-center space-x-2">

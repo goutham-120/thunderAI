@@ -332,6 +332,8 @@ export default function App() {
         selectedLocation={selectedLocation}
         onRefresh={handleManualRefresh}
         isRefreshing={isRefreshing}
+        onToggleSidebar={() => setIsCollapsed(!isCollapsed)}
+        isCollapsed={isCollapsed}
       />
 
       {/* Operational Convective Threat Banner */}
