@@ -16,6 +16,7 @@ import ModelView from './components/ModelView';
 import ReportsValidationPage from './components/ReportsValidationPage';
 import DataSourcesView from './components/DataSourcesView';
 import StormTrackingPage from './components/StormTrackingPage';
+import WhatIfView from './components/WhatIfView';
 import DataProvenanceModal from './components/DataProvenanceModal';
 import HistoricalReplayBar from './components/HistoricalReplayBar';
 import AreaIntelligencePanel from './components/AreaIntelligencePanel';
@@ -27,11 +28,44 @@ import ForecastEvolutionSection from './components/ForecastEvolutionSection';
 import { REGION_CONFIGS } from './components/WeatherMapConfig';
 import indiaStatesData from './data/india_states.json';
 import api from './services/api';
+import { useAuth } from './context/AuthContext';
+import LoginPage from './components/auth/LoginPage';
+import RegisterPage from './components/auth/RegisterPage';
+import AdminDashboard from './components/admin/AdminDashboard';
 
 export default function App() {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const [authView, setAuthView] = useState('login'); // 'login' | 'register'
   const [activeTab, setActiveTab] = useState('live');
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [horizonMin, setHorizonMin] = useState(30);
+
+  const handleToggleSidebar = () => {
+    if (window.innerWidth < 768) {
+      setIsMobileOpen((prev) => !prev);
+    } else {
+      setIsCollapsed((prev) => !prev);
+    }
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 320);
+  };
+
+  // Validate activeTab against user role permissions
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    const role = user.role;
+    const isAllowed = (tab) => {
+      // Only the admin tab is restricted exclusively to ADMIN
+      if (tab === 'admin') return role === 'ADMIN';
+      return true;
+    };
+
+    if (!isAllowed(activeTab)) {
+      setActiveTab('live');
+    }
+  }, [user, isAuthenticated, activeTab]);
 
   const [selectedRegion, setSelectedRegion] = useState('Telangana');
 
@@ -319,6 +353,24 @@ export default function App() {
     loadAreaIntelligence();
   }, [selectedLocation, horizonMin]);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#0A1929] flex flex-col items-center justify-center font-mono text-white p-4">
+        <div className="w-10 h-10 border-4 border-[#0284C7]/30 border-t-[#38BDF8] rounded-full animate-spin mb-4" />
+        <div className="text-sm font-bold tracking-wider">INITIALIZING VAJRA-AI PLATFORM...</div>
+        <div className="text-xs text-[#64748B] mt-1 font-sans">Verifying Accredited Operational Credentials</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return authView === 'register' ? (
+      <RegisterPage onNavigateToLogin={() => setAuthView('login')} />
+    ) : (
+      <LoginPage onNavigateToRegister={() => setAuthView('register')} />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-atmospheric flex flex-col text-[#12324E] font-sans selection:bg-[#38BDF8] selection:text-[#12324E]">
 
@@ -332,104 +384,9 @@ export default function App() {
         selectedLocation={selectedLocation}
         onRefresh={handleManualRefresh}
         isRefreshing={isRefreshing}
+        onToggleSidebar={handleToggleSidebar}
+        isCollapsed={isCollapsed}
       />
-
-      {/* Operational Convective Threat Banner */}
-      {(() => {
-        const topCell =
-          selectedCell ||
-          (forecastData?.storm_cells &&
-            forecastData.storm_cells[0]);
-
-        const topAlert =
-          forecastData?.cap_alerts &&
-          forecastData.cap_alerts[0];
-
-        const hasThreat = topCell || topAlert;
-
-        return (
-          <div
-            className={`px-4 py-2 flex items-center justify-between text-xs font-mono border-b transition-colors ${
-              hasThreat
-                ? 'bg-[#FEF2F2] border-[#FEE2E2] text-[#991B1B]'
-                : 'bg-[#ECFDF5] border-[#A7F3D0] text-[#047857]'
-            }`}
-          >
-            <div className="flex items-center space-x-3 overflow-x-auto">
-
-              <span
-                className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider font-sans shrink-0 ${
-                  hasThreat
-                    ? 'bg-[#DC2626] text-white'
-                    : 'bg-[#047857] text-white'
-                }`}
-              >
-                {hasThreat
-                  ? '⚡ CONVECTIVE THREAT WARNING'
-                  : '✓ BASAL ATMOSPHERIC STATUS'}
-              </span>
-
-              {hasThreat ? (
-                <div className="flex items-center space-x-4 font-sans text-xs">
-
-                  <span>
-                    <strong className="font-mono text-[#0F2942]">
-                      Region:
-                    </strong>{' '}
-                    {selectedLocation?.name || 'Telangana'}
-                  </span>
-
-                  <span>
-                    <strong className="font-mono text-[#0F2942]">
-                      Cell ID:
-                    </strong>{' '}
-                    {topCell?.cell_id || 'CELL-A'}
-                  </span>
-
-                  <span>
-                    <strong className="font-mono text-[#0F2942]">
-                      Motion:
-                    </strong>{' '}
-                    {topCell?.movement
-                      ? `${topCell.movement.direction_compass} @ ${topCell.movement.speed_kmh} km/h`
-                      : 'SE @ 24 km/h'}
-                  </span>
-
-                  <span>
-                    <strong className="font-mono text-[#0F2942]">
-                      Stage:
-                    </strong>{' '}
-                    <span className="font-bold text-[#DC2626]">
-                      {topCell?.lifecycle_state ||
-                        'RAPIDLY INTENSIFYING'}
-                    </span>
-                  </span>
-
-                </div>
-              ) : (
-                <span className="font-sans text-xs">
-                  NO ACTIVE CONVECTIVE WARNING — Regional sectors
-                  operating within baseline environmental thresholds.
-                </span>
-              )}
-            </div>
-
-            <div className="hidden lg:flex items-center space-x-2 text-[10px] text-[#47637E] font-mono shrink-0 ml-2">
-              <span>
-                Updated:{' '}
-                {forecastData?.timestamp
-                  ? new Date(
-                      forecastData.timestamp
-                    ).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })
-                  : 'Live'}
-              </span>
-            </div>
-          </div>
-        );
-      })()}
 
       {/* Historical Replay Bar */}
       {activeTab === 'replay' && (
@@ -449,10 +406,17 @@ export default function App() {
           setActiveTab={setActiveTab}
           isCollapsed={isCollapsed}
           setIsCollapsed={setIsCollapsed}
+          isMobileOpen={isMobileOpen}
+          setIsMobileOpen={setIsMobileOpen}
         />
 
         {/* Dynamic Page Views */}
         <main className="flex-1 p-4 overflow-y-auto max-w-[1600px] mx-auto w-full">
+
+          {/* 0. ADMIN SECURITY & USER MANAGEMENT (ADMIN ROLE ONLY) */}
+          {activeTab === 'admin' && user?.role === 'ADMIN' && (
+            <AdminDashboard />
+          )}
 
           {/* 1. DASHBOARD PAGE */}
           {activeTab === 'live' && (
@@ -537,6 +501,7 @@ export default function App() {
               {/* Current Atmospheric Conditions */}
               <NowcastSummaryBar
                 forecastData={forecastData}
+                selectedLocation={selectedLocation}
               />
 
               {/* Forecast Evolution */}
@@ -582,15 +547,6 @@ export default function App() {
               <ForecastTimelineBar
                 horizonMin={horizonMin}
                 setHorizonMin={setHorizonMin}
-              />
-
-              {/* Status Footer */}
-              <DashboardStatusFooter
-                systemStatus={systemStatus}
-                forecastData={forecastData}
-                onOpenProvenance={() =>
-                  setIsProvenanceOpen(true)
-                }
               />
 
             </div>
@@ -689,6 +645,11 @@ export default function App() {
               systemStatus={systemStatus}
               onRefreshStatus={fetchSystemTelemetry}
             />
+          )}
+
+          {/* 10. WHAT-IF SCENARIO PAGE */}
+          {activeTab === 'whatif' && (
+            <WhatIfView />
           )}
 
         </main>

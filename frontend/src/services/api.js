@@ -8,19 +8,32 @@ const API_BASE = import.meta.env?.VITE_API_BASE || 'http://localhost:8000/api';
  */
 async function fetchJson(endpoint, options = {}) {
   try {
+    const token = localStorage.getItem('vajra_auth_token');
+    const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+
     const res = await fetch(`${API_BASE}${endpoint}`, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
+        ...authHeaders,
         ...options.headers,
       },
       ...options,
     });
 
     if (!res.ok) {
-      const errorText = await res.text();
-      console.warn(`[API] HTTP ${res.status} for ${endpoint}: ${errorText}`);
-      throw new Error(`API Error ${res.status}: ${res.statusText}`);
+      let errorDetail = `API Error ${res.status}: ${res.statusText}`;
+      try {
+        const errorJson = await res.json();
+        if (errorJson && errorJson.detail) {
+          errorDetail = errorJson.detail;
+        }
+      } catch {
+        const errorText = await res.text();
+        if (errorText) errorDetail = errorText;
+      }
+      console.warn(`[API] HTTP ${res.status} for ${endpoint}:`, errorDetail);
+      throw new Error(errorDetail);
     }
 
     return await res.json();
@@ -122,7 +135,51 @@ export const api = {
   },
   getRadarAlignment: (roiName = 'NATIONAL') => 
     fetchJson(`/data/radar/alignment?roi_name=${encodeURIComponent(roiName)}`),
+
+  // Live Radar Stream (Open IMD Mosaic)
   getLiveRadarStream: () => fetchJson('/data/radar/live-stream'),
+
+  // What-If Scenario (POST — isolated from live forecast)
+  postWhatIf: (body) =>
+    fetchJson('/forecast/what-if', { method: 'POST', body: JSON.stringify(body) }),
+
+  // Authentication & Session
+  login: (email, password) =>
+    fetchJson('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    }),
+
+  register: (userData) =>
+    fetchJson('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    }),
+
+  getMe: () => fetchJson('/auth/me'),
+  logout: () => fetchJson('/auth/logout', { method: 'POST' }),
+
+  // Administrator Management
+  getAdminStats: () => fetchJson('/admin/stats'),
+  getAdminUsers: () => fetchJson('/admin/users'),
+  getPendingUsers: () => fetchJson('/admin/pending-users'),
+  approveUser: (userId) =>
+    fetchJson(`/admin/users/${userId}/approve`, { method: 'POST' }),
+  rejectUser: (userId, reason) =>
+    fetchJson(`/admin/users/${userId}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    }),
+  updateUserRole: (userId, role) =>
+    fetchJson(`/admin/users/${userId}/role`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role }),
+    }),
+  updateUserStatus: (userId, status) =>
+    fetchJson(`/admin/users/${userId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    }),
 };
 
 export default api;
