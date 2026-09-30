@@ -74,9 +74,9 @@ export default function LeftSidebar({
       {/* Main Sidebar Element */}
       <aside
         aria-label="Application Navigation Sidebar"
-        className={`bg-[#0B3552] border-r border-[#0C4F78] flex flex-col justify-between h-[calc(100vh-53px)] select-none font-sans shrink-0 sticky top-[53px] transition-all duration-300 z-30 ${
+        className={`bg-[#0B3552] border-r border-[#0C4F78] flex flex-col justify-between h-full select-none font-sans shrink-0 transition-all duration-300 z-30 ${
           isMobileOpen
-            ? 'fixed inset-y-0 left-0 top-[53px] w-64 translate-x-0 shadow-2xl'
+            ? 'fixed inset-y-0 left-0 top-0 w-64 translate-x-0 shadow-2xl'
             : isCollapsed
             ? 'w-16'
             : 'w-60'
