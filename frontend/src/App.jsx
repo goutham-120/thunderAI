@@ -16,6 +16,7 @@ import ModelView from './components/ModelView';
 import ReportsValidationPage from './components/ReportsValidationPage';
 import DataSourcesView from './components/DataSourcesView';
 import StormTrackingPage from './components/StormTrackingPage';
+import WhatIfView from './components/WhatIfView';
 import DataProvenanceModal from './components/DataProvenanceModal';
 import HistoricalReplayBar from './components/HistoricalReplayBar';
 import AreaIntelligencePanel from './components/AreaIntelligencePanel';
@@ -27,8 +28,14 @@ import ForecastEvolutionSection from './components/ForecastEvolutionSection';
 import { REGION_CONFIGS } from './components/WeatherMapConfig';
 import indiaStatesData from './data/india_states.json';
 import api from './services/api';
+import { useAuth } from './context/AuthContext';
+import LoginPage from './components/auth/LoginPage';
+import RegisterPage from './components/auth/RegisterPage';
+import AdminDashboard from './components/admin/AdminDashboard';
 
 export default function App() {
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const [authView, setAuthView] = useState('login'); // 'login' | 'register'
   const [activeTab, setActiveTab] = useState('live');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -44,6 +51,21 @@ export default function App() {
       window.dispatchEvent(new Event('resize'));
     }, 320);
   };
+
+  // Validate activeTab against user role permissions
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    const role = user.role;
+    const isAllowed = (tab) => {
+      // Only the admin tab is restricted exclusively to ADMIN
+      if (tab === 'admin') return role === 'ADMIN';
+      return true;
+    };
+
+    if (!isAllowed(activeTab)) {
+      setActiveTab('live');
+    }
+  }, [user, isAuthenticated, activeTab]);
 
   const [selectedRegion, setSelectedRegion] = useState('Telangana');
 
@@ -331,6 +353,24 @@ export default function App() {
     loadAreaIntelligence();
   }, [selectedLocation, horizonMin]);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#0A1929] flex flex-col items-center justify-center font-mono text-white p-4">
+        <div className="w-10 h-10 border-4 border-[#0284C7]/30 border-t-[#38BDF8] rounded-full animate-spin mb-4" />
+        <div className="text-sm font-bold tracking-wider">INITIALIZING VAJRA-AI PLATFORM...</div>
+        <div className="text-xs text-[#64748B] mt-1 font-sans">Verifying Accredited Operational Credentials</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return authView === 'register' ? (
+      <RegisterPage onNavigateToLogin={() => setAuthView('login')} />
+    ) : (
+      <LoginPage onNavigateToRegister={() => setAuthView('register')} />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-atmospheric flex flex-col text-[#12324E] font-sans selection:bg-[#38BDF8] selection:text-[#12324E]">
 
@@ -372,6 +412,11 @@ export default function App() {
 
         {/* Dynamic Page Views */}
         <main className="flex-1 p-4 overflow-y-auto max-w-[1600px] mx-auto w-full">
+
+          {/* 0. ADMIN SECURITY & USER MANAGEMENT (ADMIN ROLE ONLY) */}
+          {activeTab === 'admin' && user?.role === 'ADMIN' && (
+            <AdminDashboard />
+          )}
 
           {/* 1. DASHBOARD PAGE */}
           {activeTab === 'live' && (
@@ -609,6 +654,11 @@ export default function App() {
               systemStatus={systemStatus}
               onRefreshStatus={fetchSystemTelemetry}
             />
+          )}
+
+          {/* 10. WHAT-IF SCENARIO PAGE */}
+          {activeTab === 'whatif' && (
+            <WhatIfView />
           )}
 
         </main>

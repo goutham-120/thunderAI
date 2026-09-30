@@ -13,8 +13,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Radio,
+  FlaskConical,
+  ShieldCheck,
+  LogOut,
+  User,
   X
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function LeftSidebar({
   activeTab,
@@ -24,7 +29,37 @@ export default function LeftSidebar({
   isMobileOpen,
   setIsMobileOpen
 }) {
-  const navSections = [
+  const { user, logout } = useAuth();
+  const role = user?.role || 'USER';
+
+  const getRoleLabel = (r) => {
+    switch (r) {
+      case 'ADMIN':
+        return 'Chief Admin';
+      case 'WEATHER_FORECASTER':
+        return 'Weather Forecaster';
+      case 'ELECTRICAL_INFRASTRUCTURE':
+        return 'Electrical & Infra';
+      case 'USER':
+        return 'Standard User';
+      default:
+        return r;
+    }
+  };
+
+  // Only the internal admin portal tab is restricted to ADMIN
+  const isAllowed = (id) => {
+    if (id === 'admin') return role === 'ADMIN';
+    return true;
+  };
+
+  const rawNavSections = [
+    ...(role === 'ADMIN' ? [{
+      title: 'ADMINISTRATION',
+      items: [
+        { id: 'admin', label: 'Admin & Approvals', icon: ShieldCheck }
+      ]
+    }] : []),
     {
       title: 'OPERATIONS',
       items: [
@@ -42,6 +77,7 @@ export default function LeftSidebar({
         { id: 'replay', label: 'Historical Replay', icon: RotateCcw },
         { id: 'explainability', label: 'Explainability (XAI)', icon: HelpCircle },
         { id: 'model', label: 'Model Performance', icon: Cpu },
+        { id: 'whatif', label: 'What-If Scenario', icon: FlaskConical },
         { id: 'reports', label: 'Reports & Validation', icon: FileText },
       ]
     },
@@ -53,12 +89,21 @@ export default function LeftSidebar({
     }
   ];
 
+  const navSections = rawNavSections
+    .map(section => ({
+      ...section,
+      items: section.items.filter(item => isAllowed(item.id))
+    }))
+    .filter(section => section.items.length > 0);
+
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
     if (setIsMobileOpen) {
       setIsMobileOpen(false);
     }
   };
+
+  const currentUser = user || { full_name: 'VAJRA User', role: 'USER', email: 'user@vajra.gov.in' };
 
   return (
     <>
@@ -155,6 +200,54 @@ export default function LeftSidebar({
                 </nav>
               </div>
             ))}
+          </div>
+
+          {/* User Account Profile & Logout (Below Data Sources) */}
+          <div className="pt-3 border-t border-[#0C4F78] mt-2">
+            {(!isCollapsed || isMobileOpen) ? (
+              <div className="bg-[#0E2C45] border border-[#0C4F78] rounded-xl p-2.5 space-y-2.5 shadow-md">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#19BCE8] text-[#0E2C45] flex items-center justify-center font-bold text-xs shrink-0 shadow-sm font-mono">
+                    {currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs font-bold text-white truncate font-sans" title={currentUser.full_name}>
+                      {currentUser.full_name}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#19BCE8]/20 text-[#19BCE8] border border-[#19BCE8]/30 uppercase">
+                        {getRoleLabel(currentUser.role)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={logout}
+                  className="w-full flex items-center justify-center space-x-1.5 py-1.5 px-2 rounded-lg text-xs font-sans text-rose-300 bg-rose-950/40 hover:bg-rose-900/60 border border-rose-500/40 transition-colors font-semibold shadow-xs cursor-pointer"
+                  title={`Sign out of ${currentUser.email || 'account'}`}
+                >
+                  <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center space-y-2 pt-1">
+                <div
+                  className="w-8 h-8 rounded-lg bg-[#19BCE8] text-[#0E2C45] flex items-center justify-center font-bold text-xs shrink-0 shadow-sm font-mono cursor-default"
+                  title={`${currentUser.full_name} (${getRoleLabel(currentUser.role)})`}
+                >
+                  {currentUser.full_name ? currentUser.full_name.charAt(0).toUpperCase() : 'U'}
+                </div>
+                <button
+                  onClick={logout}
+                  className="p-1.5 rounded-lg text-rose-400 hover:bg-rose-900/50 transition-colors cursor-pointer"
+                  title="Logout"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
