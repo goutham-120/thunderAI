@@ -35,10 +35,53 @@ export default function SpatialLocationInspector({
   const timestamps = forecastData?.timestamps || {};
   const validTime = timestamps.forecast_valid_time;
 
-  const thunderProb = metrics.max_thunderstorm_prob_pct ?? metrics.max_thunderstorm_prob_percent ?? 45;
-  const lightningProb = metrics.max_lightning_prob_pct ?? metrics.max_lightning_prob_percent ?? 30;
-  const rainRate = metrics.max_rainfall_rate_mmh ?? metrics.max_rain_intensity_mmh ?? 12.5;
-  const dbz = metrics.peak_radar_dbz ?? metrics.max_reflectivity_dbz ?? 42.0;
+  // Dynamic Point Sampling from Spatial Nowcast Grid
+  let thunderProb = null;
+  let lightningProb = null;
+  let rainRate = null;
+  let dbz = null;
+
+  const gridProb = forecastData?.pred_thunderstorm_prob;
+  if (Array.isArray(gridProb) && gridProb.length > 0 && !isNaN(latNum) && !isNaN(lonNum)) {
+    const numRows = gridProb.length;
+    const numCols = gridProb[0].length;
+    const minLat = bounds[0] ?? 15.0;
+    const minLon = bounds[1] ?? 76.5;
+    const maxLat = bounds[2] ?? 19.8;
+    const maxLon = bounds[3] ?? 83.5;
+
+    // Row 0 is maxLat (North), Row N-1 is minLat (South)
+    // Col 0 is minLon (West), Col N-1 is maxLon (East)
+    const latNorm = (maxLat - latNum) / (maxLat - minLat);
+    const lonNorm = (lonNum - minLon) / (maxLon - minLon);
+
+    const r = Math.max(0, Math.min(numRows - 1, Math.round(latNorm * (numRows - 1))));
+    const c = Math.max(0, Math.min(numCols - 1, Math.round(lonNorm * (numCols - 1))));
+
+    const rawThunder = forecastData.pred_thunderstorm_prob?.[r]?.[c];
+    const rawLightning = forecastData.pred_lightning_prob?.[r]?.[c];
+    const rawRain = forecastData.pred_rainfall_mmh?.[r]?.[c];
+    const rawDbz = forecastData.pred_radar_dbz?.[r]?.[c];
+
+    if (rawThunder !== undefined && rawThunder !== null) {
+      thunderProb = Number(rawThunder <= 1.0 ? rawThunder * 100 : rawThunder).toFixed(1);
+    }
+    if (rawLightning !== undefined && rawLightning !== null) {
+      lightningProb = Number(rawLightning <= 1.0 ? rawLightning * 100 : rawLightning).toFixed(1);
+    }
+    if (rawRain !== undefined && rawRain !== null) {
+      rainRate = Number(rawRain).toFixed(1);
+    }
+    if (rawDbz !== undefined && rawDbz !== null) {
+      dbz = Number(rawDbz).toFixed(1);
+    }
+  }
+
+  // Fallback to regional summary metrics if point grid is unavailable
+  if (thunderProb === null) thunderProb = metrics.max_thunderstorm_prob_pct ?? metrics.max_thunderstorm_prob_percent ?? 45;
+  if (lightningProb === null) lightningProb = metrics.max_lightning_prob_pct ?? metrics.max_lightning_prob_percent ?? 30;
+  if (rainRate === null) rainRate = metrics.max_rainfall_rate_mmh ?? metrics.max_rain_intensity_mmh ?? 12.5;
+  if (dbz === null) dbz = metrics.peak_radar_dbz ?? metrics.max_reflectivity_dbz ?? 42.0;
 
   return (
     <div className="bg-[#F8FCFE] border border-[#D0E3F0] p-4 rounded-xl shadow-xs space-y-3 font-sans text-[#12324E] h-full flex flex-col justify-between">
