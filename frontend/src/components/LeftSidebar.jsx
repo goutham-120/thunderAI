@@ -10,7 +10,8 @@ import {
   Cpu, 
   Database,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Radio
 } from 'lucide-react';
 
 export default function LeftSidebar({
@@ -26,6 +27,7 @@ export default function LeftSidebar({
         { id: 'live', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'spatial', label: 'Spatial Nowcast', icon: Map },
         { id: 'cells', label: 'Storm Cells', icon: CloudLightning },
+        { id: 'storm-tracking', label: 'Storm Tracking', icon: Radio },
         { id: 'alerts', label: 'CAP Alerts', icon: ShieldAlert },
       ]
     },
