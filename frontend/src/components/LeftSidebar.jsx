@@ -1,19 +1,19 @@
 import React from 'react';
 import { 
-  LayoutDashboard, 
-  Map, 
-  CloudLightning,
-  ShieldAlert, 
-  TrendingUp,
-  RotateCcw,
-  HelpCircle,
-  Cpu, 
-  FileText,
-  Database,
+  LayoutGrid, 
+  Layers, 
+  CloudHail,
+  Bell, 
+  BarChart3,
+  History,
+  FileSearch,
+  LineChart, 
+  SlidersHorizontal,
+  ClipboardCheck,
+  Server,
   ChevronLeft,
   ChevronRight,
-  Radio,
-  FlaskConical,
+  Crosshair,
   ShieldCheck,
   LogOut,
   User,
@@ -63,28 +63,28 @@ export default function LeftSidebar({
     {
       title: 'OPERATIONS',
       items: [
-        { id: 'live', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'spatial', label: 'Spatial Nowcast', icon: Map },
-        { id: 'cells', label: 'Storm Cells', icon: CloudLightning },
-        { id: 'storm-tracking', label: 'Storm Tracking', icon: Radio },
-        { id: 'alerts', label: 'CAP Alerts', icon: ShieldAlert },
+        { id: 'live', label: 'Dashboard', icon: LayoutGrid },
+        { id: 'spatial', label: 'Spatial Nowcast', icon: Layers },
+        { id: 'cells', label: 'Storm Cells', icon: CloudHail },
+        { id: 'storm-tracking', label: 'Storm Tracking', icon: Crosshair },
+        { id: 'alerts', label: 'CAP Alerts', icon: Bell },
       ]
     },
     {
       title: 'ANALYSIS & FORECASTING',
       items: [
-        { id: 'forecast', label: 'Forecast Matrix', icon: TrendingUp },
-        { id: 'replay', label: 'Historical Replay', icon: RotateCcw },
-        { id: 'explainability', label: 'Explainability (XAI)', icon: HelpCircle },
-        { id: 'model', label: 'Model Performance', icon: Cpu },
-        { id: 'whatif', label: 'What-If Scenario', icon: FlaskConical },
-        { id: 'reports', label: 'Reports & Validation', icon: FileText },
+        { id: 'forecast', label: 'Forecast Matrix', icon: BarChart3 },
+        { id: 'replay', label: 'Historical Replay', icon: History },
+        { id: 'explainability', label: 'Explainability (XAI)', icon: FileSearch },
+        { id: 'model', label: 'Model Performance', icon: LineChart },
+        { id: 'whatif', label: 'What-If Scenario', icon: SlidersHorizontal },
+        { id: 'reports', label: 'Reports & Validation', icon: ClipboardCheck },
       ]
     },
     {
       title: 'DATA',
       items: [
-        { id: 'datasources', label: 'Data Sources', icon: Database }
+        { id: 'datasources', label: 'Data Sources', icon: Server }
       ]
     }
   ];
