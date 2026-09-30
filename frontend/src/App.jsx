@@ -549,15 +549,6 @@ export default function App() {
                 setHorizonMin={setHorizonMin}
               />
 
-              {/* Status Footer */}
-              <DashboardStatusFooter
-                systemStatus={systemStatus}
-                forecastData={forecastData}
-                onOpenProvenance={() =>
-                  setIsProvenanceOpen(true)
-                }
-              />
-
             </div>
           )}
 

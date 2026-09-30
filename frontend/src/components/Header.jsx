@@ -450,43 +450,12 @@ export default function Header({
           </div>
         )}
 
-        {/* Operating Mode */}
-        <div
-          className={`flex items-center space-x-1.5 text-[10px] font-mono font-bold px-2.5 py-1 rounded-md border ${
-            dataMode === 'REAL'
-              ? 'bg-[#ECFDF5] text-[#047857] border-[#A7F3D0]'
-              : 'bg-[#FFFBEB] text-[#D97706] border-[#FEF3C7]'
-          }`}
-          title="Backend Ingestion Operating Mode"
-        >
-
-          <Activity className="w-3 h-3" />
-
-          <span>
-            MODE: {dataMode}
-          </span>
-
-        </div>
-
-        {/* Data Freshness */}
-        <div className="hidden sm:flex items-center space-x-1 text-xs text-[#5E82A6] font-mono bg-[#EEF6FB] px-2.5 py-1 rounded-md border border-[#D0E3F0]">
-
-          <span className="text-[10px] text-[#5E82A6]">
-            OBS:
-          </span>
-
-          <span className="font-semibold text-[#12324E]">
-            {obsTime}
-          </span>
-
-        </div>
-
         {/* Refresh */}
         {onRefresh && (
           <button
             onClick={onRefresh}
             disabled={isRefreshing}
-            className="text-xs font-mono text-[#12324E] hover:text-[#0284C7] bg-[#EEF6FB] hover:bg-[#E5F0F7] px-2.5 py-1 rounded-md border border-[#D0E3F0] transition-colors flex items-center gap-1.5 disabled:opacity-50"
+            className="text-xs font-mono text-[#12324E] hover:text-[#0284C7] bg-[#EEF6FB] hover:bg-[#E5F0F7] px-2.5 py-1 rounded-md border border-[#D0E3F0] transition-colors flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
             title="Fetch Fresh Telemetry"
           >
 
@@ -498,27 +467,8 @@ export default function Header({
               }`}
             />
 
-            <span className="hidden md:inline font-sans font-medium">
+            <span className="font-sans font-medium">
               Refresh
-            </span>
-
-          </button>
-        )}
-
-        {/* Data Provenance */}
-        {onOpenProvenance && (
-          <button
-            onClick={
-              onOpenProvenance
-            }
-            className="text-xs font-mono text-[#12324E] hover:text-[#0284C7] bg-[#EEF6FB] hover:bg-[#E5F0F7] px-2.5 py-1 rounded-md border border-[#D0E3F0] transition-colors flex items-center gap-1.5"
-            title="View Data Provenance Matrix"
-          >
-
-            <Database className="w-3.5 h-3.5 text-[#0284C7]" />
-
-            <span className="hidden md:inline font-sans font-medium">
-              Data Log
             </span>
 
           </button>
