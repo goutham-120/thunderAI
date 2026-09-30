@@ -11,9 +11,7 @@ import {
   FileText,
   Database,
   ChevronLeft,
-  ChevronRight,
-  Radio,
-  FileText
+  Radio
 } from 'lucide-react';
 
 export default function LeftSidebar({

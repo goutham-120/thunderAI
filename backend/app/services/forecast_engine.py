@@ -83,18 +83,6 @@ class ForecastEngine:
             heading = 160.0
             intensity = 0.95
             base_temp, base_rh, base_cape, base_press, base_wind, base_tpw = 26.5, 72.0, 1450.0, 1012.0, "SW 14 km/h", 44.0
-        elif lat is not None and lon is not None:
-            center = (float(lat), float(lon))
-            speed = 25.0
-            heading = 130.0
-            intensity = 1.0 + ((float(lat) % 5.0) * 0.04)
-            base_temp, base_rh, base_cape, base_press, base_wind, base_tpw = 28.5, 76.0, 1950.0, 1005.0, "SE 18 km/h", 50.0
-        elif min_lat is not None and max_lat is not None and min_lon is not None and max_lon is not None:
-            center = ((float(min_lat) + float(max_lat)) / 2.0, (float(min_lon) + float(max_lon)) / 2.0)
-            speed = 25.0
-            heading = 130.0
-            intensity = 1.05
-            base_temp, base_rh, base_cape, base_press, base_wind, base_tpw = 28.5, 76.0, 1950.0, 1005.0, "SE 18 km/h", 50.0
         elif region_name and region_name in REGION_COORDINATES:
             cfg = REGION_COORDINATES[region_name]
             center = cfg["center"]
@@ -102,8 +90,14 @@ class ForecastEngine:
             heading = cfg["heading"]
             intensity = cfg["intensity"]
             base_temp, base_rh, base_cape, base_press, base_wind, base_tpw = 29.0, 78.0, 1840.0, 1004.0, "SE 18 km/h", 52.0
+        elif min_lat is not None and max_lat is not None and min_lon is not None and max_lon is not None:
+            center = ((float(min_lat) + float(max_lat)) / 2.0, (float(min_lon) + float(max_lon)) / 2.0)
+            speed = 25.0
+            heading = 130.0
+            intensity = 1.05
+            base_temp, base_rh, base_cape, base_press, base_wind, base_tpw = 28.5, 76.0, 1950.0, 1005.0, "SE 18 km/h", 50.0
         else: # Default LIVE / Telangana
-            center = (18.1124, 79.0193)
+            center = (17.6185, 78.8380)  # Bhongir / Yadagirigutta storm center
             speed = 24.0
             heading = 135.0
             intensity = 1.05
