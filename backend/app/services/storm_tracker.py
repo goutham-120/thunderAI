@@ -33,8 +33,8 @@ class StormCellTracker:
         """
         Segments contiguous convective cores (dBZ >= 38.0) and generates tracked storm objects.
         """
-        # Threshold for active convective cell core
-        convective_mask = dbz_grid >= 38.0
+        # Threshold for active convective cell core (Standard SCIT / TITAN 35.0 dBZ threshold)
+        convective_mask = dbz_grid >= 35.0
         labeled_array, num_features = label(convective_mask)
 
         cells = []
@@ -51,7 +51,7 @@ class StormCellTracker:
         for feature_id in range(1, num_features + 1):
             cell_mask = (labeled_array == feature_id)
             pixel_count = int(np.sum(cell_mask))
-            if pixel_count < 8: # Minimum size to be considered a significant convective cell
+            if pixel_count < 4: # Minimum size (4 pixels = ~4 km²) to be considered a convective cluster
                 continue
 
             r_com, c_com = center_of_mass(cell_mask)

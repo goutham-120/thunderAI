@@ -146,6 +146,12 @@ export default function Header({
         'ConvLSTM neural network specifications & verification benchmarks'
     },
 
+    reports: {
+      title: 'Reports & Model Validation',
+      desc:
+        'Scientific verification metrics, dataset scope, and performance audit report'
+    },
+
     datasources: {
       title: 'Data Sources',
       desc:

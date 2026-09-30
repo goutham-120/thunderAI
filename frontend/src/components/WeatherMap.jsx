@@ -22,12 +22,14 @@ export default function WeatherMap({
   horizonMin,
   selectedLocation,
   onLocationSelect,
-  selectedRegion
+  selectedRegion,
+  baseMapStyle: parentBaseMapStyle
 }) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [baseMapStyle, setBaseMapStyle] = useState('map');
+  const [internalBaseMapStyle, setInternalBaseMapStyle] = useState('map');
+  const baseMapStyle = parentBaseMapStyle || internalBaseMapStyle;
 
   const currentRegion = REGION_CONFIGS[selectedRegion] || REGION_CONFIGS['Andhra Pradesh & Telangana'];
 
@@ -555,6 +557,55 @@ export default function WeatherMap({
       addSelectionLayers('selected-region-source', 'selected-region', '#0284C7');
       addSelectionLayers('selected-area-source', 'selected-area', '#0284C7');
 
+      // Target Point Selection Marker Source & Layers
+      map.addSource('selected-target-point-source', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      });
+
+      map.addLayer({
+        id: 'selected-target-point-ring',
+        type: 'circle',
+        source: 'selected-target-point-source',
+        paint: {
+          'circle-radius': 14,
+          'circle-color': '#0284C7',
+          'circle-opacity': 0.25,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#38BDF8'
+        }
+      });
+
+      map.addLayer({
+        id: 'selected-target-point-core',
+        type: 'circle',
+        source: 'selected-target-point-source',
+        paint: {
+          'circle-radius': 6,
+          'circle-color': '#DC2626',
+          'circle-stroke-width': 2.5,
+          'circle-stroke-color': '#FFFFFF'
+        }
+      });
+
+      map.addLayer({
+        id: 'selected-target-point-label',
+        type: 'symbol',
+        source: 'selected-target-point-source',
+        layout: {
+          'text-field': ['get', 'name'],
+          'text-size': 11,
+          'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+          'text-offset': [0.7, -0.7],
+          'text-anchor': 'left'
+        },
+        paint: {
+          'text-color': '#0F2942',
+          'text-halo-color': '#FFFFFF',
+          'text-halo-width': 3
+        }
+      });
+
       // Add Cities
       const cityFeatures = currentRegion.cities.map(c => ({
         type: 'Feature',
@@ -897,6 +948,51 @@ export default function WeatherMap({
 
     bringSelectionLayersToFront(map);
   }, [selectedRegion, mapLoaded]);
+
+  // Update Target Point Marker & Camera on selectedLocation change
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded || !selectedLocation) return;
+
+    const lat = parseFloat(selectedLocation.lat);
+    const lon = parseFloat(selectedLocation.lon);
+
+    if (!isNaN(lat) && !isNaN(lon)) {
+      const pointSource = map.getSource('selected-target-point-source');
+      if (pointSource) {
+        pointSource.setData({
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: {
+                name: `● ${selectedLocation.name || `${lat.toFixed(4)}°N, ${lon.toFixed(4)}°E`}`
+              },
+              geometry: {
+                type: 'Point',
+                coordinates: [lon, lat] // MapLibre takes [lon, lat]
+              }
+            }
+          ]
+        });
+      }
+
+      if (map.getLayer('selected-target-point-ring')) {
+        map.moveLayer('selected-target-point-ring');
+        map.moveLayer('selected-target-point-core');
+        map.moveLayer('selected-target-point-label');
+      }
+
+      // Fly map camera to selected point if user searched or clicked
+      if (selectedLocation.isUserSearch) {
+        map.flyTo({
+          center: [lon, lat],
+          zoom: Math.max(map.getZoom(), 8.5),
+          essential: true
+        });
+      }
+    }
+  }, [selectedLocation, mapLoaded]);
 
 
 

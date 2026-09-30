@@ -11,7 +11,8 @@ import {
   Database,
   ChevronLeft,
   ChevronRight,
-  Radio
+  Radio,
+  FileText
 } from 'lucide-react';
 
 export default function LeftSidebar({
@@ -38,6 +39,7 @@ export default function LeftSidebar({
         { id: 'replay', label: 'Historical Replay', icon: RotateCcw },
         { id: 'explainability', label: 'Explainability (XAI)', icon: HelpCircle },
         { id: 'model', label: 'Model Performance', icon: Cpu },
+        { id: 'reports', label: 'Reports & Validation', icon: FileText },
       ]
     },
     {
