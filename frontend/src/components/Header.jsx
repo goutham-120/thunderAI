@@ -203,10 +203,15 @@ export default function Header({
 
         <button
           onClick={onToggleSidebar}
-          className="p-2 rounded-lg bg-[#EEF6FB] hover:bg-[#E5F0F7] border border-[#D0E3F0] text-[#0B3552] transition-colors flex items-center justify-center shadow-2xs"
-          title={isCollapsed ? "Expand Sidebar (Slide Out)" : "Collapse Sidebar (Slide In)"}
+          aria-label={isCollapsed ? "Open navigation" : "Close navigation"}
+          className="p-2 rounded-lg bg-[#EEF6FB] hover:bg-[#E5F0F7] border border-[#D0E3F0] text-[#0B3552] transition-colors flex items-center justify-center shadow-2xs cursor-pointer"
+          title={isCollapsed ? "Open navigation" : "Close navigation"}
         >
-          <Menu className="w-5 h-5 text-[#0284C7]" />
+          {isCollapsed ? (
+            <Menu className="w-5 h-5 text-[#0284C7]" />
+          ) : (
+            <X className="w-5 h-5 text-[#0284C7]" />
+          )}
         </button>
 
         <div>

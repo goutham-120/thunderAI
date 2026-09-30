@@ -16,8 +16,8 @@
 
 @layer base {
   body {
-    background-color: #EAF0F6;
-    color: #12324E;
+    background-color: #F3F8FC;
+    color: #0E2C45;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
@@ -26,18 +26,13 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    color: #12324E;
+    color: #0E2C45;
   }
 }
 
-/* Atmospheric subtle workstation background */
+/* Atmospheric workstation uniform background canvas */
 .bg-atmospheric {
-  background-color: #EAF0F6;
-  background-image: 
-    radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.15) 0%, rgba(234, 240, 246, 0.4) 60%, rgba(94, 130, 166, 0.15) 100%),
-    linear-gradient(to right, rgba(94, 130, 166, 0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(94, 130, 166, 0.1) 1px, transparent 1px);
-  background-size: 100% 100%, 32px 32px, 32px 32px;
+  background-color: #F3F8FC;
 }
 
 /* Clean Custom Workstation Scrollbars */

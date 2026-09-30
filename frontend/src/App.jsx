@@ -29,9 +29,20 @@ import indiaStatesData from './data/india_states.json';
 import api from './services/api';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('live');
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [horizonMin, setHorizonMin] = useState(30);
+
+  const handleToggleSidebar = () => {
+    if (window.innerWidth < 768) {
+      setIsMobileOpen((prev) => !prev);
+    } else {
+      setIsCollapsed((prev) => !prev);
+    }
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 320);
+  };
 
   const [selectedRegion, setSelectedRegion] = useState('Telangana');
 
@@ -332,7 +343,7 @@ export default function App() {
         selectedLocation={selectedLocation}
         onRefresh={handleManualRefresh}
         isRefreshing={isRefreshing}
-        onToggleSidebar={() => setIsCollapsed(!isCollapsed)}
+        onToggleSidebar={handleToggleSidebar}
         isCollapsed={isCollapsed}
       />
 
@@ -451,6 +462,8 @@ export default function App() {
           setActiveTab={setActiveTab}
           isCollapsed={isCollapsed}
           setIsCollapsed={setIsCollapsed}
+          isMobileOpen={isMobileOpen}
+          setIsMobileOpen={setIsMobileOpen}
         />
 
         {/* Dynamic Page Views */}
