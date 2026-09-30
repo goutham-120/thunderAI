@@ -123,6 +123,10 @@ export const api = {
   },
   getRadarAlignment: (roiName = 'NATIONAL') => 
     fetchJson(`/data/radar/alignment?roi_name=${encodeURIComponent(roiName)}`),
+
+  // What-If Scenario (POST — isolated from live forecast)
+  postWhatIf: (body) =>
+    fetchJson('/forecast/what-if', { method: 'POST', body: JSON.stringify(body) }),
 };
 
 export default api;

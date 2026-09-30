@@ -15,6 +15,7 @@ import ExplainabilityView from './components/ExplainabilityView';
 import ModelView from './components/ModelView';
 import DataSourcesView from './components/DataSourcesView';
 import StormTrackingPage from './components/StormTrackingPage';
+import WhatIfView from './components/WhatIfView';
 import DataProvenanceModal from './components/DataProvenanceModal';
 import HistoricalReplayBar from './components/HistoricalReplayBar';
 import AreaIntelligencePanel from './components/AreaIntelligencePanel';
@@ -675,6 +676,11 @@ export default function App() {
               systemStatus={systemStatus}
               onRefreshStatus={fetchSystemTelemetry}
             />
+          )}
+
+          {/* 10. WHAT-IF SCENARIO PAGE */}
+          {activeTab === 'whatif' && (
+            <WhatIfView />
           )}
 
         </main>
