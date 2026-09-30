@@ -24,13 +24,15 @@ export default function WeatherMap({
   selectedLocation,
   onLocationSelect,
   selectedRegion,
-  baseMapStyle: parentBaseMapStyle
+  baseMapStyle: parentBaseMapStyle,
+  setBaseMapStyle: parentSetBaseMapStyle
 }) {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [internalBaseMapStyle, setInternalBaseMapStyle] = useState('map');
   const baseMapStyle = parentBaseMapStyle || internalBaseMapStyle;
+  const setBaseMapStyle = parentSetBaseMapStyle || setInternalBaseMapStyle;
   const [liveRadarData, setLiveRadarData] = useState(null);
 
   useEffect(() => {

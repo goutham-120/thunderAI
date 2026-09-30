@@ -199,6 +199,7 @@ export default function SpatialNowcastPage({
               onLocationSelect={setSelectedLocation}
               selectedRegion={selectedRegion}
               baseMapStyle={baseMapStyle}
+              setBaseMapStyle={setBaseMapStyle}
             />
 
             {/* Top-Right Map Target Status Badge */}
