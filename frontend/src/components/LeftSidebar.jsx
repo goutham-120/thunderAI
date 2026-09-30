@@ -12,8 +12,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Radio,
-  FlaskConical
+  FlaskConical,
+  ShieldCheck,
+  LogOut,
+  User
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function LeftSidebar({
   activeTab,
@@ -21,7 +25,39 @@ export default function LeftSidebar({
   isCollapsed,
   setIsCollapsed
 }) {
-  const navSections = [
+  const { user, logout } = useAuth();
+  const role = user?.role || 'USER';
+
+  const getRoleLabel = (r) => {
+    switch (r) {
+      case 'ADMIN':
+        return 'Chief Admin';
+      case 'WEATHER_FORECASTER':
+        return 'Weather Forecaster';
+      case 'ELECTRICAL_INFRASTRUCTURE':
+        return 'Electrical & Infra';
+      case 'USER':
+        return 'Standard User';
+      default:
+        return r;
+    }
+  };
+
+  // Navigation permissions:
+  // All meteorological and operational tabs are available for all authenticated users
+  // Only the 'admin' tab is restricted exclusively to ADMIN
+  const isAllowed = (id) => {
+    if (id === 'admin') return role === 'ADMIN';
+    return true;
+  };
+
+  const rawNavSections = [
+    ...(role === 'ADMIN' ? [{
+      title: 'ADMINISTRATION',
+      items: [
+        { id: 'admin', label: 'Admin & Approvals', icon: ShieldCheck }
+      ]
+    }] : []),
     {
       title: 'OPERATIONS',
       items: [
@@ -49,6 +85,13 @@ export default function LeftSidebar({
       ]
     }
   ];
+
+  const navSections = rawNavSections
+    .map(section => ({
+      ...section,
+      items: section.items.filter(item => isAllowed(item.id))
+    }))
+    .filter(section => section.items.length > 0);
 
   return (
     <aside
@@ -115,6 +158,56 @@ export default function LeftSidebar({
             </div>
           ))}
         </div>
+
+        {/* User Account Profile & Logout (Below Data Sources) */}
+        {user && (
+          <div className="pt-3 border-t border-[#D0E3F0] mt-2">
+            {!isCollapsed ? (
+              <div className="bg-[#EEF6FB] border border-[#D0E3F0] rounded-xl p-2.5 space-y-2.5">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#0284C7] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs font-mono">
+                    {user.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs font-bold text-[#0F2942] truncate font-sans" title={user.full_name}>
+                      {user.full_name || 'VAJRA User'}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-[#0284C7]/15 text-[#0284C7] border border-[#0284C7]/20 uppercase">
+                        {getRoleLabel(user.role)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={logout}
+                  className="w-full flex items-center justify-center space-x-1.5 py-1.5 px-2 rounded-lg text-xs font-sans text-rose-700 bg-white hover:bg-rose-50 border border-rose-200 transition-colors font-semibold shadow-2xs cursor-pointer"
+                  title={`Sign out of ${user.email}`}
+                >
+                  <LogOut className="w-3.5 h-3.5 text-rose-600" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center space-y-2 pt-1">
+                <div
+                  className="w-8 h-8 rounded-lg bg-[#0284C7] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs font-mono cursor-default"
+                  title={`${user.full_name} (${getRoleLabel(user.role)})`}
+                >
+                  {user.full_name ? user.full_name.charAt(0).toUpperCase() : 'A'}
+                </div>
+                <button
+                  onClick={logout}
+                  className="p-1.5 rounded-lg text-rose-700 hover:bg-rose-100 transition-colors cursor-pointer"
+                  title="Logout"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Footer info */}

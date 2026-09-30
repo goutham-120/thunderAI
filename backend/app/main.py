@@ -33,7 +33,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from app.auth import init_db, auth_router, admin_router
+
 # Register API Routers
+app.include_router(auth_router)
+app.include_router(admin_router)
 app.include_router(forecast_router)
 app.include_router(storms_router)
 app.include_router(alerts_router)
@@ -45,6 +49,10 @@ app.include_router(weather_router)
 app.include_router(mosdac_router)
 app.include_router(radar_router)
 app.include_router(lightning_router)
+
+@app.on_event("startup")
+def on_startup():
+    init_db()
 
 @app.get("/")
 def root():
