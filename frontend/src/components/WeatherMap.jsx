@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { REGION_CONFIGS } from './WeatherMapConfig';
 import indiaStatesData from '../data/india_states.json';
+import api from '../services/api';
 
 export default function WeatherMap({
   forecastData,
@@ -30,6 +31,19 @@ export default function WeatherMap({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [internalBaseMapStyle, setInternalBaseMapStyle] = useState('map');
   const baseMapStyle = parentBaseMapStyle || internalBaseMapStyle;
+  const [liveRadarData, setLiveRadarData] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    api.getLiveRadarStream().then(res => {
+      if (isMounted && res?.tile_url_template) {
+        setLiveRadarData(res);
+      }
+    }).catch(err => {
+      console.warn('[WeatherMap] Live radar stream unavailable:', err);
+    });
+    return () => { isMounted = false; };
+  }, []);
 
   const currentRegion = REGION_CONFIGS[selectedRegion] || REGION_CONFIGS['Andhra Pradesh & Telangana'];
 
@@ -1026,28 +1040,51 @@ export default function WeatherMap({
       [b.minLon, b.minLat]
     ];
 
-    // 1. Radar Layer
-    const radarDataUrl = generateRadarImageDataUrl(horizonMin);
-    if (map.getSource('radar-source')) {
-      map.removeLayer('radar-layer');
-      map.removeSource('radar-source');
-    }
+    const safeRemove = (layerId, sourceId) => {
+      if (map.getLayer(layerId)) {
+        try { map.removeLayer(layerId); } catch (e) {}
+      }
+      if (map.getSource(sourceId)) {
+        try { map.removeSource(sourceId); } catch (e) {}
+      }
+    };
+
+    const getSafeBefore = (preferred) => {
+      if (preferred && map.getLayer(preferred)) return preferred;
+      if (map.getLayer('boundaries-layer')) return 'boundaries-layer';
+      return undefined;
+    };
+
+    // 1. Radar Layer (Live RainViewer Doppler Composite at Now, AI Extrapolation at +T)
+    safeRemove('radar-layer', 'radar-source');
     if (activeLayers.radar) {
-      map.addSource('radar-source', { type: 'image', url: radarDataUrl, coordinates });
-      map.addLayer({
-        id: 'radar-layer',
-        type: 'raster',
-        source: 'radar-source',
-        paint: { 'raster-opacity': 0.85, 'raster-resampling': 'linear' }
-      }, 'boundaries-layer');
+      if (liveRadarData?.tile_url_template && horizonMin === 0) {
+        map.addSource('radar-source', {
+          type: 'raster',
+          tiles: [liveRadarData.tile_url_template],
+          tileSize: 256
+        });
+        map.addLayer({
+          id: 'radar-layer',
+          type: 'raster',
+          source: 'radar-source',
+          paint: { 'raster-opacity': 0.85 }
+        }, getSafeBefore('boundaries-layer'));
+      } else {
+        const radarDataUrl = generateRadarImageDataUrl(horizonMin);
+        map.addSource('radar-source', { type: 'image', url: radarDataUrl, coordinates });
+        map.addLayer({
+          id: 'radar-layer',
+          type: 'raster',
+          source: 'radar-source',
+          paint: { 'raster-opacity': 0.85, 'raster-resampling': 'linear' }
+        }, getSafeBefore('boundaries-layer'));
+      }
     }
 
     // 2. Satellite Layer
     const satDataUrl = generateSatelliteImageDataUrl();
-    if (map.getSource('satellite-ir-source')) {
-      map.removeLayer('satellite-ir-layer');
-      map.removeSource('satellite-ir-source');
-    }
+    safeRemove('satellite-ir-layer', 'satellite-ir-source');
     if (activeLayers.satellite) {
       map.addSource('satellite-ir-source', { type: 'image', url: satDataUrl, coordinates });
       map.addLayer({
@@ -1055,15 +1092,12 @@ export default function WeatherMap({
         type: 'raster',
         source: 'satellite-ir-source',
         paint: { 'raster-opacity': 0.65, 'raster-resampling': 'linear' }
-      }, 'boundaries-layer');
+      }, getSafeBefore('boundaries-layer'));
     }
 
     // 3. AI Risk Layer
     const riskDataUrl = generateAIRiskImageDataUrl(horizonMin);
-    if (map.getSource('ai-risk-source')) {
-      map.removeLayer('ai-risk-layer');
-      map.removeSource('ai-risk-source');
-    }
+    safeRemove('ai-risk-layer', 'ai-risk-source');
     if (activeLayers.aiRisk) {
       map.addSource('ai-risk-source', { type: 'image', url: riskDataUrl, coordinates });
       map.addLayer({
@@ -1071,15 +1105,12 @@ export default function WeatherMap({
         type: 'raster',
         source: 'ai-risk-source',
         paint: { 'raster-opacity': 0.6, 'raster-resampling': 'linear' }
-      }, 'radar-layer');
+      }, getSafeBefore('radar-layer'));
     }
 
     // 4. Lightning Risk Layer
     const lightRiskDataUrl = generateLightningRiskImageDataUrl(horizonMin);
-    if (map.getSource('lightning-risk-source')) {
-      map.removeLayer('lightning-risk-layer');
-      map.removeSource('lightning-risk-source');
-    }
+    safeRemove('lightning-risk-layer', 'lightning-risk-source');
     if (activeLayers.lightningRisk) {
       map.addSource('lightning-risk-source', { type: 'image', url: lightRiskDataUrl, coordinates });
       map.addLayer({
@@ -1087,15 +1118,12 @@ export default function WeatherMap({
         type: 'raster',
         source: 'lightning-risk-source',
         paint: { 'raster-opacity': 0.7, 'raster-resampling': 'linear' }
-      }, 'radar-layer');
+      }, getSafeBefore('radar-layer'));
     }
 
     // 5. Rainfall Isohyets
     const rainDataUrl = generateRainfallImageDataUrl(horizonMin);
-    if (map.getSource('rainfall-source')) {
-      map.removeLayer('rainfall-layer');
-      map.removeSource('rainfall-source');
-    }
+    safeRemove('rainfall-layer', 'rainfall-source');
     if (activeLayers.rainfall) {
       map.addSource('rainfall-source', { type: 'image', url: rainDataUrl, coordinates });
       map.addLayer({
@@ -1103,15 +1131,12 @@ export default function WeatherMap({
         type: 'raster',
         source: 'rainfall-source',
         paint: { 'raster-opacity': 0.75, 'raster-resampling': 'linear' }
-      }, 'boundaries-layer');
+      }, getSafeBefore('boundaries-layer'));
     }
 
     // 6. Cloud Top Temp
     const cloudTopDataUrl = generateCloudTopTempImageDataUrl();
-    if (map.getSource('cloud-top-source')) {
-      map.removeLayer('cloud-top-layer');
-      map.removeSource('cloud-top-source');
-    }
+    safeRemove('cloud-top-layer', 'cloud-top-source');
     if (activeLayers.cloudTop) {
       map.addSource('cloud-top-source', { type: 'image', url: cloudTopDataUrl, coordinates });
       map.addLayer({
@@ -1119,15 +1144,12 @@ export default function WeatherMap({
         type: 'raster',
         source: 'cloud-top-source',
         paint: { 'raster-opacity': 0.7, 'raster-resampling': 'linear' }
-      }, 'boundaries-layer');
+      }, getSafeBefore('boundaries-layer'));
     }
 
     // 7. CAPE Energy
     const capeDataUrl = generateCAPEImageDataUrl();
-    if (map.getSource('cape-source')) {
-      map.removeLayer('cape-layer');
-      map.removeSource('cape-source');
-    }
+    safeRemove('cape-layer', 'cape-source');
     if (activeLayers.cape) {
       map.addSource('cape-source', { type: 'image', url: capeDataUrl, coordinates });
       map.addLayer({
@@ -1135,7 +1157,7 @@ export default function WeatherMap({
         type: 'raster',
         source: 'cape-source',
         paint: { 'raster-opacity': 0.5, 'raster-resampling': 'linear' }
-      }, 'boundaries-layer');
+      }, getSafeBefore('boundaries-layer'));
     }
 
     // 8. Wind Vectors

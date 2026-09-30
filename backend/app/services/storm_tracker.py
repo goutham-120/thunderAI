@@ -121,6 +121,10 @@ class StormCellTracker:
             poly_coords.append(poly_coords[0]) # Close loop
 
             cell_id = f"CELL-{chr(64 + len(cells) + 1)}"
+            # Calculate physical VIL (Vertically Integrated Liquid) and Echo Tops
+            vil_val = round(max(5.0, min(85.0, 3.44e-3 * (10.0 ** (max_dbz / 17.5)))), 1)
+            echo_top = round(max(8.0, min(16.5, 4.0 + (max_dbz / 4.5))), 1)
+
             cells.append({
                 "cell_id": cell_id,
                 "name": f"Storm Cell {cell_id[-1]} ({lifecycle.title()})",
@@ -140,6 +144,8 @@ class StormCellTracker:
                 "area_km2": round(pixel_count * 1.0, 1),
                 "max_dbz": round(max_dbz, 1),
                 "avg_dbz": round(avg_dbz, 1),
+                "vil_kgm2": vil_val,
+                "echo_top_km": echo_top,
                 "min_cloud_top_c": min_cloud_temp_c,
                 "lightning_flash_rate_min": round(total_flash_rate, 1),
                 "flash_rate_accel_min2": flash_rate_accel,

@@ -5,10 +5,11 @@ export default function NowcastSummaryBar({ forecastData }) {
   const summary = forecastData?.summary_metrics || {};
   const risk = forecastData?.convective_risk || {};
 
-  const thunderProb = summary.max_thunderstorm_prob_percent ?? summary.max_thunderstorm_prob_pct ?? risk.p_thunderstorm_percent ?? null;
-  const lightningProb = summary.max_lightning_prob_percent ?? summary.max_lightning_prob_pct ?? risk.p_lightning_percent ?? null;
-  const maxRain = summary.max_rain_intensity_mmh ?? summary.max_rainfall_rate_mmh ?? risk.max_rainfall_rate_mmh ?? null;
-  const maxDbz = summary.peak_radar_dbz ?? summary.max_reflectivity_dbz ?? risk.max_reflectivity_dbz ?? null;
+  const thunderProb = summary.max_thunderstorm_prob_pct ?? summary.max_thunderstorm_prob_percent ?? risk.p_thunderstorm_percent ?? null;
+  const lightningProb = summary.max_lightning_prob_pct ?? summary.max_lightning_prob_percent ?? risk.p_lightning_percent ?? null;
+  const maxRain = summary.max_rainfall_rate_mmh ?? summary.max_rain_intensity_mmh ?? risk.max_rainfall_rate_mmh ?? null;
+  const maxDbz = summary.max_reflectivity_dbz ?? summary.peak_radar_dbz ?? risk.max_reflectivity_dbz ?? null;
+
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono select-none">

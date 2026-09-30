@@ -134,7 +134,7 @@ class ForecastEngine:
         selected_pred = pred_dict.get(horizon_min, pred_dict[30])
 
         # 3. Detect and track convective storm cells
-        active_cells = storm_tracker.detect_and_track_cells(
+        raw_cells = storm_tracker.detect_and_track_cells(
             dbz_grid=last_frame[:, :, 0],
             sat_grid=last_frame[:, :, 2],
             lightning_grid=last_frame[:, :, 4],
@@ -142,6 +142,21 @@ class ForecastEngine:
             storm_speed_kmh=speed,
             storm_heading_deg=heading
         )
+
+        # Update active cells position and intensity to the selected forecast horizon
+        active_cells = []
+        lead_decay = max(0.4, 1.0 - (horizon_min / 240.0))
+        for cell in raw_cells:
+            cell_copy = dict(cell)
+            proj = next((p for p in cell.get("trajectory", []) if p["horizon_min"] == horizon_min), None)
+            if proj:
+                cell_copy["lat"] = proj["lat"]
+                cell_copy["lon"] = proj["lon"]
+                cell_copy["uncertainty_radius_km"] = proj.get("uncertainty_radius_km", proj.get("uncertainty_km", 5.0))
+            cell_copy["max_dbz"] = round(float(cell.get("max_dbz", 55.0)) * lead_decay, 1)
+            cell_copy["vil_kgm2"] = round(float(cell.get("vil_kgm2", 42.0)) * lead_decay, 1)
+            cell_copy["echo_top_km"] = round(float(cell.get("echo_top_km", 13.5)) * lead_decay, 1)
+            active_cells.append(cell_copy)
 
         # 4. Generate CAP Emergency Alerts
         cap_alerts = cap_engine.generate_cap_alerts(active_cells)
@@ -208,7 +223,7 @@ class ForecastEngine:
                 cape_jkg=base_cape,
                 cin_jkg=25.0,
                 wind_shear_kts=22.0,
-                lightning_rate=top_cell["lightning_flash_rate_min"]
+                lightning_rate=top_cell["lightning_flash_rate_min"] * lead_decay
             )
         else:
             xai_explanation = xai_engine.explain_cell_or_point(
@@ -220,9 +235,15 @@ class ForecastEngine:
         p_thunder_grid = np.round(selected_pred["p_thunderstorm"][::2, ::2], 3).tolist()
         p_lightning_grid = np.round(selected_pred["p_lightning"][::2, ::2], 3).tolist()
         rainfall_grid = np.round(selected_pred["rainfall_mmh"][::2, ::2], 1).tolist()
-        radar_dbz_grid = np.round(last_frame[::2, ::2, 0], 1).tolist()
-        sat_tir_grid = np.round(last_frame[::2, ::2, 2], 1).tolist()
-        lightning_density_grid = np.round(last_frame[::2, ::2, 4], 2).tolist()
+        radar_dbz_grid = np.round(selected_pred["pred_dbz"][::2, ::2], 1).tolist()
+
+        # Advect and decay satellite and lightning density layers for the horizon
+        shift_x = int(round((speed / 60.0) * np.sin(np.radians(heading)) * horizon_min))
+        shift_y = int(round((speed / 60.0) * np.cos(np.radians(heading)) * horizon_min))
+        sat_advected = np.roll(np.roll(last_frame[:, :, 2], shift_y, axis=0), shift_x, axis=1)
+        light_advected = np.roll(np.roll(last_frame[:, :, 4], shift_y, axis=0), shift_x, axis=1) * lead_decay
+        sat_tir_grid = np.round(sat_advected[::2, ::2], 1).tolist()
+        lightning_density_grid = np.round(light_advected[::2, ::2], 2).tolist()
 
         now_dt = datetime.now(timezone.utc)
         obs_iso = cube_data.get("observation_timestamp") or now_dt.isoformat()

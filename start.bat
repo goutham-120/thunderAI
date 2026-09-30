@@ -5,8 +5,8 @@ echo  SIH 2026 Problem Statement 26072 - MoES / IMD
 echo ================================================================
 echo.
 
-echo [1/2] Starting FastAPI Backend on http://localhost:8008 ...
-start "VAJRA-AI Backend" cmd /k "cd backend && set PYTHONPATH=. && python -m uvicorn app.main:app --host 127.0.0.1 --port 8008 --reload"
+echo [1/2] Starting FastAPI Backend on http://localhost:8000 ...
+start "VAJRA-AI Backend" cmd /k "cd backend && set PYTHONPATH=. && python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload"
 
 timeout /t 3 /nobreak > nul
 
@@ -17,6 +17,6 @@ echo.
 echo ================================================================
 echo  VAJRA-AI is launching!
 echo  Frontend: http://localhost:5123
-echo  Backend API Docs: http://localhost:8008/docs
+echo  Backend API Docs: http://localhost:8000/docs
 echo ================================================================
 pause

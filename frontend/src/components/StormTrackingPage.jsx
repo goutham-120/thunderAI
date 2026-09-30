@@ -217,7 +217,7 @@ export default function StormTrackingPage() {
             <p className="font-semibold text-sm text-red-300">Unable to load storm data</p>
             <p className="text-xs text-red-400/80 font-sans mt-0.5">{errorMsg}</p>
             <p className="text-xs text-red-500/70 font-sans mt-1">
-              Check that the FastAPI backend is running on port 8008.
+              Check that the FastAPI backend is running on port 8000.
             </p>
           </div>
         </div>

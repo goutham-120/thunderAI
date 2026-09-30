@@ -136,3 +136,13 @@ def get_satellite_radar_alignment(roi_name: str = Query("NATIONAL", description=
     Exposes spatial overlap and temporal matching diagnostics between INSAT-3DS satellite and Cherrapunji DWR radar.
     """
     return data_alignment.match_satellite_and_radar_sequences(roi_name=roi_name)
+
+@router.get("/live-stream")
+def get_live_radar_stream():
+    """
+    Returns real-time open Doppler radar stream metadata and MapLibre tile schema.
+    Zero authentication keys required.
+    """
+    from app.services.live_open_streams import live_open_streams
+    return live_open_streams.get_live_radar_metadata()
+

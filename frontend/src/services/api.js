@@ -1,8 +1,7 @@
 /**
  * VAJRA AI - Centralized Backend API Client Service
  */
-
-const API_BASE = 'http://localhost:8008/api';
+const API_BASE = import.meta.env?.VITE_API_BASE || 'http://localhost:8000/api';
 
 /**
  * Helper wrapper for fetch with standard JSON error handling & fallback
@@ -123,6 +122,7 @@ export const api = {
   },
   getRadarAlignment: (roiName = 'NATIONAL') => 
     fetchJson(`/data/radar/alignment?roi_name=${encodeURIComponent(roiName)}`),
+  getLiveRadarStream: () => fetchJson('/data/radar/live-stream'),
 };
 
 export default api;

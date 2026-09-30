@@ -16,10 +16,10 @@ export default function RightPanel({
   summaryMetrics,
   selectedLocation
 }) {
-  const pThunder = summaryMetrics?.max_thunderstorm_prob_percent ?? xaiData?.p_thunderstorm_percent ?? 87.0;
-  const pLightning = summaryMetrics?.max_lightning_prob_percent ?? xaiData?.p_lightning_percent ?? 92.0;
-  const maxRain = summaryMetrics?.max_rain_intensity_mmh ?? 45.0;
-  const peakDbz = summaryMetrics?.peak_radar_dbz ?? 58.0;
+  const pThunder = summaryMetrics?.max_thunderstorm_prob_percent ?? summaryMetrics?.max_thunderstorm_prob_pct ?? xaiData?.p_thunderstorm_percent ?? 87.0;
+  const pLightning = summaryMetrics?.max_lightning_prob_percent ?? summaryMetrics?.max_lightning_prob_pct ?? xaiData?.p_lightning_percent ?? 92.0;
+  const maxRain = summaryMetrics?.max_rain_intensity_mmh ?? summaryMetrics?.max_rainfall_rate_mmh ?? 45.0;
+  const peakDbz = summaryMetrics?.peak_radar_dbz ?? summaryMetrics?.max_reflectivity_dbz ?? 58.0;
   const confidence = summaryMetrics?.system_confidence_percent ?? 88.5;
 
   const drivers = xaiData?.drivers || [
