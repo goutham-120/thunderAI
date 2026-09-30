@@ -8,6 +8,7 @@ import {
   RotateCcw,
   HelpCircle,
   Cpu, 
+  FileText,
   Database,
   ChevronLeft,
   ChevronRight,
