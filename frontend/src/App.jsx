@@ -29,6 +29,7 @@ import indiaStatesData from './data/india_states.json';
 import api from './services/api';
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState('live');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [horizonMin, setHorizonMin] = useState(30);
