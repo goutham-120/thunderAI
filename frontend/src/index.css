@@ -3,6 +3,17 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-navy: #0B3552;
+  --color-navy-dark: #0E2C45;
+  --color-ocean: #0C4F78;
+  --color-cyan: #19BCE8;
+  --color-background: #F3F8FC;
+  --color-white: #FFFFFF;
+  --color-border: #E5EAF0;
+  --color-teal: #159C83;
+}
+
 @layer base {
   body {
     background-color: #EAF0F6;
